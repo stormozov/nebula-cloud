@@ -31,6 +31,23 @@ dev = [
     "factory-boy>=3.3.0",
 ]
 
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["*"]
+exclude = [
+    "media",
+    "staticfiles",
+    "static",
+    "node_modules",
+    ".venv",
+    "venv",
+    "__pycache__",
+    "migrations",
+    "*.migrations",
+    "tests",
+    "*.tests",
+]
+
 [tool.black]
 line-length = 100
 target-version = ["py312"]
