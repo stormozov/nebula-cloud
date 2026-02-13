@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     # Third-party apps
     "corsheaders",
     "rest_framework",
+    # Local apps
+    "users",
 ]
 
 MIDDLEWARE = [
@@ -94,6 +96,14 @@ DATABASES = {
         "PORT": env("DB_PORT", default="5432"),
     }
 }
+
+# Set a custom user model
+AUTH_USER_MODEL = "users.UserAccount"
+
+# Authentication backends
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+]
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
