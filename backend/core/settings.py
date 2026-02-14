@@ -184,6 +184,41 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+# File upload settings
+MAX_UPLOAD_SIZE = 100 * 1024 * 1024  # 100 MB
+ALLOWED_FILE_EXTENSIONS = [
+    "pdf",
+    "doc",
+    "docx",
+    "xls",
+    "xlsx",
+    "ppt",
+    "pptx",
+    "jpg",
+    "jpeg",
+    "png",
+    "gif",
+    "bmp",
+    "svg",
+    "txt",
+    "rtf",
+    "csv",
+    "mp3",
+    "wav",
+    "mp4",
+    "avi",
+    "mov",
+    "mkv",
+    "zip",
+    "rar",
+    "7z",
+    "tar",
+    "gz",
+]
+
+# Storage settings
+STORAGE_BASE_PATH = os.getenv("STORAGE_BASE_PATH", "storage")
+
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
