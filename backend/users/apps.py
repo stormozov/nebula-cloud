@@ -11,3 +11,7 @@ class UsersConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "users"
     verbose_name = "Пользователи"
+
+    def ready(self):
+        """Register signals for users app."""
+        import users.signals
