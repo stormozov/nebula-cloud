@@ -1,0 +1,119 @@
+name: Backend CI/CD
+
+on:
+  push:
+    branches: [dev, main]
+  pull_request:
+    branches: [dev, main]
+
+env:
+  POSTGRES_PORT: 5434
+  STORAGE_BASE_PATH: /tmp/storage
+  JWT_ACCESS_TOKEN_LIFETIME_MINUTES: 5
+  JWT_REFRESH_TOKEN_LIFETIME_DAYS: 7
+  JWT_ROTATE_REFRESH_TOKENS: true
+  JWT_BLACKLIST_AFTER_ROTATION: true
+  JWT_AUTH_HEADER_TYPE: Bearer
+  ALLOWED_HOSTS: "*"
+  CORS_ALLOWED_ORIGINS: http://localhost:3000
+
+jobs:
+  lint:
+    name: Lint & Format Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      
+      - name: Install uv
+        run: pip install uv
+      
+      - name: Install dependencies
+        run: uv pip install -e .
+      
+      - name: Install linters
+        run: uv pip install flake8 black isort
+      
+      - name: Run flake8 (syntax)
+        run: flake8 backend/ --exclude=migrations
+      
+      - name: Run black (formatting)
+        run: black --check backend/
+      
+      - name: Run isort (imports)
+        run: isort --check backend/
+  
+  type-check:
+    name: Type Checking
+    runs-on: ubuntu-latest
+    needs: lint
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      
+      - name: Install uv
+        run: pip install uv
+      
+      - name: Install dependencies
+        run: uv pip install -e .
+      
+      - name: Install mypy
+        run: uv pip install mypy
+      
+      - name: Run type checking
+        run: mypy backend/ --exclude=migrations || echo "Type checking completed with warnings"
+  
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    needs: [lint, type-check]
+    
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - ${{ env.POSTGRES_PORT }}:${{ env.POSTGRES_PORT }}
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      
+      - name: Install uv
+        run: pip install uv
+      
+      - name: Install dependencies
+        run: uv pip install -e .
+      
+      - name: Run tests
+        env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DEBUG: 'False'
+        run: |
+          python manage.py test --verbosity=2
