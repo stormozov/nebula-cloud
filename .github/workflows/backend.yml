@@ -24,7 +24,7 @@ jobs:
         run: pip install uv
       
       - name: Install dependencies
-        run: uv pip install -e . --system
+        run: uv pip install -e ./backend --system
       
       - name: Install linters
         run: uv pip install flake8 black isort --system
@@ -56,7 +56,7 @@ jobs:
         run: pip install uv
       
       - name: Install dependencies
-        run: uv pip install -e . --system
+        run: uv pip install -e ./backend --system
       
       - name: Install mypy
         run: uv pip install mypy --system
@@ -97,7 +97,7 @@ jobs:
         run: pip install uv
       
       - name: Install dependencies
-        run: uv pip install -e . --system  # ← Добавлен флаг --system
+        run: uv pip install -e ./backend --system
       
       - name: Create storage directory
         run: mkdir -p /tmp/storage
@@ -116,4 +116,5 @@ jobs:
           ALLOWED_HOSTS: '*'
           CORS_ALLOWED_ORIGINS: 'http://localhost:3000'
         run: |
+          cd backend
           python manage.py test --verbosity=2
