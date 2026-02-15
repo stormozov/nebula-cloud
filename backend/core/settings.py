@@ -17,6 +17,8 @@ from pathlib import Path
 # Read environment variables from .env file
 import environ
 
+from core.logging_config import get_logging_config
+
 # Build paths inside the project
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -233,6 +235,9 @@ STORAGE_BASE_PATH = os.getenv("STORAGE_BASE_PATH", "storage")
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Logging settings
+LOGGING = get_logging_config(BASE_DIR, DEBUG)
 
 # Security settings for production (auto-applied when DEBUG=False)
 if not DEBUG:

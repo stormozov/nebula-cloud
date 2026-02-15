@@ -5,6 +5,8 @@ Module for custom user manager.
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
 
+from .logging import auth_logger, logger
+
 
 class UserAccountManager(BaseUserManager):
     """Manager for UserAccount model."""
@@ -30,6 +32,9 @@ class UserAccountManager(BaseUserManager):
         user.set_password(password)
         user.save(using=self._db)
 
+        logger.info("New user created: %s (%s)", user.username, user.email)
+        auth_logger.info("New user created: %s", user.username)
+
         return user
 
     def create_superuser(
@@ -46,4 +51,9 @@ class UserAccountManager(BaseUserManager):
         if extra_fields.get("is_superuser") is not True:
             raise ValueError(_("Суперпользователь должен иметь is_superuser=True."))
 
-        return self.create_user(username, email, first_name, last_name, password, **extra_fields)
+        user = self.create_user(username, email, first_name, last_name, password, **extra_fields)
+
+        logger.warning("New superuser created: %s", user.username)
+        auth_logger.warning("New superuser created: %s", user.username)
+
+        return user
