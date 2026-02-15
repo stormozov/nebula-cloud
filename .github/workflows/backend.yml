@@ -24,10 +24,10 @@ jobs:
         run: pip install uv
       
       - name: Install dependencies
-        run: uv pip install -e .
+        run: uv pip install -e . --system
       
       - name: Install linters
-        run: uv pip install flake8 black isort
+        run: uv pip install flake8 black isort --system
       
       - name: Run flake8 (syntax)
         run: flake8 backend/ --exclude=migrations
@@ -56,10 +56,10 @@ jobs:
         run: pip install uv
       
       - name: Install dependencies
-        run: uv pip install -e .
+        run: uv pip install -e . --system
       
       - name: Install mypy
-        run: uv pip install mypy
+        run: uv pip install mypy --system
       
       - name: Run type checking
         run: mypy backend/ --exclude=migrations || echo "Type checking completed with warnings"
@@ -73,9 +73,9 @@ jobs:
       postgres:
         image: postgres:18
         env:
-          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: test_db
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -97,20 +97,23 @@ jobs:
         run: pip install uv
       
       - name: Install dependencies
-        run: uv pip install -e .
+        run: uv pip install -e . --system  # ← Добавлен флаг --system
+      
+      - name: Create storage directory
+        run: mkdir -p /tmp/storage
       
       - name: Run tests
         env:
-            SECRET_KEY: ${{ secrets.SECRET_KEY }}
-            DATABASE_URL: postgresql://test_user:test_password@localhost:5434/test_db
-            DEBUG: 'False'
-            STORAGE_BASE_PATH: /tmp/storage
-            JWT_ACCESS_TOKEN_LIFETIME_MINUTES: '5'
-            JWT_REFRESH_TOKEN_LIFETIME_DAYS: '7'
-            JWT_ROTATE_REFRESH_TOKENS: 'true'
-            JWT_BLACKLIST_AFTER_ROTATION: 'true'
-            JWT_AUTH_HEADER_TYPE: 'Bearer'
-            ALLOWED_HOSTS: '*'
-            CORS_ALLOWED_ORIGINS: 'http://localhost:3000'
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          DEBUG: 'False'
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5434/test_db
+          STORAGE_BASE_PATH: /tmp/storage
+          JWT_ACCESS_TOKEN_LIFETIME_MINUTES: '5'
+          JWT_REFRESH_TOKEN_LIFETIME_DAYS: '7'
+          JWT_ROTATE_REFRESH_TOKENS: 'true'
+          JWT_BLACKLIST_AFTER_ROTATION: 'true'
+          JWT_AUTH_HEADER_TYPE: 'Bearer'
+          ALLOWED_HOSTS: '*'
+          CORS_ALLOWED_ORIGINS: 'http://localhost:3000'
         run: |
           python manage.py test --verbosity=2
