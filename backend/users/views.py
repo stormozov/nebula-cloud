@@ -23,6 +23,9 @@ from users.serializers import (
 )
 from users.throttles import LoginRateThrottle, RegisterRateThrottle
 
+from .logging import auth_logger, logger
+from .utils import get_client_ip
+
 # ==============================================================================
 # AUTHENTICATION
 # ==============================================================================
@@ -67,7 +70,24 @@ class RegisterView(generics.CreateAPIView):
         # Serialize response
         response_serializer = TokenResponseSerializer(token_data)
 
+        # Log successful registration
+        auth_logger.info(
+            "User registered successfully: email=%s, username=%s, IP=%s",
+            user.email,
+            user.username,
+            get_client_ip(request),
+        )
+
         return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+
+    def handle_exception(self, exc):
+        """Handle exceptions and log them."""
+        auth_logger.error(
+            "Registration failed: %s, IP=%s",
+            str(exc),
+            get_client_ip(self.request),
+        )
+        return super().handle_exception(exc)
 
 
 class LoginView(APIView):
@@ -91,7 +111,17 @@ class LoginView(APIView):
         """
 
         serializer = UserLoginSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+
+        if not serializer.is_valid():
+            # Log failed login attempt
+            email = request.data.get("email", "unknown")
+            auth_logger.warning(
+                "Failed login attempt: email=%s, errors=%s, IP=%s",
+                email,
+                serializer.errors,
+                get_client_ip(request),
+            )
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         user = serializer.validated_data["user"]
 
@@ -107,6 +137,14 @@ class LoginView(APIView):
 
         # Serialize response
         response_serializer = TokenResponseSerializer(token_data)
+
+        # Log successful login
+        auth_logger.info(
+            "User logged in successfully: email=%s, username=%s, IP=%s",
+            user.email,
+            user.username,
+            get_client_ip(request),
+        )
 
         return Response(response_serializer.data, status=status.HTTP_200_OK)
 
@@ -134,22 +172,50 @@ class LogoutView(APIView):
             refresh_token = request.data.get("refresh")
 
             if not refresh_token:
+                auth_logger.warning(
+                    "Logout failed: missing refresh token, user=%s, IP=%s",
+                    request.user.email,
+                    get_client_ip(request),
+                )
                 return Response(
-                    {"detail": "Refresh token is required."}, status=status.HTTP_400_BAD_REQUEST
+                    {"detail": "Refresh token is required."},
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
 
             # Blacklist the refresh token
             token = RefreshToken(refresh_token)
             token.blacklist()
 
+            # Log successful logout
+            auth_logger.info(
+                "User logged out successfully: email=%s, username=%s, IP=%s",
+                request.user.email,
+                request.user.username,
+                get_client_ip(request),
+            )
+
             return Response({"detail": "Successfully logged out."}, status=status.HTTP_200_OK)
         except TokenError as e:
+            auth_logger.error(
+                "Logout failed - invalid token: %s, user=%s, IP=%s",
+                str(e),
+                request.user.email,
+                get_client_ip(request),
+            )
             return Response(
-                {"detail": f"Invalid token: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST
+                {"detail": f"Invalid token: {str(e)}"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
         except Exception as e:
+            auth_logger.error(
+                "Logout failed: %s, user=%s, IP=%s",
+                str(e),
+                request.user.email,
+                get_client_ip(request),
+            )
             return Response(
-                {"detail": f"Logout failed: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST
+                {"detail": f"Logout failed: {str(e)}"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
 
@@ -205,6 +271,13 @@ class CurrentUserView(generics.RetrieveUpdateAPIView):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
 
+        # Log profile access
+        logger.info(
+            "User profile accessed: email=%s, IP=%s",
+            request.user.email,
+            get_client_ip(request),
+        )
+
         return Response(serializer.data)
 
     def update(self, request, *args, **kwargs) -> Response:
@@ -222,5 +295,13 @@ class CurrentUserView(generics.RetrieveUpdateAPIView):
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
+
+        # Log profile update
+        logger.info(
+            "User profile updated: email=%s, updated_fields=%s, IP=%s",
+            request.user.email,
+            list(request.data.keys()),
+            get_client_ip(request),
+        )
 
         return Response(serializer.data)
