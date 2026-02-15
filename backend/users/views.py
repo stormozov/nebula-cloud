@@ -21,6 +21,7 @@ from users.serializers import (
     UserRegistrationSerializer,
     UserSerializer,
 )
+from users.throttles import LoginRateThrottle, RegisterRateThrottle
 
 # ==============================================================================
 # AUTHENTICATION
@@ -37,6 +38,7 @@ class RegisterView(generics.CreateAPIView):
 
     serializer_class = UserRegistrationSerializer
     permission_classes = [permissions.AllowAny]
+    throttle_classes = [RegisterRateThrottle]
 
     def create(self, request, *args, **kwargs) -> Response:
         """
@@ -76,8 +78,9 @@ class LoginView(APIView):
     Authenticates user and returns JWT tokens.
     """
 
-    permission_classes = [permissions.AllowAny]
     serializer_class = UserLoginSerializer
+    permission_classes = [permissions.AllowAny]
+    throttle_classes = [LoginRateThrottle]
 
     def post(self, request) -> Response:
         """
