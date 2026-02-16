@@ -14,4 +14,4 @@ class UsersConfig(AppConfig):
 
     def ready(self):
         """Register signals for users app."""
-        import users.signals
+        import users.signals  # noqa: F401 pylint: disable=unused-import, import-outside-toplevel

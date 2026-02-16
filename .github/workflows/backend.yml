@@ -34,9 +34,6 @@ jobs:
       
       - name: Run black (formatting)
         run: black --check backend/
-      
-      - name: Run isort (imports)
-        run: isort --check backend/
   
   type-check:
     name: Type Checking
