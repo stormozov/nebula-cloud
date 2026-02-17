@@ -4,6 +4,7 @@ Models for storage app.
 
 from django.db import models
 from django.utils import timezone
+from nanoid import generate
 
 from core.settings import AUTH_USER_MODEL
 from storage.utils import generate_unique_path
@@ -64,3 +65,15 @@ class File(models.Model):
         if self.file:
             self.file.delete(save=False)  # type: ignore[attr-defined] pylint: disable=no-member
         super().delete(*args, **kwargs)
+
+    def generate_public_link(self, force=False):
+        """Generate public link."""
+        if self.public_link and not force:
+            return self.public_link
+
+        while True:
+            link = generate(size=12)
+            if not File.objects.filter(public_link=link).exists():  # pylint: disable=no-member
+                self.public_link = link
+                self.save(update_fields=["public_link"])
+                return link
