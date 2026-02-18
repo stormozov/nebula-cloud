@@ -34,16 +34,25 @@ def validate_file_size(file):
 
 
 def validate_filename(value):
-    """Validate filename does not contain forbidden characters (per diploma requirements)."""
+    """
+    Validate filename does not contain forbidden characters.
 
+    Forbidden: \\ / : * ? " < > |
+    Also rejected: trailing dot (.), trailing space ( ), empty string
+    """
+
+    if not value or not value.strip():
+        raise serializers.ValidationError("Имя файла не может быть пустым")
+
+    # Check for forbidden characters
     forbidden_chars = r'[\\/:*?"<>|]'
     if re.search(forbidden_chars, value):
         raise serializers.ValidationError(
             'Имя файла содержит запрещённые символы: \\ / : * ? " < > |'
         )
-    if value.endswith((".", " ")):
+
+    # Check for trailing dot or space
+    if value.endswith(".") or value.endswith(" "):
         raise serializers.ValidationError("Имя файла не может заканчиваться точкой или пробелом")
-    if not value.strip():
-        raise serializers.ValidationError("Имя файла не может быть пустым")
 
     return value.strip()

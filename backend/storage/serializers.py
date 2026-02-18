@@ -113,7 +113,9 @@ class FileRenameSerializer(serializers.Serializer):
     Serializer for renaming file (changes original_name only).
     """
 
-    original_name = serializers.CharField(max_length=255, validators=[validate_filename])
+    original_name = serializers.CharField(
+        max_length=255, validators=[validate_filename], trim_whitespace=False
+    )
 
     def create(self, validated_data: dict) -> None:
         """Not implemented for rename serializer."""

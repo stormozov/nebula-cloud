@@ -2,6 +2,7 @@
 Models for storage app.
 """
 
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
 from nanoid import generate
@@ -19,6 +20,9 @@ class File(models.Model):
         verbose_name="Физический файл с уникальным именем",
         upload_to=generate_unique_path,
         max_length=255,
+        validators=[
+            MinValueValidator(0),
+        ],
     )
 
     original_name = models.CharField(verbose_name="Оригинальное имя", max_length=255)

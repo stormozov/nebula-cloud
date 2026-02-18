@@ -28,8 +28,10 @@ dev = [
     "isort>=5.13.0",
     "pytest>=8.0.0",
     "pytest-django>=4.8.0",
+    "pytest-cov>=7.0.0",
     "django-debug-toolbar>=4.0.0",
     "factory-boy>=3.3.0",
+    "faker>=40.4.0",
 ]
 
 [tool.setuptools.packages.find]
@@ -93,3 +95,68 @@ known-first-party = ["backend", "users", "storage"]
 [tool.ruff.lint.per-file-ignores]
 "backend/**/migrations/*.py" = ["E501", "F401"]
 "backend/**/tests/*.py" = ["E501"]
+"tests/**/*" = ["S101", "D100", "D101", "D102", "D103"]
+"storage/tests/**/*" = ["S101", "D100", "D101", "D102", "D103"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "core.settings"
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--cov=storage",
+    "--cov-report=html",
+    "--cov-report=term-missing",
+    "--cov-report=xml",
+    "--cov-fail-under=80",
+    "--strict-markers",
+    "--tb=short",
+    "-v",
+    "--ds=core.settings",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["storage", "users"]
+omit = [
+    "*/migrations/*",
+    "*/tests/*",
+    "*/__pycache__/*",
+    "*/venv/*",
+    "*/env/*",
+    "*/.venv/*",
+    "*/manage.py",
+    "*/asgi.py",
+    "*/wsgi.py",
+    "*/apps.py",
+    "*/admin.py",
+    "*/core/settings.py",
+    "*/core/urls.py",
+    "*/core/logging_config.py",
+    "*/storage/logging.py",
+    "*/*__init__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "if settings.DEBUG",
+    "logger\\.",
+    '"""',
+    "'''",
+]
+precision = 2
+show_missing = true
+skip_covered = false
+
+[tool.coverage.html]
+directory = "htmlcov"
+show_contexts = true
+
+[tool.coverage.xml]
+output = "logs/coverage.xml"
