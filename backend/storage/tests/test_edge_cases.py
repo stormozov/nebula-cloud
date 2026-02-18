@@ -515,9 +515,7 @@ class TestConcurrentOperations:
         # Arrange
         file_name = "document.pdf"
         file1 = File.objects.create(owner=user_account, original_name=file_name, size=100)
-        file2 = File.objects.create(
-            owner=another_user_account, original_name=file_name, size=100
-        )
+        file2 = File.objects.create(owner=another_user_account, original_name=file_name, size=100)
 
         # Act
         file1.file.save(file_name, ContentFile(b"Content 1"), save=True)

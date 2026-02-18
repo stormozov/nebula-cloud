@@ -975,6 +975,6 @@ class TestEdgePermissions:
                 case "POST":
                     response = authenticated_client.post(url, data, format="json")
 
-            assert response.status_code == status.HTTP_403_FORBIDDEN, (
-                f"Endpoint {method} {url} should return 403, got {response.status_code}"
-            )
+            assert (
+                response.status_code == status.HTTP_403_FORBIDDEN
+            ), f"Endpoint {method} {url} should return 403, got {response.status_code}"

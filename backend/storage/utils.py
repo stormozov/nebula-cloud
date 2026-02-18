@@ -25,10 +25,8 @@ def validate_file_size(file):
     """Validate file size does not exceed 100 MB."""
 
     if file.size > settings.MAX_UPLOAD_SIZE:
-        raise serializers.ValidationError(
-            f"Размер файла превышает допустимый лимит (100 МБ). \
-                Текущий размер: {file.size / (1024 * 1024):.2f} МБ"
-        )
+        raise serializers.ValidationError(f"Размер файла превышает допустимый лимит (100 МБ). \
+                Текущий размер: {file.size / (1024 * 1024):.2f} МБ")
 
     return file
 
