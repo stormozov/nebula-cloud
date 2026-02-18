@@ -11,10 +11,11 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 import os
+import sys
+import tempfile
 from datetime import timedelta
 from pathlib import Path
 
-# Read environment variables from .env file
 import environ
 
 from core.logging_config import get_logging_config
@@ -56,6 +57,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt.token_blacklist",
     # Local apps
     "users",
+    "storage",
 ]
 
 MIDDLEWARE = [
@@ -253,3 +255,42 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+
+# ==============================================================================
+# TEST-SPECIFIC SETTINGS
+# Applied automatically when running tests via pytest or manage.py test
+# ==============================================================================
+
+# Detect test mode - multiple detection methods
+IS_TESTING = (
+    "test" in sys.argv
+    or "pytest" in sys.modules
+    or os.environ.get("PYTEST_CURRENT_TEST") is not None
+)
+
+if IS_TESTING:
+    # Fast password hashing (speeds up test execution)
+    PASSWORD_HASHERS = [
+        "django.contrib.auth.hashers.MD5PasswordHasher",
+    ]
+
+    # Temporary media root (files deleted after tests)
+    # Use a subdirectory to avoid conflicts
+    TEMP_MEDIA_DIR = tempfile.mkdtemp(prefix="test_media_")
+    MEDIA_ROOT = TEMP_MEDIA_DIR
+
+    # Debug: print media root during tests
+    print(f"[TEST MODE] MEDIA_ROOT set to: {MEDIA_ROOT}")
+
+    # Disable throttling (prevents rate limit errors during testing)
+    if "REST_FRAMEWORK" in locals() and "DEFAULT_THROTTLE_CLASSES" in REST_FRAMEWORK:
+        REST_FRAMEWORK["DEFAULT_THROTTLE_CLASSES"] = []
+
+    # Reduce logging noise during tests
+    if "LOGGING" in locals():
+        if "root" in LOGGING:
+            LOGGING["root"]["level"] = "WARNING"
+        if "handlers" in LOGGING:
+            for handler in LOGGING["handlers"].values():
+                if handler.get("class") == "logging.StreamHandler":
+                    handler["level"] = "WARNING"

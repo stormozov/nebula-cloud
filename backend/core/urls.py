@@ -28,6 +28,7 @@ urlpatterns = [
     path("api/auth/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     # Users app
     path("api/", include("users.urls")),
+    path("api/storage/", include("storage.urls")),
 ]
 
 # Serve media files in development

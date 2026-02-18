@@ -22,9 +22,9 @@ from users.serializers import (
     UserSerializer,
 )
 from users.throttles import LoginRateThrottle, RegisterRateThrottle
+from utils.ip_utils import get_client_ip
 
 from .logging import auth_logger, logger
-from .utils import get_client_ip
 
 # ==============================================================================
 # AUTHENTICATION
