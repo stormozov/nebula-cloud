@@ -12,8 +12,6 @@ This module provides reusable test fixtures for:
 # pylint: disable=unused-argument
 # pylint: disable=no-member
 
-import shutil
-import tempfile
 import uuid
 
 import pytest
@@ -198,7 +196,7 @@ def large_test_file() -> SimpleUploadedFile:
         SimpleUploadedFile: Large file object (~101MB).
     """
     # Create 101MB of data (exceeds 100MB limit)
-    file_content = b"x" * (101 * 1024 * 1024)
+    file_content = b"x" * (settings.MAX_UPLOAD_SIZE + 1)
     return SimpleUploadedFile(
         name="large_file.bin",
         content=file_content,

@@ -59,7 +59,7 @@ class TestFileUploadView:
             - File size under 100MB limit
             - Filename with spaces and unicode
         """
-        
+
         # Arrange
         upload_data = {
             "file": test_file,

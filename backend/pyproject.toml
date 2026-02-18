@@ -93,10 +93,11 @@ extend-fixable = ["ALL"]
 known-first-party = ["backend", "users", "storage"]
 
 [tool.ruff.lint.per-file-ignores]
-"backend/**/migrations/*.py" = ["E501", "F401"]
-"backend/**/tests/*.py" = ["E501"]
-"tests/**/*" = ["S101", "D100", "D101", "D102", "D103"]
-"storage/tests/**/*" = ["S101", "D100", "D101", "D102", "D103"]
+"**/migrations/*.py" = ["ALL"]
+"**/tests/**/*.py" = ["ALL"]
+"test_*.py" = ["ALL"]
+"conftest.py" = ["ALL"]
+"**/settings.py" = ["F401", "F403"]
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "core.settings"
