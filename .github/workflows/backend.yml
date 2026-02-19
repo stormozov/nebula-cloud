@@ -98,6 +98,25 @@ jobs:
       
       - name: Create storage directory
         run: mkdir -p /tmp/storage
+
+      - name: Wait for PostgreSQL
+        run: |
+          until pg_isready -h localhost -p 5432 -U test_user; do
+            echo "Waiting for PostgreSQL..."
+            sleep 2
+          done
+    
+      - name: Run migrations
+        run: |
+          cd backend
+          python manage.py migrate --noinput
+        env:
+          DB_NAME: test_db
+          DB_USER: test_user
+          DB_PASSWORD: test_password
+          DB_HOST: localhost
+          DB_PORT: '5432'
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
       
       - name: Run tests
         env:
