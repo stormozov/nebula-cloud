@@ -137,6 +137,9 @@ REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
     ],
+    "DEFAULT_RENDERER_CLASSES": [
+        "rest_framework.renderers.JSONRenderer",
+    ],
     # Rate limiting settings for throttling
     "DEFAULT_THROTTLE_CLASSES": [
         "rest_framework.throttling.AnonRateThrottle",
@@ -241,8 +244,15 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Logging settings
 LOGGING = get_logging_config(BASE_DIR, DEBUG)
 
+# Detect test mode - multiple detection methods
+IS_TESTING = (
+    "test" in sys.argv
+    or "pytest" in sys.modules
+    or os.environ.get("PYTEST_CURRENT_TEST") is not None
+)
+
 # Security settings for production (auto-applied when DEBUG=False)
-if not DEBUG:
+if not DEBUG and not IS_TESTING:
     # HTTPS enforcement
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
@@ -260,13 +270,6 @@ if not DEBUG:
 # TEST-SPECIFIC SETTINGS
 # Applied automatically when running tests via pytest or manage.py test
 # ==============================================================================
-
-# Detect test mode - multiple detection methods
-IS_TESTING = (
-    "test" in sys.argv
-    or "pytest" in sys.modules
-    or os.environ.get("PYTEST_CURRENT_TEST") is not None
-)
 
 if IS_TESTING:
     # Fast password hashing (speeds up test execution)
