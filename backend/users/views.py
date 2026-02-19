@@ -4,7 +4,9 @@ Views for user authentication and management.
 This module provides API endpoints for:
 - User registration
 - User login/logout
+- Token refresh
 - Current user profile management
+- Password change
 """
 
 from rest_framework import generics, permissions, status
@@ -16,6 +18,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 
 from users.models import UserAccount
 from users.serializers import (
+    PasswordChangeSerializer,
     TokenResponseSerializer,
     UserLoginSerializer,
     UserRegistrationSerializer,
@@ -305,3 +308,68 @@ class CurrentUserView(generics.RetrieveUpdateAPIView):
         )
 
         return Response(serializer.data)
+
+
+class PasswordChangeView(APIView):
+    """
+    API endpoint for password change.
+
+    `POST /api/auth/password/change/`
+    Changes the authenticated user's password.
+    """
+
+    serializer_class = PasswordChangeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request) -> Response:
+        """
+        Change the authenticated user's password.
+
+        Returns:
+            Response: Success message on successful password change.
+        """
+
+        serializer = PasswordChangeSerializer(data=request.data, context={"request": request})
+
+        if not serializer.is_valid():
+            auth_logger.warning(
+                "Failed password change attempt: user=%s, errors=%s, IP=%s",
+                request.user.email,
+                serializer.errors,
+                get_client_ip(request),
+            )
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        # Change password
+        user = request.user
+        new_password: str = serializer.validated_data["new_password"]
+        user.set_password(new_password)
+        user.save()
+
+        auth_logger.info(
+            "User password changed successfully: email=%s, username=%s, IP=%s",
+            user.email,
+            user.username,
+            get_client_ip(request),
+        )
+
+        return Response({"detail": "Пароль успешно изменён."}, status=status.HTTP_200_OK)
+
+    def handle_exception(self, exc):
+        """Handle exceptions and log them."""
+
+        user_email = (
+            getattr(self.request.user, "email", "anonymous")
+            if hasattr(self, "request") and self.request.user
+            else "unknown"
+        )
+        user_ip = get_client_ip(self.request) if hasattr(self, "request") else "unknown"
+
+        auth_logger.error(
+            "Password change failed: %s, user=%s, IP=%s",
+            str(exc),
+            user_email,
+            user_ip,
+        )
+
+        return super().handle_exception(exc)

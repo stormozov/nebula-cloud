@@ -122,6 +122,18 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+    {
+        "NAME": "users.validators.UppercaseValidator",
+    },
+    {
+        "NAME": "users.validators.LowercaseValidator",
+    },
+    {
+        "NAME": "users.validators.DigitValidator",
+    },
+    {
+        "NAME": "users.validators.SpecialCharValidator",
+    },
 ]
 
 # REST framework settings
