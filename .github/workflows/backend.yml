@@ -79,7 +79,7 @@ jobs:
           --health-timeout 5s
           --health-retries 5
         ports:
-          - "5434:5434"
+          - "5432:5432"
     
     steps:
       - uses: actions/checkout@v4
@@ -103,7 +103,7 @@ jobs:
         env:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           DEBUG: 'False'
-          DATABASE_URL: postgresql://test_user:test_password@localhost:5434/test_db
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
           STORAGE_BASE_PATH: /tmp/storage
           JWT_ACCESS_TOKEN_LIFETIME_MINUTES: '5'
           JWT_REFRESH_TOKEN_LIFETIME_DAYS: '7'
