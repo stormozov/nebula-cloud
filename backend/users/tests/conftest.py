@@ -18,8 +18,12 @@ import uuid
 
 import pytest
 from django.contrib.auth import get_user_model
+from django.core.files.base import ContentFile
+from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken
+
+from storage.models import File
 
 User = get_user_model()
 
@@ -228,6 +232,34 @@ def wrong_current_password_data():
     }
 
 
+@pytest.fixture
+def valid_password_data():
+    """
+    Provide valid password data that meets all validation requirements.
+
+    Returns:
+        dict: Valid password payload.
+    """
+    return {
+        "new_password": "ValidPass123!",
+        "new_password_confirm": "ValidPass123!",
+    }
+
+
+@pytest.fixture
+def weak_password_data():
+    """
+    Provide weak password data that fails validation.
+
+    Returns:
+        dict: Weak password payload.
+    """
+    return {
+        "new_password": "weak",
+        "new_password_confirm": "weak",
+    }
+
+
 # ==============================================================================
 # FIXTURES: HELPERS
 # ==============================================================================
@@ -304,3 +336,86 @@ def create_test_user(db):
         )
 
     return _create_user
+
+
+# ==============================================================================
+# FIXTURES: STORAGE (for admin tests)
+# ==============================================================================
+
+
+@pytest.fixture
+def test_file_for_users():
+    """
+    Create a temporary test file for upload testing.
+    Local version for users app tests (doesn't depend on storage fixtures).
+
+    Returns:
+        SimpleUploadedFile: Test file object.
+    """
+
+    file_content = b"Test file content for storage application testing." * 20
+    return SimpleUploadedFile(
+        name="test_file.txt",
+        content=file_content,
+        content_type="text/plain",
+    )
+
+
+@pytest.fixture
+def uploaded_file(db, user_account, test_file_for_users):
+    """
+    Create an uploaded file in the database for testing.
+    Creates file directly in DB to avoid API client state conflicts.
+
+    Args:
+        db: Pytest database fixture.
+        user_account: Regular user fixture.
+        test_file_for_users: Local test file fixture.
+
+    Returns:
+        File: Saved File model instance.
+    """
+
+    # Read file content and reset pointer
+    file_content = test_file_for_users.read()
+    test_file_for_users.seek(0)
+
+    # Create file directly in database
+    file_obj = File(
+        owner=user_account,
+        original_name=test_file_for_users.name,
+        size=len(file_content),
+        comment="Test comment for uploaded file",
+    )
+    file_obj.file.save(  # pylint: disable=no-member
+        test_file_for_users.name,
+        ContentFile(file_content),
+        save=True,
+    )
+
+    return file_obj
+
+
+@pytest.fixture
+def admin_uploaded_file(db, admin_account, test_file_for_users):
+    """
+    Create an uploaded file by admin user for testing.
+    Creates file directly in DB to avoid API client state conflicts.
+    """
+
+    file_content = test_file_for_users.read()
+    test_file_for_users.seek(0)
+
+    file_obj = File(
+        owner=admin_account,
+        original_name=test_file_for_users.name,
+        size=len(file_content),
+        comment="Admin test comment",
+    )
+    file_obj.file.save(  # pylint: disable=no-member
+        test_file_for_users.name,
+        ContentFile(file_content),
+        save=True,
+    )
+
+    return file_obj
