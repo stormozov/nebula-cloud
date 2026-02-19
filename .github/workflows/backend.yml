@@ -103,7 +103,13 @@ jobs:
         env:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           DEBUG: 'False'
-          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
+          # DB
+          DB_NAME: test_db
+          DB_USER: test_user
+          DB_PASSWORD: test_password
+          DB_HOST: localhost
+          DB_PORT: '5432'
+          # Storage
           STORAGE_BASE_PATH: /tmp/storage
           JWT_ACCESS_TOKEN_LIFETIME_MINUTES: '5'
           JWT_REFRESH_TOKEN_LIFETIME_DAYS: '7'
