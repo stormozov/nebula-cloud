@@ -94,7 +94,7 @@ jobs:
         run: pip install uv
       
       - name: Install dependencies
-        run: uv pip install -e ./backend --system
+        run: uv pip install -e "./backend[dev]" --system
       
       - name: Create storage directory
         run: mkdir -p /tmp/storage
@@ -114,4 +114,4 @@ jobs:
           CORS_ALLOWED_ORIGINS: 'http://localhost:3000'
         run: |
           cd backend
-          python manage.py test --verbosity=2
+          uv run pytest backend/ -v --cov=storage --cov-report=xml
