@@ -1,5 +1,12 @@
 """
 Serializers for user authentication and management.
+
+The module provides serializers for:
+- User registration
+- User login
+- Token response
+- User profile management
+- Password change
 """
 
 from django.contrib.auth import authenticate
@@ -210,3 +217,64 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+
+class PasswordChangeSerializer(serializers.Serializer):
+    """Serializer for password change."""
+
+    current_password = serializers.CharField(
+        write_only=True,
+        required=True,
+        style={"input_type": "password"},
+        help_text="Текущий пароль пользователя",
+    )
+    new_password = serializers.CharField(
+        write_only=True,
+        required=True,
+        style={"input_type": "password"},
+        help_text="Новый пароль пользователя",
+    )
+    new_password_confirm = serializers.CharField(
+        write_only=True,
+        required=True,
+        style={"input_type": "password"},
+        help_text="Подтверждение нового пароля",
+    )
+
+    def validate(self, attrs: dict) -> dict:
+        """Validate password change data."""
+
+        current_password = attrs.get("current_password")
+        new_password = attrs.get("new_password")
+        new_password_confirm = attrs.get("new_password_confirm")
+        user = self.context.get("request").user
+
+        # Check current password
+        if not user.check_password(current_password):
+            raise serializers.ValidationError({"current_password": "Неверный текущий пароль."})
+
+        # Check password confirmation
+        if new_password != new_password_confirm:
+            raise serializers.ValidationError({"new_password_confirm": "Пароли не совпадают."})
+
+        # Check if new password is same as current
+        if user.check_password(new_password):
+            raise serializers.ValidationError(
+                {"new_password": "Новый пароль не должен совпадать с текущим."}
+            )
+
+        # Validate new password with Django validators
+        try:
+            validate_password(new_password, user=user)
+        except DjangoValidationError as e:
+            raise serializers.ValidationError({"new_password": list(e.messages)}) from e
+
+        return attrs
+
+    def create(self, validated_data):
+        """Not implemented for password change serializer."""
+        raise NotImplementedError("PasswordChangeSerializer does not implement create")
+
+    def update(self, instance, validated_data):
+        """Not implemented for password change serializer."""
+        raise NotImplementedError("PasswordChangeSerializer does not implement update")
