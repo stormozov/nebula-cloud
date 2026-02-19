@@ -114,4 +114,4 @@ jobs:
           CORS_ALLOWED_ORIGINS: 'http://localhost:3000'
         run: |
           cd backend
-          uv run pytest backend/ -v --cov=storage --cov-report=xml
+          uv run pytest . -v --cov=storage --cov-report=xml
