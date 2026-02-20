@@ -14,6 +14,7 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from core.utils import get_client_ip
 from users.exceptions import AdminUserActionError
 from users.models import UserAccount
 from users.permissions import IsAdminUser
@@ -31,7 +32,6 @@ from users.services import (
     toggle_admin_status,
     validate_not_self_action,
 )
-from utils.ip_utils import get_client_ip
 
 from ..loggers import auth_logger, logger
 

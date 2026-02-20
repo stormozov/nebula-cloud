@@ -14,6 +14,7 @@ from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenRefreshView
 
+from core.utils import get_client_ip
 from users.serializers import (
     TokenResponseSerializer,
     UserLoginSerializer,
@@ -21,7 +22,6 @@ from users.serializers import (
 )
 from users.services import AuthResponseBuilder
 from users.throttles import LoginRateThrottle, RegisterRateThrottle
-from utils.ip_utils import get_client_ip
 
 from ..loggers import auth_logger
 

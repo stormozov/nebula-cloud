@@ -16,7 +16,7 @@ from rest_framework import generics, permissions, status, views
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 
-from utils.ip_utils import get_client_ip
+from core.utils import get_client_ip
 
 from .loggers import file_logger, logger
 from .models import File
