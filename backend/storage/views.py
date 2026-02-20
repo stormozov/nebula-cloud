@@ -18,7 +18,7 @@ from rest_framework.response import Response
 
 from utils.ip_utils import get_client_ip
 
-from .logging import file_logger, logger
+from .loggers import file_logger, logger
 from .models import File
 from .permissions import IsOwnerOrAdmin
 from .serializers import (

@@ -5,7 +5,7 @@ Module for custom user manager.
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
 
-from .logging import auth_logger, logger
+from .loggers import auth_logger, logger
 
 
 class UserAccountManager(BaseUserManager):
@@ -15,6 +15,7 @@ class UserAccountManager(BaseUserManager):
         self, username, email, first_name="", last_name="", password=None, **extra_fields
     ):
         """Create and save a UserAccount with the given email and password."""
+
         if not username:
             raise ValueError(_("Пользователь должен иметь логин"))
 
