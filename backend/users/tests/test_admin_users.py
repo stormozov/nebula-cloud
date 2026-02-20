@@ -263,17 +263,112 @@ class TestAdminToggleAdminView:
 class TestAdminUserStorageStatsView:
     """Test cases for AdminUserStorageStatsView endpoint."""
 
-    def test_admin_can_get_storage_stats(self, admin_client, uploaded_file):
-        """Test that admin can get user storage statistics."""
+    # === Response Structure Tests ===
 
-        url = reverse("users:admin_storage_stats", kwargs={"pk": uploaded_file.owner.id})
+    def test_response_contains_user_and_storage_sections(self, admin_client, uploaded_file):
+        """Test that response contains both 'user' and 'storage' sections."""
+
+        user = uploaded_file.owner
+        url = reverse("users:admin_storage_stats", kwargs={"pk": user.id})
 
         response = admin_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data["file_count"] >= 1
-        assert "total_size" in response.data
-        assert "storage_path" in response.data
+        assert "user" in response.data
+        assert "storage" in response.data
+
+    # === User Section Tests ===
+
+    def test_user_section_contains_required_fields(self, admin_client, uploaded_file):
+        """Test that user section contains all required fields."""
+
+        user = uploaded_file.owner
+        url = reverse("users:admin_storage_stats", kwargs={"pk": user.id})
+
+        response = admin_client.get(url)
+        user_data = response.data["user"]
+
+        assert "user_id" in user_data
+        assert "username" in user_data
+        assert "email" in user_data
+
+    def test_user_section_data_accuracy(self, admin_client, uploaded_file):
+        """Test that user section data matches the actual user data."""
+
+        user = uploaded_file.owner
+        url = reverse("users:admin_storage_stats", kwargs={"pk": user.id})
+
+        response = admin_client.get(url)
+        user_data = response.data["user"]
+
+        assert user_data["user_id"] == user.id
+        assert user_data["username"] == user.username
+        assert user_data["email"] == user.email
+
+    def test_user_section_field_types(self, admin_client, uploaded_file):
+        """Test that user section fields have correct data types."""
+
+        user = uploaded_file.owner
+        url = reverse("users:admin_storage_stats", kwargs={"pk": user.id})
+
+        response = admin_client.get(url)
+        user_data = response.data["user"]
+
+        assert isinstance(user_data["user_id"], int)
+        assert isinstance(user_data["username"], str)
+        assert isinstance(user_data["email"], str)
+
+    # === Storage Section Tests ===
+
+    def test_storage_section_contains_required_fields(self, admin_client, uploaded_file):
+        """Test that storage section contains all required fields."""
+
+        user = uploaded_file.owner
+        url = reverse("users:admin_storage_stats", kwargs={"pk": user.id})
+
+        response = admin_client.get(url)
+        storage_data = response.data["storage"]
+
+        assert "path" in storage_data
+        assert "file_count" in storage_data
+        assert "total_size" in storage_data
+        assert "total_size_formatted" in storage_data
+
+    def test_storage_section_file_count_accuracy(self, admin_client, uploaded_file):
+        """Test that storage section file count is accurate."""
+
+        user = uploaded_file.owner
+        url = reverse("users:admin_storage_stats", kwargs={"pk": user.id})
+
+        response = admin_client.get(url)
+        storage_data = response.data["storage"]
+
+        assert storage_data["file_count"] >= 1
+
+    def test_storage_section_total_size_type(self, admin_client, uploaded_file):
+        """Test that total_size is an integer and non-negative."""
+
+        user = uploaded_file.owner
+        url = reverse("users:admin_storage_stats", kwargs={"pk": user.id})
+
+        response = admin_client.get(url)
+        storage_data = response.data["storage"]
+
+        assert isinstance(storage_data["total_size"], int)
+        assert storage_data["total_size"] >= 0
+
+    def test_storage_section_path_accuracy(self, admin_client, uploaded_file):
+        """Test that storage path matches user's storage_path."""
+
+        user = uploaded_file.owner
+        url = reverse("users:admin_storage_stats", kwargs={"pk": user.id})
+
+        response = admin_client.get(url)
+        storage_data = response.data["storage"]
+
+        assert storage_data["path"] == user.storage_path
+
+    # === Permission Tests ===
 
     def test_regular_user_cannot_get_storage_stats(self, authenticated_client, user_account):
         """Test that regular user cannot access storage stats endpoint."""
@@ -281,8 +376,43 @@ class TestAdminUserStorageStatsView:
         response = authenticated_client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    def test_unauthenticated_user_cannot_get_storage_stats(self, client, user_account):
+        """Test that unauthenticated user cannot access storage stats endpoint."""
+        url = reverse("users:admin_storage_stats", kwargs={"pk": user_account.id})
+        response = client.get(url)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    # === Edge Case Tests ===
+
     def test_storage_stats_nonexistent_user(self, admin_client):
         """Test storage stats for non-existent user returns 404."""
         url = reverse("users:admin_storage_stats", kwargs={"pk": 99999})
         response = admin_client.get(url)
         assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert response.data["detail"] == "Пользователь не найден."
+
+    def test_storage_stats_for_user_with_no_files(self, admin_client, user_account):
+        """Test storage stats for user who has no files uploaded."""
+
+        url = reverse("users:admin_storage_stats", kwargs={"pk": user_account.id})
+        response = admin_client.get(url)
+        storage = response.data["storage"]
+
+        assert response.status_code == status.HTTP_200_OK
+        assert storage["file_count"] == 0
+        assert storage["total_size"] == 0
+
+    def test_response_structure_contract(self, admin_client, uploaded_file):
+        """Test that response structure doesn't change unexpectedly."""
+
+        user = uploaded_file.owner
+        url = reverse("users:admin_storage_stats", kwargs={"pk": user.id})
+        response = admin_client.get(url)
+
+        assert set(response.data["user"].keys()) == {"user_id", "username", "email"}
+        assert set(response.data["storage"].keys()) == {
+            "path",
+            "file_count",
+            "total_size",
+            "total_size_formatted",
+        }
