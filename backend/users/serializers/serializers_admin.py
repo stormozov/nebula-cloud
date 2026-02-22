@@ -14,9 +14,9 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import models
 from rest_framework import serializers
 
+from core.utils import format_size
 from storage.models import File
 from users.models import UserAccount
-from users.utils import format_size
 
 # ==================================================================================================
 # ADMIN PANEL

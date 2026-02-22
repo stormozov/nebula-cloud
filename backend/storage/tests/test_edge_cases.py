@@ -22,7 +22,7 @@ from rest_framework import status
 
 from core.settings import MAX_UPLOAD_SIZE
 from storage.models import File
-from storage.serializers import validate_filename
+from storage.utils import validate_filename
 
 User = get_user_model()
 

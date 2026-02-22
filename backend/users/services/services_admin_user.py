@@ -2,10 +2,10 @@
 
 from django.db import models
 
+from core.utils import format_size
 from storage.models import File
 from users.exceptions import AdminUserActionError
 from users.models import UserAccount
-from users.utils import format_size
 
 
 def get_user_by_id_or_raise(user_id: int) -> UserAccount:

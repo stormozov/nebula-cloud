@@ -330,7 +330,7 @@ class TestPublicFileView:
 
         Expected:
             - size_formatted field is present
-            - Format is human-readable (Б, КБ, МБ)
+            - Format is human-readable (B, KB, MB, etc.)
         """
 
         # Arrange
@@ -346,7 +346,7 @@ class TestPublicFileView:
         # Assert
         assert response.status_code == status.HTTP_200_OK
         assert "size_formatted" in response.data
-        assert "КБ" in response.data["size_formatted"]
+        assert "KB" in response.data["size_formatted"]
 
 
 # ==============================================================================

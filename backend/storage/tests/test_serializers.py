@@ -590,9 +590,9 @@ class TestFileSerializer:
         Verify that size_formatted returns human-readable format.
 
         Expected:
-            - Bytes shown as "X.XX Б"
-            - KB shown as "X.XX КБ"
-            - MB shown as "X.XX МБ"
+            - Bytes shown as "X.XX B"
+            - KB shown as "X.XX KB"
+            - MB shown as "X.XX MB"
         """
 
         # Arrange
@@ -606,9 +606,9 @@ class TestFileSerializer:
         data_mb = FileSerializer(file_mb, context={"request": None}).data
 
         # Assert
-        assert "Б" in data_bytes["size_formatted"]
-        assert "КБ" in data_kb["size_formatted"]
-        assert "МБ" in data_mb["size_formatted"]
+        assert "B" in data_bytes["size_formatted"]
+        assert "KB" in data_kb["size_formatted"]
+        assert "MB" in data_mb["size_formatted"]
 
     def test_file_serializer_has_public_link_boolean(self, db, user_account, create_file):
         """
@@ -779,7 +779,7 @@ class TestPublicFileSerializer:
 
         # Assert
         assert "size_formatted" in data
-        assert "КБ" in data["size_formatted"]
+        assert "KB" in data["size_formatted"]
 
     def test_public_file_serializer_uploaded_at_included(self, db, user_account, create_file):
         """
