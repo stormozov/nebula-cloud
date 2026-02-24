@@ -11,7 +11,6 @@ This module contains comprehensive tests for public file access via public_link:
 
 import re
 import pytest
-from django.core.files.base import ContentFile
 from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.test import APIClient
@@ -22,9 +21,9 @@ User = get_user_model()
 
 pytestmark = pytest.mark.django_db
 
-# ==============================================================================
+# ==================================================================================================
 # TEST CLASS: PUBLIC FILE VIEW (PREVIEW)
-# ==============================================================================
+# ==================================================================================================
 
 
 class TestPublicFileView:
@@ -194,9 +193,9 @@ class TestPublicFileView:
         assert response.data["original_name"] == file_with_public_link.original_name
 
 
-# ==============================================================================
+# ==================================================================================================
 # TEST CLASS: PUBLIC FILE DOWNLOAD VIEW
-# ==============================================================================
+# ==================================================================================================
 
 
 class TestPublicFileDownloadView:
@@ -358,9 +357,9 @@ class TestPublicFileDownloadView:
         assert response.status_code == status.HTTP_200_OK
 
 
-# ==============================================================================
+# ==================================================================================================
 # TEST CLASS: PUBLIC LINK GENERATION (VIA FILEVIEWSET @ACTION)
-# ==============================================================================
+# ==================================================================================================
 
 
 class TestPublicLinkGeneration:
@@ -523,9 +522,9 @@ class TestPublicLinkGeneration:
         assert response.data["has_public_link"] is True
 
 
-# ==============================================================================
+# ==================================================================================================
 # TEST CLASS: PUBLIC LINK DELETION (VIA FILEVIEWSET @ACTION)
-# ==============================================================================
+# ==================================================================================================
 
 
 class TestPublicLinkDeletion:
@@ -678,9 +677,9 @@ class TestPublicLinkDeletion:
         assert response.data["has_public_link"] is False
 
 
-# ==============================================================================
+# ==================================================================================================
 # TEST CLASS: PUBLIC LINK INTEGRATION
-# ==============================================================================
+# ==================================================================================================
 
 
 class TestPublicLinkIntegration:
@@ -722,6 +721,36 @@ class TestPublicLinkIntegration:
         # Assert 3: Download works
         assert download_response.status_code == status.HTTP_200_OK
         assert download_response["Content-Disposition"].startswith("attachment")
+
+    def test_public_link_access_does_not_require_owner_permission(self, api_client, create_file):
+        """
+        Verify that public link access bypasses owner permission checks.
+
+        Scenario:
+            - User generates public link
+            - User tries to access file via public link
+
+        Expected:
+            - Unauthenticated user can access file via public link
+            - No 401/403 error for public endpoints
+        """
+
+        # Arrange
+        create_file(
+            original_name="public_file.txt",
+            public_link="public123",
+        )
+
+        # Act
+        # Act - Public info access
+        response_info = api_client.get("/api/storage/public/public123/")
+
+        # Act - Public download access
+        response_download = api_client.get("/api/storage/public/public123/download/")
+
+        # Assert
+        assert response_info.status_code == status.HTTP_200_OK
+        assert response_download.status_code == status.HTTP_200_OK
 
     def test_public_link_becomes_invalid_after_deletion(
         self, authenticated_client: APIClient, api_client: APIClient, uploaded_file: File

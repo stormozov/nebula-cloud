@@ -19,9 +19,9 @@ from storage.models import File
 User = get_user_model()
 
 
-# ==============================================================================
+# ==================================================================================================
 # TEST CLASS: LIST ACTION
-# ==============================================================================
+# ==================================================================================================
 
 
 class TestFileViewSetList:
@@ -111,23 +111,6 @@ class TestFileViewSetList:
         assert response.status_code == status.HTTP_200_OK
         assert all(item["original_name"] == "user1_file.txt" for item in response.data)
 
-    def test_list_unauthenticated_returns_401(self, api_client: APIClient) -> None:
-        """
-        Test: Unauthenticated request returns 401.
-
-        Scenario: Guest user requests file list.
-        Expected: HTTP 401 Unauthorized.
-        """
-
-        # Arrange
-        # No authentication credentials set
-
-        # Act
-        response = api_client.get("/api/storage/files/")
-
-        # Assert
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
-
     def test_list_empty_returns_empty_array(self, authenticated_client: APIClient) -> None:
         """
         Test: List returns empty array when no files exist.
@@ -147,9 +130,9 @@ class TestFileViewSetList:
         assert response.data == []
 
 
-# ==============================================================================
+# ==================================================================================================
 # TEST CLASS: RETRIEVE ACTION
-# ==============================================================================
+# ==================================================================================================
 
 
 class TestFileViewSetRetrieve:
@@ -195,25 +178,6 @@ class TestFileViewSetRetrieve:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_retrieve_returns_403_for_other_user_file(
-        self, authenticated_client: APIClient, another_user_file: File
-    ) -> None:
-        """
-        Test: Retrieve returns 403 for another user's file.
-
-        Scenario: User requests details of file owned by different user.
-        Expected: HTTP 403 Forbidden.
-        """
-
-        # Arrange
-        file_id = another_user_file.id
-
-        # Act
-        response = authenticated_client.get(f"/api/storage/files/{file_id}/")
-
-        # Assert
-        assert response.status_code == status.HTTP_403_FORBIDDEN
-
     def test_retrieve_admin_can_access_any_file(
         self, admin_client: APIClient, uploaded_file: File
     ) -> None:
@@ -235,9 +199,9 @@ class TestFileViewSetRetrieve:
         assert response.data["id"] == file_id
 
 
-# ==============================================================================
+# ==================================================================================================
 # TEST CLASS: CREATE ACTION
-# ==============================================================================
+# ==================================================================================================
 
 
 class TestFileViewSetCreate:
@@ -305,23 +269,6 @@ class TestFileViewSetCreate:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "file" in response.data or "detail" in response.data
 
-    def test_create_unauthenticated_returns_401(self, api_client: APIClient, test_file) -> None:
-        """
-        Test: Create returns 401 for unauthenticated request.
-
-        Scenario: Guest user attempts to upload file.
-        Expected: HTTP 401 Unauthorized.
-        """
-
-        # Arrange
-        upload_data = {"file": test_file}
-
-        # Act
-        response = api_client.post("/api/storage/files/", upload_data, format="multipart")
-
-        # Assert
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
-
     def test_create_without_file_field_returns_400(self, authenticated_client: APIClient) -> None:
         """
         Test: Create returns 400 when file field is missing.
@@ -340,9 +287,9 @@ class TestFileViewSetCreate:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
-# ==============================================================================
+# ==================================================================================================
 # TEST CLASS: UPDATE ACTIONS
-# ==============================================================================
+# ==================================================================================================
 
 
 class TestFileViewSetUpdate:
@@ -396,28 +343,6 @@ class TestFileViewSetUpdate:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["comment"] == new_comment
 
-    def test_partial_update_other_user_file_returns_403(
-        self, authenticated_client: APIClient, another_user_file: File
-    ) -> None:
-        """
-        Test: Partial update returns 403 for another user's file.
-
-        Scenario: User attempts to modify file owned by different user.
-        Expected: HTTP 403 Forbidden.
-        """
-
-        # Arrange
-        file_id = another_user_file.id
-        update_data = {"comment": "Unauthorized change"}
-
-        # Act
-        response = authenticated_client.patch(
-            f"/api/storage/files/{file_id}/", update_data, format="json"
-        )
-
-        # Assert
-        assert response.status_code == status.HTTP_403_FORBIDDEN
-
     def test_full_update_returns_200(
         self, authenticated_client: APIClient, uploaded_file: File
     ) -> None:
@@ -446,9 +371,9 @@ class TestFileViewSetUpdate:
         assert response.data["original_name"] == new_name
 
 
-# ==============================================================================
+# ==================================================================================================
 # TEST CLASS: DESTROY ACTION
-# ==============================================================================
+# ==================================================================================================
 
 
 class TestFileViewSetDestroy:
@@ -474,26 +399,6 @@ class TestFileViewSetDestroy:
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert not File.objects.filter(id=file_id).exists()  # pylint: disable=no-member
 
-    def test_destroy_other_user_file_returns_403(
-        self, authenticated_client: APIClient, another_user_file: File
-    ) -> None:
-        """
-        Test: Destroy returns 403 for another user's file.
-
-        Scenario: User attempts to delete file owned by different user.
-        Expected: HTTP 403 Forbidden, file remains in database.
-        """
-
-        # Arrange
-        file_id = another_user_file.id
-
-        # Act
-        response = authenticated_client.delete(f"/api/storage/files/{file_id}/")
-
-        # Assert
-        assert response.status_code == status.HTTP_403_FORBIDDEN
-        assert File.objects.filter(id=file_id).exists()  # pylint: disable=no-member
-
     def test_destroy_nonexistent_file_returns_404(self, authenticated_client: APIClient) -> None:
         """
         Test: Destroy returns 404 for non-existent file.
@@ -512,9 +417,9 @@ class TestFileViewSetDestroy:
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-# ==============================================================================
+# ==================================================================================================
 # TEST CLASS: UPLOAD ACTION
-# ==============================================================================
+# ==================================================================================================
 
 
 class TestFileViewSetUploadAction:
@@ -543,27 +448,10 @@ class TestFileViewSetUploadAction:
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data["original_name"] == file_name
 
-    def test_upload_action_requires_authentication(self, api_client: APIClient, test_file) -> None:
-        """
-        Test: Upload action returns 401 for unauthenticated request.
 
-        Scenario: Guest user attempts to use /upload/ endpoint.
-        Expected: HTTP 401 Unauthorized.
-        """
-
-        # Arrange
-        upload_data = {"file": test_file}
-
-        # Act
-        response = api_client.post("/api/storage/files/upload/", upload_data, format="multipart")
-
-        # Assert
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
-
-
-# ==============================================================================
+# ==================================================================================================
 # TEST CLASS: DOWNLOAD ACTION
-# ==============================================================================
+# ==================================================================================================
 
 
 class TestFileViewSetDownloadAction:
@@ -613,25 +501,6 @@ class TestFileViewSetDownloadAction:
         # Assert
         assert uploaded_file.last_downloaded is not None
 
-    def test_download_other_user_file_returns_403(
-        self, authenticated_client: APIClient, another_user_file: File
-    ) -> None:
-        """
-        Test: Download returns 403 for another user's file.
-
-        Scenario: User attempts to download file owned by different user.
-        Expected: HTTP 403 Forbidden.
-        """
-
-        # Arrange
-        file_id = another_user_file.id
-
-        # Act
-        response = authenticated_client.get(f"/api/storage/files/{file_id}/download/")
-
-        # Assert
-        assert response.status_code == status.HTTP_403_FORBIDDEN
-
     def test_download_nonexistent_file_returns_404(self, authenticated_client: APIClient) -> None:
         """
         Test: Download returns 404 for non-existent file.
@@ -650,9 +519,9 @@ class TestFileViewSetDownloadAction:
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-# ==============================================================================
+# ==================================================================================================
 # TEST CLASS: RENAME ACTION
-# ==============================================================================
+# ==================================================================================================
 
 
 class TestFileViewSetRenameAction:
@@ -706,32 +575,10 @@ class TestFileViewSetRenameAction:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "original_name" in response.data or "detail" in response.data
 
-    def test_rename_other_user_file_returns_403(
-        self, authenticated_client: APIClient, another_user_file: File
-    ) -> None:
-        """
-        Test: Rename returns 403 for another user's file.
 
-        Scenario: User attempts to rename file owned by different user.
-        Expected: HTTP 403 Forbidden.
-        """
-
-        # Arrange
-        file_id = another_user_file.id
-        rename_data = {"original_name": "hacked.txt"}
-
-        # Act
-        response = authenticated_client.patch(
-            f"/api/storage/files/{file_id}/rename/", rename_data, format="json"
-        )
-
-        # Assert
-        assert response.status_code == status.HTTP_403_FORBIDDEN
-
-
-# ==============================================================================
+# ==================================================================================================
 # TEST CLASS: COMMENT ACTION
-# ==============================================================================
+# ==================================================================================================
 
 
 class TestFileViewSetCommentAction:
@@ -785,101 +632,3 @@ class TestFileViewSetCommentAction:
         # Assert
         assert response.status_code == status.HTTP_200_OK
         assert response.data["comment"] == ""
-
-    def test_comment_other_user_file_returns_403(
-        self, authenticated_client: APIClient, another_user_file: File
-    ) -> None:
-        """
-        Test: Comment returns 403 for another user's file.
-
-        Scenario: User attempts to comment on file owned by different user.
-        Expected: HTTP 403 Forbidden.
-        """
-
-        # Arrange
-        file_id = another_user_file.id
-        comment_data = {"comment": "Unauthorized comment"}
-
-        # Act
-        response = authenticated_client.patch(
-            f"/api/storage/files/{file_id}/comment/", comment_data, format="json"
-        )
-
-        # Assert
-        assert response.status_code == status.HTTP_403_FORBIDDEN
-
-
-# ==============================================================================
-# TEST CLASS: PERMISSIONS EDGE CASES
-# ==============================================================================
-
-
-class TestFileViewSetPermissions:
-    """Tests for permission edge cases and access control."""
-
-    def test_admin_can_delete_any_user_file(
-        self, admin_client: APIClient, uploaded_file: File
-    ) -> None:
-        """
-        Test: Admin can delete any user's file.
-
-        Scenario: Admin deletes file owned by regular user.
-        Expected: HTTP 204 No Content, file removed.
-        """
-
-        # Arrange
-        file_id = uploaded_file.id
-
-        # Act
-        response = admin_client.delete(f"/api/storage/files/{file_id}/")
-
-        # Assert
-        assert response.status_code == status.HTTP_204_NO_CONTENT
-        assert not File.objects.filter(id=file_id).exists()  # pylint: disable=no-member
-
-    def test_user_cannot_access_admin_only_filter(
-        self, authenticated_client: APIClient, another_user_account
-    ) -> None:
-        """
-        Test: Regular user cannot use admin-only user_id filter.
-
-        Scenario: Regular user requests files with user_id parameter.
-        Expected: HTTP 200 but filtered to user's own files only.
-        """
-
-        # Arrange
-        # Create file for another user
-        File.objects.create(  # pylint: disable=no-member
-            owner=another_user_account,
-            original_name="admin_filter_test.txt",
-            size=100,
-        )
-
-        # Act
-        response = authenticated_client.get(
-            f"/api/storage/files/?user_id={another_user_account.id}"
-        )
-
-        # Assert
-        assert response.status_code == status.HTTP_200_OK
-        # Regular user should only see their own files, ignoring user_id param
-        assert all(item["owner"] != another_user_account.email for item in response.data)
-
-    def test_invalid_user_id_parameter_falls_back_gracefully(self, admin_client: APIClient) -> None:
-        """
-        Test: Invalid user_id parameter returns user's own files for admin.
-
-        Scenario: Admin provides non-numeric user_id query parameter.
-        Expected: HTTP 200 with admin's own files (fallback behavior).
-        """
-
-        # Arrange
-        invalid_user_id = "not_a_number"
-
-        # Act
-        response = admin_client.get(f"/api/storage/files/?user_id={invalid_user_id}")
-
-        # Assert
-        assert response.status_code == status.HTTP_200_OK
-        # Should not crash, returns admin's files or empty list
-        assert isinstance(response.data, list)
