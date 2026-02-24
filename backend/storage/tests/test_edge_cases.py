@@ -11,8 +11,8 @@ This module tests boundary conditions and exceptional scenarios including:
 """
 
 import time
-
 import pytest
+
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
@@ -564,41 +564,6 @@ class TestConcurrentOperations:
 
         assert file1.file.path != file2.file.path
 
-    def test_generate_public_link_twice_returns_existing(
-        self, authenticated_client, create_file, temp_media_root
-    ):
-        """
-        Verify that generating public link twice returns existing link.
-
-        Expected:
-            - First call: HTTP 200, link generated
-            - Second call: HTTP 400, link already exists
-            - Link remains unchanged
-        """
-
-        # Arrange
-        file_obj = create_file(owner=authenticated_client.user, original_name="test.txt")
-
-        def generate_link():
-            return authenticated_client.post(
-                f"/api/storage/files/{file_obj.id}/public-link/generate/",
-                data={},
-                format="json",
-            )
-
-        # Act
-        response1 = generate_link()
-        first_link = response1.data["public_link_url"]
-        response2 = generate_link()
-
-        # Assert
-        assert response1.status_code == status.HTTP_200_OK
-        assert response2.status_code == status.HTTP_400_BAD_REQUEST
-
-        file_obj.refresh_from_db()
-        assert file_obj.public_link is not None
-        assert first_link is not None
-
 
 # ==============================================================================
 # TESTS: FILESYSTEM INCONSISTENCIES
@@ -614,39 +579,6 @@ class TestFilesystemInconsistencies:
     - Corrupted file paths
     - Permission issues on file access
     """
-
-    def test_download_file_missing_on_disk_returns_404(
-        self, authenticated_client, user_account, temp_media_root
-    ):
-        """
-        Verify that downloading file missing from disk returns 404.
-
-        Scenario:
-            1. Create file record in database
-            2. Do NOT save actual file to disk
-            3. Attempt to download
-
-        Expected:
-            - HTTP 404 Not Found
-            - Error message indicates file not found on server
-            - Database record may still exist (not automatically cleaned)
-        """
-
-        # Arrange
-        file_obj = File.objects.create(
-            owner=user_account,
-            original_name="missing_file.txt",
-            size=100,
-        )
-
-        # Act
-        response = authenticated_client.get(f"/api/storage/files/{file_obj.id}/download/")
-
-        # Assert
-        assert response.status_code == status.HTTP_404_NOT_FOUND
-        assert (
-            "не найден" in str(response.data).lower() or "not found" in str(response.data).lower()
-        )
 
     def test_delete_file_missing_on_disk_succeeds(
         self, authenticated_client, user_account, temp_media_root

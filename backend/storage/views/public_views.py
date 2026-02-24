@@ -1,160 +1,76 @@
 """
 Views for public file access via public_link.
 
-These views do not require authentication and are accessible via generated public links.
+These views do not require authentication and are accessible via generated
+public links. The module provides the following views:
 
-The module provides the following views:
-- FilePublicLinkView
-- PublicFileView
-- PublicFileDownloadView
+- PublicFileView: Preview file metadata via public link
+- PublicFileDownloadView: Download file via public link without authentication
 
+Note: Public link management (generate/delete) is handled by FileViewSet
+@action endpoints since they require authentication.
 """
 
 from django.http import FileResponse
-from rest_framework import permissions, status, views
+from rest_framework import permissions, views
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 
 from core.utils import get_client_ip
 from storage.loggers import file_logger
 from storage.models import File
-from storage.permissions import IsOwnerOrAdmin
-from storage.serializers import FileSerializer, PublicFileSerializer
-
-
-class FilePublicLinkView(views.APIView):
-    """
-    API endpoint for public link management.
-
-    `POST /api/storage/files/{id}/public-link/generate/`
-    Generates new public link for file.
-
-    `DELETE /api/storage/files/{id}/public-link/`
-    Deletes existing public link.
-    """
-
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin]
-
-    def post(self, request, pk=None) -> Response:
-        """
-        Generate public link.
-
-        Returns:
-            Response: Updated file data with public link.
-        """
-        try:
-            file_obj = File.objects.get(pk=pk)
-            self.check_object_permissions(request, file_obj)
-
-            if file_obj.public_link:
-                file_logger.warning(
-                    "Public link already exists: id=%d, user=%s, IP=%s",
-                    file_obj.id,
-                    request.user.email,
-                    get_client_ip(request),
-                )
-                return Response(
-                    {
-                        "detail": "Публичная ссылка уже существует",
-                        "public_link": file_obj.public_link,
-                    },
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
-            file_obj.generate_public_link(force=True)
-
-            file_logger.info(
-                "Public link generated: id=%d, link=%s, name=%s, user=%s, IP=%s",
-                file_obj.id,
-                file_obj.public_link,
-                file_obj.original_name,
-                request.user.email,
-                get_client_ip(request),
-            )
-
-            response_serializer = FileSerializer(file_obj, context={"request": request})
-            return Response(response_serializer.data)
-
-        except File.DoesNotExist:
-            file_logger.warning(
-                "Public link generation failed - not found: id=%s, user=%s, IP=%s",
-                pk,
-                request.user.email,
-                get_client_ip(request),
-            )
-            raise NotFound("Файл не найден") from None
-
-    def delete(self, request, pk=None) -> Response:
-        """
-        Delete public link.
-
-        Returns:
-            Response: Updated file data without public link.
-        """
-        try:
-            file_obj = File.objects.get(pk=pk)
-            self.check_object_permissions(request, file_obj)
-
-            if not file_obj.public_link:
-                file_logger.warning(
-                    "Public link deletion failed - not exists: id=%d, user=%s, IP=%s",
-                    file_obj.id,
-                    request.user.email,
-                    get_client_ip(request),
-                )
-                return Response(
-                    {"detail": "Публичная ссылка отсутствует"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
-            old_link = file_obj.public_link
-            file_obj.public_link = None
-            file_obj.save(update_fields=["public_link"])
-
-            file_logger.info(
-                "Public link deleted: id=%d, link=%s, name=%s, user=%s, IP=%s",
-                file_obj.id,
-                old_link,
-                file_obj.original_name,
-                request.user.email,
-                get_client_ip(request),
-            )
-
-            response_serializer = FileSerializer(file_obj, context={"request": request})
-            return Response(response_serializer.data)
-
-        except File.DoesNotExist:
-            file_logger.warning(
-                "Public link deletion failed - not found: id=%s, user=%s, IP=%s",
-                pk,
-                request.user.email,
-                get_client_ip(request),
-            )
-            raise NotFound("Файл не найден") from None
+from storage.serializers import PublicFileSerializer
 
 
 class PublicFileView(views.APIView):
     """
     API endpoint for public file access via public_link.
 
-    `GET /api/storage/public/{public_link}/`
-    Returns file information (preview before download).
+    Provides read-only access to file metadata without authentication.
+    Used for preview before download in public sharing scenarios.
 
-    `GET /api/storage/public/{public_link}/download/`
-    Downloads file without authentication.
+    Endpoints:
+        GET /api/storage/public/{public_link}/ - File metadata preview
+
+    Permissions:
+        AllowAny - No authentication required
+
+    Security:
+        - Only minimal metadata exposed (no owner info, no internal paths)
+        - Public link is unguessable (UUID-based)
+        - File must have active public_link to be accessible
     """
 
     permission_classes = [permissions.AllowAny]
 
-    def get(self, request, public_link=None) -> Response:
+    def get(self, request, public_link: str | None = None) -> Response:
         """
-        Get public file information.
+        Retrieve public file information for preview.
+
+        Args:
+            request: The HTTP request object.
+            public_link: Public link UUID string from URL.
 
         Returns:
-            Response: Serialized file data for public access.
+            Response: Serialized file metadata for public access.
+
+        Raises:
+            NotFound: If public link is invalid or file was deleted.
+
+        Logs:
+            Info: Successful public preview access.
+            Warning: Invalid or expired public link access attempt.
         """
+        if not public_link:
+            file_logger.warning(
+                "Public link access attempt with empty link, IP=%s",
+                get_client_ip(request),
+            )
+            raise NotFound("Ссылка недействительна или файл удалён")
+
         try:
             file_obj = File.objects.select_related("owner").get(public_link=public_link)
+
             serializer = PublicFileSerializer(file_obj, context={"request": request})
 
             file_logger.info(
@@ -165,6 +81,7 @@ class PublicFileView(views.APIView):
             )
 
             return Response(serializer.data)
+
         except File.DoesNotExist:
             file_logger.warning(
                 "Public link not found: link=%s, IP=%s",
@@ -176,24 +93,55 @@ class PublicFileView(views.APIView):
 
 class PublicFileDownloadView(views.APIView):
     """
-    API endpoint for public file download.
+    API endpoint for public file download via public_link.
 
-    `GET /api/storage/public/{public_link}/download/`
-    Downloads file via public link without authentication.
+    Allows downloading files without authentication using generated public links.
+    Updates last_downloaded timestamp for analytics.
+
+    Endpoints:
+        GET /api/storage/public/{public_link}/download/ - File download
+
+    Permissions:
+        AllowAny - No authentication required
+
+    Security:
+        - File served with original name in Content-Disposition header
+        - Public link can be revoked by owner at any time
+        - Access logged for audit purposes
     """
 
     permission_classes = [permissions.AllowAny]
 
-    def get(self, request, public_link=None) -> FileResponse:
+    def get(self, request, public_link: str | None = None) -> FileResponse:
         """
         Handle public file download.
 
+        Args:
+            request: The HTTP request object.
+            public_link: Public link UUID string from URL.
+
         Returns:
-            FileResponse: File with original name in Content-Disposition header.
+            FileResponse: File content with original name in header.
+
+        Raises:
+            NotFound: If public link is invalid or file missing from disk.
+
+        Logs:
+            Info: Successful public download with file size.
+            Warning: Invalid public link access attempt.
+            Error: File missing from disk storage.
         """
+        if not public_link:
+            file_logger.warning(
+                "Public download attempt with empty link, IP=%s",
+                get_client_ip(request),
+            )
+            raise NotFound("Ссылка недействительна или файл удалён")
+
         try:
             file_obj = File.objects.get(public_link=public_link)
 
+            # Проверка наличия файла на диске
             if not file_obj.file or not file_obj.file.storage.exists(file_obj.file.name):
                 file_logger.error(
                     "Public file not found on disk: link=%s, path=%s, IP=%s",
@@ -203,7 +151,7 @@ class PublicFileDownloadView(views.APIView):
                 )
                 raise NotFound("Файл не найден на сервере")
 
-            # Update last download timestamp
+            # Обновление timestamp последнего скачивания
             file_obj.update_last_downloaded()
 
             file_logger.info(
@@ -221,8 +169,8 @@ class PublicFileDownloadView(views.APIView):
                 filename=file_obj.original_name,
             )
             response["Content-Length"] = file_obj.size
-
             return response
+
         except File.DoesNotExist:
             file_logger.warning(
                 "Public download failed - not found: link=%s, IP=%s",

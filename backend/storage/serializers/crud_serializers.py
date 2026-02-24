@@ -40,7 +40,20 @@ class FileSerializer(serializers.ModelSerializer):
             "public_link_url",
             "download_url",
         ]
-        read_only_fields = fields
+        read_only_fields = [
+            "id",
+            "size",
+            "size_formatted",
+            "uploaded_at",
+            "last_downloaded",
+            "has_public_link",
+            "public_link_url",
+            "download_url",
+        ]
+        extra_kwargs = {
+            "original_name": {"validators": [validate_filename]},
+            "comment": {"max_length": 1000, "allow_blank": True, "required": False},
+        }
 
     def get_has_public_link(self, obj: File) -> bool:
         """Return True if public link exists."""

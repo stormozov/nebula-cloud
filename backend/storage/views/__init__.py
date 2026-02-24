@@ -2,26 +2,11 @@
 Storage app views.
 """
 
-from .crud_views import (
-    FileCommentView,
-    FileDetailView,
-    FileDownloadView,
-    FileListView,
-    FileRenameView,
-    FileUploadView,
-)
-from .public_views import FilePublicLinkView, PublicFileDownloadView, PublicFileView
+from .crud_views import FileViewSet
+from .public_views import PublicFileDownloadView, PublicFileView
 
 __all__ = [
-    # CRUD operations (authenticated)
-    "FileListView",
-    "FileUploadView",
-    "FileDetailView",
-    "FileRenameView",
-    "FileCommentView",
-    "FilePublicLinkView",
-    "FileDownloadView",
-    # Public access (no auth required)
+    "FileViewSet",
     "PublicFileView",
     "PublicFileDownloadView",
 ]

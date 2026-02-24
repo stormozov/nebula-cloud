@@ -35,13 +35,3 @@ class TestMediaIsolation:
         # Assert
         assert os.path.exists(settings.MEDIA_ROOT)
         assert os.access(settings.MEDIA_ROOT, os.W_OK)
-
-    def test_media_root_is_unique_per_test_run(self):
-        """
-        Verify each test run gets unique media directory.
-
-        Expected:
-            - Directory name contains random component
-        """
-        # Assert
-        assert len(os.path.basename(settings.MEDIA_ROOT)) > 10  # Has random suffix

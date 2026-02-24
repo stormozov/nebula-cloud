@@ -13,6 +13,7 @@ works correctly across all storage endpoints.
 
 # pylint: disable=no-member
 
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth import get_user_model
 from rest_framework import status
 
@@ -34,7 +35,7 @@ class TestOwnerAccess:
     on files they own, regardless of file properties or public link status.
     """
 
-    def test_owner_can_list_own_files(self, authenticated_client, create_file, temp_media_root):
+    def test_owner_can_list_own_files(self, authenticated_client, create_file):
         """
         Verify that owner can retrieve list of their own files.
 
@@ -53,13 +54,12 @@ class TestOwnerAccess:
 
         # Assert
         assert response.status_code == status.HTTP_200_OK
+
         returned_ids = [f["id"] for f in response.data]
         assert own_file1.id in returned_ids
         assert own_file2.id in returned_ids
 
-    def test_owner_can_view_own_file_detail(
-        self, authenticated_client, create_file, temp_media_root
-    ):
+    def test_owner_can_view_own_file_detail(self, authenticated_client, create_file):
         """
         Verify that owner can view details of their own file.
 
@@ -88,7 +88,7 @@ class TestOwnerAccess:
         assert response.data["size"] == size
         assert response.data["comment"] == comment
 
-    def test_owner_can_upload_file(self, authenticated_client, test_file, temp_media_root):
+    def test_owner_can_upload_file(self, authenticated_client, test_file):
         """
         Verify that owner can upload new files to their storage.
 
@@ -117,7 +117,7 @@ class TestOwnerAccess:
         assert file_obj.owner == authenticated_client.user
         assert file_obj.original_name == "test_file.txt"
 
-    def test_owner_can_delete_own_file(self, authenticated_client, create_file, temp_media_root):
+    def test_owner_can_delete_own_file(self, authenticated_client, create_file):
         """
         Verify that owner can delete their own file.
 
@@ -138,7 +138,7 @@ class TestOwnerAccess:
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert not File.objects.filter(id=file_id).exists()
 
-    def test_owner_can_rename_own_file(self, authenticated_client, create_file, temp_media_root):
+    def test_owner_can_rename_own_file(self, authenticated_client, create_file):
         """
         Verify that owner can rename their own file.
 
@@ -162,13 +162,12 @@ class TestOwnerAccess:
 
         # Assert
         assert response.status_code == status.HTTP_200_OK
+
         file_obj.refresh_from_db()
         assert file_obj.original_name == new_name
         assert file_obj.file.path == old_path
 
-    def test_owner_can_update_own_file_comment(
-        self, authenticated_client, create_file, temp_media_root
-    ):
+    def test_owner_can_update_own_file_comment(self, authenticated_client, create_file):
         """
         Verify that owner can update comment on their own file.
 
@@ -194,12 +193,11 @@ class TestOwnerAccess:
 
         # Assert
         assert response.status_code == status.HTTP_200_OK
+
         file_obj.refresh_from_db()
         assert file_obj.comment == new_comment
 
-    def test_owner_can_generate_public_link_for_own_file(
-        self, authenticated_client, create_file, temp_media_root
-    ):
+    def test_owner_can_generate_public_link_for_own_file(self, authenticated_client, create_file):
         """
         Verify that owner can generate public link for their own file.
 
@@ -227,9 +225,7 @@ class TestOwnerAccess:
         file_obj.refresh_from_db()
         assert file_obj.public_link is not None
 
-    def test_owner_can_delete_public_link_for_own_file(
-        self, authenticated_client, create_file, temp_media_root
-    ):
+    def test_owner_can_delete_public_link_for_own_file(self, authenticated_client, create_file):
         """
         Verify that owner can delete public link for their own file.
 
@@ -255,7 +251,7 @@ class TestOwnerAccess:
         file_obj.refresh_from_db()
         assert file_obj.public_link is None
 
-    def test_owner_can_download_own_file(self, authenticated_client, create_file, temp_media_root):
+    def test_owner_can_download_own_file(self, authenticated_client, create_file):
         """
         Verify that owner can download their own file.
 
@@ -295,7 +291,7 @@ class TestAdminAccess:
     """
 
     def test_admin_can_list_all_files(
-        self, admin_client, create_file, user_account, another_user_account, temp_media_root
+        self, admin_client, create_file, user_account, another_user_account
     ):
         """
         Verify that admin can retrieve list of all files without filter.
@@ -315,13 +311,14 @@ class TestAdminAccess:
 
         # Assert
         assert response.status_code == status.HTTP_200_OK
+
         returned_ids = [f["id"] for f in response.data]
         assert file1.id in returned_ids
         assert file2.id in returned_ids
         assert file3.id in returned_ids
 
     def test_admin_can_filter_files_by_user_id(
-        self, admin_client, create_file, user_account, another_user_account, temp_media_root
+        self, admin_client, create_file, user_account, another_user_account
     ):
         """
         Verify that admin can filter file list by specific user_id.
@@ -341,14 +338,13 @@ class TestAdminAccess:
 
         # Assert
         assert response.status_code == status.HTTP_200_OK
+
         returned_ids = [f["id"] for f in response.data]
         assert user1_file1.id in returned_ids
         assert user1_file2.id in returned_ids
         assert user2_file.id not in returned_ids
 
-    def test_admin_can_view_any_user_file_detail(
-        self, admin_client, create_file, user_account, temp_media_root
-    ):
+    def test_admin_can_view_any_user_file_detail(self, admin_client, create_file, user_account):
         """
         Verify that admin can view details of any user's file.
 
@@ -375,9 +371,7 @@ class TestAdminAccess:
         assert response.data["original_name"] == original_name
         assert response.data["size"] == size
 
-    def test_admin_can_delete_any_user_file(
-        self, admin_client, create_file, user_account, temp_media_root
-    ):
+    def test_admin_can_delete_any_user_file(self, admin_client, create_file, user_account):
         """
         Verify that admin can delete any user's file.
 
@@ -397,9 +391,7 @@ class TestAdminAccess:
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert not File.objects.filter(id=file_id).exists()
 
-    def test_admin_can_rename_any_user_file(
-        self, admin_client, create_file, user_account, temp_media_root
-    ):
+    def test_admin_can_rename_any_user_file(self, admin_client, create_file, user_account):
         """
         Verify that admin can rename any user's file.
 
@@ -410,7 +402,6 @@ class TestAdminAccess:
 
         # Arrange
         file_obj = create_file(owner=user_account, original_name="original_name.txt")
-
         rename_data = {"original_name": "admin_renamed.txt"}
 
         # Act
@@ -420,12 +411,11 @@ class TestAdminAccess:
 
         # Assert
         assert response.status_code == status.HTTP_200_OK
+
         file_obj.refresh_from_db()
         assert file_obj.original_name == "admin_renamed.txt"
 
-    def test_admin_can_update_any_user_file_comment(
-        self, admin_client, create_file, user_account, temp_media_root
-    ):
+    def test_admin_can_update_any_user_file_comment(self, admin_client, create_file, user_account):
         """
         Verify that admin can update comment on any user's file.
 
@@ -449,11 +439,12 @@ class TestAdminAccess:
 
         # Assert
         assert response.status_code == status.HTTP_200_OK
+
         file_obj.refresh_from_db()
         assert file_obj.comment == "Admin updated comment"
 
     def test_admin_can_generate_public_link_for_any_user_file(
-        self, admin_client, create_file, user_account, temp_media_root
+        self, admin_client, create_file, user_account
     ):
         """
         Verify that admin can generate public link for any user's file.
@@ -481,7 +472,7 @@ class TestAdminAccess:
         assert file_obj.public_link is not None
 
     def test_admin_can_delete_public_link_for_any_user_file(
-        self, admin_client, create_file, user_account, temp_media_root
+        self, admin_client, create_file, user_account
     ):
         """
         Verify that admin can delete public link for any user's file.
@@ -508,9 +499,7 @@ class TestAdminAccess:
         file_obj.refresh_from_db()
         assert file_obj.public_link is None
 
-    def test_admin_can_download_any_user_file(
-        self, admin_client, create_file, user_account, temp_media_root
-    ):
+    def test_admin_can_download_any_user_file(self, admin_client, create_file, user_account):
         """
         Verify that admin can download any user's file.
 
@@ -534,7 +523,7 @@ class TestAdminAccess:
         assert response.status_code == status.HTTP_200_OK
         assert original_name in response["Content-Disposition"]
 
-    def test_admin_can_access_own_storage(self, admin_client, create_file, temp_media_root):
+    def test_admin_can_access_own_storage(self, admin_client):
         """
         Verify that admin can access their own storage like a regular user.
 
@@ -544,8 +533,6 @@ class TestAdminAccess:
         """
 
         # Arrange - Upload a file as admin
-        from django.core.files.uploadedfile import SimpleUploadedFile
-
         test_file = SimpleUploadedFile(
             name="admin_own.txt",
             content=b"Admin's own file content",
@@ -588,9 +575,12 @@ class TestUnauthorizedAccess:
         """
         Verify that unauthenticated user cannot list files.
 
+        Scenario: User attempts to list files
+
         Expected:
             - HTTP 401 Unauthorized
         """
+
         # Act
         response = api_client.get("/api/storage/files/")
 
@@ -600,6 +590,8 @@ class TestUnauthorizedAccess:
     def test_unauthenticated_detail_returns_401(self, api_client, create_file):
         """
         Verify that unauthenticated user cannot view file details.
+
+        Scenario: User attempts to view file
 
         Expected:
             - HTTP 401 Unauthorized
@@ -618,6 +610,8 @@ class TestUnauthorizedAccess:
         """
         Verify that unauthenticated user cannot upload files.
 
+        Scenario: User attempts to upload file
+
         Expected:
             - HTTP 401 Unauthorized
         """
@@ -635,6 +629,8 @@ class TestUnauthorizedAccess:
         """
         Verify that unauthenticated user cannot delete files.
 
+        Scenario: User attempts to delete file
+
         Expected:
             - HTTP 401 Unauthorized
         """
@@ -649,10 +645,12 @@ class TestUnauthorizedAccess:
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_user_cannot_view_another_user_file(
-        self, authenticated_client, create_file, another_user_account, temp_media_root
+        self, authenticated_client, create_file, another_user_account
     ):
         """
         Verify that user cannot view another user's file details.
+
+        Scenario: User attempts to view file owned by different user
 
         Expected:
             - HTTP 403 Forbidden
@@ -669,10 +667,12 @@ class TestUnauthorizedAccess:
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_user_cannot_delete_another_user_file(
-        self, authenticated_client, create_file, another_user_account, temp_media_root
+        self, authenticated_client, create_file, another_user_account
     ):
         """
         Verify that user cannot delete another user's file.
+
+        Scenario: User attempts to delete file owned by different user
 
         Expected:
             - HTTP 403 Forbidden
@@ -690,10 +690,12 @@ class TestUnauthorizedAccess:
         assert File.objects.filter(id=file_obj.id).exists()
 
     def test_user_cannot_rename_another_user_file(
-        self, authenticated_client, create_file, another_user_account, temp_media_root
+        self, authenticated_client, create_file, another_user_account
     ):
         """
         Verify that user cannot rename another user's file.
+
+        Scenario: User attempts to rename file owned by different user
 
         Expected:
             - HTTP 403 Forbidden
@@ -713,14 +715,17 @@ class TestUnauthorizedAccess:
 
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
         file_obj.refresh_from_db()
         assert file_obj.original_name == original_name
 
     def test_user_cannot_update_another_user_comment(
-        self, authenticated_client, create_file, another_user_account, temp_media_root
+        self, authenticated_client, create_file, another_user_account
     ):
         """
         Verify that user cannot update another user's file comment.
+
+        Scenario: User updates comment for another user's file
 
         Expected:
             - HTTP 403 Forbidden
@@ -744,14 +749,17 @@ class TestUnauthorizedAccess:
 
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
         file_obj.refresh_from_db()
         assert file_obj.comment == comment
 
     def test_user_cannot_generate_link_for_another_user_file(
-        self, authenticated_client, create_file, another_user_account, temp_media_root
+        self, authenticated_client, create_file, another_user_account
     ):
         """
         Verify that user cannot generate public link for another user's file.
+
+        Scenario: User generates public link for another user's file
 
         Expected:
             - HTTP 403 Forbidden
@@ -770,14 +778,17 @@ class TestUnauthorizedAccess:
 
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
         file_obj.refresh_from_db()
         assert file_obj.public_link is None
 
     def test_user_cannot_delete_another_user_public_link(
-        self, authenticated_client, create_file, another_user_account, temp_media_root
+        self, authenticated_client, create_file, another_user_account
     ):
         """
         Verify that user cannot delete another user's public link.
+
+        Scenario: User deletes public link for another user's file
 
         Expected:
             - HTTP 403 Forbidden
@@ -797,11 +808,12 @@ class TestUnauthorizedAccess:
 
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
         file_obj.refresh_from_db()
         assert file_obj.public_link == public_link
 
     def test_user_cannot_download_another_user_file(
-        self, authenticated_client, create_file, another_user_account, temp_media_root
+        self, authenticated_client, create_file, another_user_account
     ):
         """
         Verify that user cannot download another user's file.
@@ -824,6 +836,8 @@ class TestUnauthorizedAccess:
     ):
         """
         Verify that permission errors return JSON-formatted responses.
+
+        Scenario: User attempts to access another user's file
 
         Expected:
             - Response Content-Type is application/json
@@ -857,10 +871,12 @@ class TestEdgePermissions:
     """
 
     def test_admin_with_invalid_user_id_returns_fallback(
-        self, admin_client, create_file, user_account, temp_media_root
+        self, admin_client, create_file, user_account
     ):
         """
         Verify that admin with invalid user_id parameter gets fallback behavior.
+
+        Scenario: Admin provides invalid user_id
 
         Expected:
             - HTTP 200 OK (not error)
@@ -876,45 +892,57 @@ class TestEdgePermissions:
         # Assert - Should not crash, returns some files
         assert response.status_code == status.HTTP_200_OK
 
-    def test_admin_with_nonexistent_user_id_returns_empty(self, admin_client, temp_media_root):
+    def test_admin_with_nonexistent_user_id_returns_empty(self, admin_client):
         """
         Verify that admin with nonexistent user_id gets empty list.
+
+        Scenario: Admin provides nonexistent user_id
 
         Expected:
             - HTTP 200 OK
             - Empty list returned (no files for that user)
         """
+
+        # Arrange
+        user_id = 999999
+
         # Act
-        response = admin_client.get("/api/storage/files/?user_id=999999")
+        response = admin_client.get(f"/api/storage/files/?user_id={user_id}")
 
         # Assert
         assert response.status_code == status.HTTP_200_OK
         assert response.data == []
 
-    def test_permission_check_happens_before_file_retrieval(
-        self, authenticated_client, another_user_account
-    ):
+    def test_permission_check_happens_before_file_retrieval(self, authenticated_client):
         """
         Verify that permission is checked before attempting file retrieval.
 
         This ensures we don't leak information about file existence
         through different error messages or timing.
 
+        Scenario: User tries to access non-existent file
+
         Expected:
             - HTTP 403 Forbidden (not 404)
             - Same error format regardless of file existence
         """
+
+        # Arrange
+        user_id = 999999
+
         # Act
-        response = authenticated_client.get("/api/storage/files/999999/")
+        response = authenticated_client.get(f"/api/storage/files/{user_id}/")
 
         # Assert - Should be 404 (not found) not 403 (forbidden)
         assert response.status_code in [status.HTTP_404_NOT_FOUND, status.HTTP_403_FORBIDDEN]
 
-    def test_public_link_access_does_not_require_owner_permission(
-        self, api_client, create_file, temp_media_root
-    ):
+    def test_public_link_access_does_not_require_owner_permission(self, api_client, create_file):
         """
         Verify that public link access bypasses owner permission checks.
+
+        Scenario:
+            - User generates public link
+            - User tries to access file via public link
 
         Expected:
             - Unauthenticated user can access file via public link
@@ -927,6 +955,7 @@ class TestEdgePermissions:
             public_link="public123",
         )
 
+        # Act
         # Act - Public info access
         response_info = api_client.get("/api/storage/public/public123/")
 
@@ -938,10 +967,14 @@ class TestEdgePermissions:
         assert response_download.status_code == status.HTTP_200_OK
 
     def test_permission_class_is_applied_to_all_endpoints(
-        self, authenticated_client, create_file, another_user_account, temp_media_root
+        self, authenticated_client, create_file, another_user_account
     ):
         """
         Verify that IsOwnerOrAdmin permission is consistently applied.
+
+        Scenario:
+            - User attempts to access their own file
+            - User attempts to access another user's file
 
         Expected:
             - All protected endpoints return 403 for unauthorized access
@@ -975,6 +1008,6 @@ class TestEdgePermissions:
                 case "POST":
                     response = authenticated_client.post(url, data, format="json")
 
-            assert (
-                response.status_code == status.HTTP_403_FORBIDDEN
-            ), f"Endpoint {method} {url} should return 403, got {response.status_code}"
+            assert response.status_code == status.HTTP_403_FORBIDDEN, (
+                f"Endpoint {method} {url} should return 403, got {response.status_code}"
+            )
