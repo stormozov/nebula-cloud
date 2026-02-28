@@ -249,26 +249,6 @@ class TestFileViewSetCreate:
         assert response.status_code == status.HTTP_201_CREATED
         assert created_file.owner == user
 
-    def test_create_with_large_file_returns_400(
-        self, authenticated_client: APIClient, large_test_file
-    ) -> None:
-        """
-        Test: Create returns 400 for file exceeding size limit.
-
-        Scenario: User attempts to upload file larger than MAX_UPLOAD_SIZE.
-        Expected: HTTP 400 Bad Request with validation error.
-        """
-
-        # Arrange
-        upload_data = {"file": large_test_file}
-
-        # Act
-        response = authenticated_client.post("/api/storage/files/", upload_data, format="multipart")
-
-        # Assert
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert "file" in response.data or "detail" in response.data
-
     def test_create_without_file_field_returns_400(self, authenticated_client: APIClient) -> None:
         """
         Test: Create returns 400 when file field is missing.

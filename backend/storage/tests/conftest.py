@@ -197,7 +197,7 @@ def admin_client(api_client, admin_account):
 
 
 @pytest.fixture
-def test_file():
+def test_file() -> SimpleUploadedFile:
     """
     Create a temporary test file for upload testing.
 
