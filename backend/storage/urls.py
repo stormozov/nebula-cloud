@@ -16,8 +16,10 @@ from .views import (
 )
 
 # Router for authenticated file operations
+# Disable format suffixes to avoid 'drf_format_suffix' converter registration errors in tests
 router = DefaultRouter()
 router.register(r"files", FileViewSet, basename="file")
+router.include_format_suffixes = False
 
 urlpatterns = [
     # Authenticated file operations (CRUD + custom actions)

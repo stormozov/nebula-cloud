@@ -2,23 +2,13 @@
 Views for users app.
 """
 
-from .views_admin import (
-    AdminPasswordResetView,
-    AdminToggleAdminView,
-    AdminUserDetailView,
-    AdminUserListView,
-    AdminUserStorageStatsView,
-)
+from .admin_views import AdminUserViewSet
 from .views_auth import CustomTokenRefreshView, LoginView, LogoutView, RegisterView
 from .views_users import CurrentUserView, PasswordChangeView
 
 __all__ = [
     # Admin endpoints
-    "AdminPasswordResetView",
-    "AdminToggleAdminView",
-    "AdminUserDetailView",
-    "AdminUserListView",
-    "AdminUserStorageStatsView",
+    "AdminUserViewSet",
     "CustomTokenRefreshView",
     # Authentication endpoints
     "LoginView",
