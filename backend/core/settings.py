@@ -295,8 +295,7 @@ if IS_TESTING:
     print(f"[TEST MODE] MEDIA_ROOT set to: {MEDIA_ROOT}")
 
     # Disable throttling (prevents rate limit errors during testing)
-    if "REST_FRAMEWORK" in locals() and "DEFAULT_THROTTLE_CLASSES" in REST_FRAMEWORK:
-        REST_FRAMEWORK["DEFAULT_THROTTLE_CLASSES"] = []
+    REST_FRAMEWORK["DEFAULT_THROTTLE_CLASSES"] = []
 
     # Reduce logging noise during tests
     if "LOGGING" in locals():

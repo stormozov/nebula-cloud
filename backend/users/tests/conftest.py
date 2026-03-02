@@ -626,6 +626,42 @@ def get_user_by_id() -> Callable[[int], Optional[User]]:
     return _get_user
 
 
+@pytest.fixture
+def valid_password_data():
+    """
+    Provide valid password data that meets all validation requirements.
+
+    Returns:
+        dict: Valid password payload for registration/reset endpoints.
+    """
+    return {
+        "password": "ValidPass123!",
+        "password_confirm": "ValidPass123!",
+    }
+
+
+@pytest.fixture
+def throttle_override(mocker):
+    """
+    Override throttling for tests to avoid rate limiting.
+
+    This fixture disables the default throttling behavior during tests
+    by mocking the allow_request method to always return True.
+
+    Usage:
+        def test_registration(throttle_override, api_client, valid_password_data):
+            # Throttling is disabled for this test
+            ...
+    """
+    from users.throttles import RegisterRateThrottle, LoginRateThrottle
+
+    # Mock allow_request to always return True (disable throttling)
+    mocker.patch.object(RegisterRateThrottle, 'allow_request', return_value=True)
+    mocker.patch.object(LoginRateThrottle, 'allow_request', return_value=True)
+
+    yield
+
+
 # ==================================================================================================
 # FIXTURES: STORAGE (for admin tests)
 # ==================================================================================================
