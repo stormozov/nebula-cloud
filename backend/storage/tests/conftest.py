@@ -13,6 +13,8 @@ This module provides reusable test fixtures for:
 # pylint: disable=unused-argument
 # pylint: disable=no-member
 
+import tempfile
+import shutil
 import uuid
 from pathlib import Path
 
@@ -51,17 +53,16 @@ def media_root_tmp(monkeypatch, tmp_path: Path):
         Path: Temporary media root directory path.
     """
 
-    tmp_media = tmp_path / "media"
-    tmp_media.mkdir(parents=True, exist_ok=True)
+    # Create temporary directory
+    temp_media = Path(tempfile.mkdtemp(prefix="test_media_"))
 
-    # Переопределяем MEDIA_ROOT до импорта моделей
-    monkeypatch.setattr("django.conf.settings.MEDIA_ROOT", str(tmp_media))
+    # Override MEDIA_ROOT
+    settings.MEDIA_ROOT = str(temp_media)
 
-    monkeypatch.setattr(
-        "django.core.files.storage.default_storage", FileSystemStorage(location=str(tmp_media))
-    )
+    yield
 
-    yield tmp_media
+    # Cleanup after all tests
+    shutil.rmtree(temp_media, ignore_errors=True)
 
 
 # ==================================================================================================
