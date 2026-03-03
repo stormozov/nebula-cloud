@@ -52,7 +52,9 @@ class FileViewSet(viewsets.ModelViewSet):
                 user_id = self.request.query_params.get("user_id")
                 if user_id:
                     try:
-                        queryset = File.objects.filter(owner_id=int(user_id))  # pylint: disable=no-member
+                        queryset = File.objects.filter(
+                            owner_id=int(user_id)
+                        )  # pylint: disable=no-member
                         user_email = getattr(user, "email", "anonymous")
                         file_logger.info(
                             "Admin %s requested files for user_id=%s, IP=%s",

@@ -102,7 +102,7 @@ class TestFileCreation:
     def test_file_size_default_value(self, db, user_account, create_file):
         """
         Verify that size field has default value of 0.
-        
+
         Scenario:
             1. Create File instance
             2. Save to database
@@ -167,7 +167,7 @@ class TestUniquePathGeneration:
     def test_generate_unique_path_preserves_extension(self, db, user_account, create_file):
         """
         Verify that file extension is preserved in lowercase.
-        
+
         Scenario:
             1. Create File instance (required for generate_unique_path)
             2. Call generate_unique_path with file instance
@@ -194,7 +194,7 @@ class TestUniquePathGeneration:
     def test_generate_unique_path_creates_unique_ids(self, db, user_account, create_file):
         """
         Verify that multiple calls generate different unique IDs.
-        
+
         Scenario:
             1. Create File instance (required for generate_unique_path)
             2. Call generate_unique_path multiple times
@@ -224,7 +224,7 @@ class TestUniquePathGeneration:
     def test_generate_unique_path_uses_prefix_subdirectory(self, db, user_account, create_file):
         """
         Verify that path includes 2-character prefix subdirectory.
-        
+
         Scenario:
             1. Create File instance (required for generate_unique_path)
             2. Call generate_unique_path with file instance
@@ -294,7 +294,7 @@ class TestPublicLink:
     ):
         """
         Verify that generate_public_link returns existing link when force=False.
-        
+
         Scenario:
             1. Create File with existing public_link
             2. Call generate_public_link(force=False)
@@ -407,7 +407,7 @@ class TestFileDeletion:
     def test_delete_removes_database_record(self, db, user_account, create_file):
         """
         Verify that delete() removes File from database.
-        
+
         Scenario:
             1. Create File
             2. Call delete()
@@ -501,7 +501,7 @@ class TestDownloadTracking:
     def test_update_last_downloaded_sets_timestamp(self, db, user_account, create_file):
         """
         Verify that update_last_downloaded() sets last_downloaded field.
-        
+
         Scenario:
             1. Create File
             2. Call update_last_downloaded()
@@ -526,7 +526,7 @@ class TestDownloadTracking:
     def test_update_last_downloaded_updates_existing_timestamp(self, db, user_account, create_file):
         """
         Verify that update_last_downloaded() updates existing timestamp.
-        
+
         Scenario:
             1. Create File
             2. Set last_downloaded timestamp
@@ -566,7 +566,7 @@ class TestStringRepresentation:
     def test_str_returns_original_name_and_owner(self, db, user_account, create_file):
         """
         Verify that __str__ returns formatted string with name and owner.
-        
+
         Scenario:
             1. Create File
             2. Call __str__()
@@ -590,7 +590,7 @@ class TestStringRepresentation:
     def test_str_handles_missing_email(self, db, user_account, create_file):
         """
         Verify that __str__ handles missing email gracefully.
-        
+
         Scenario:
             1. Set email to empty string
             2. Call __str__()
@@ -627,7 +627,7 @@ class TestModelMeta:
     def test_ordering_by_uploaded_at_desc(self, db, user_account, create_file):
         """
         Verify that files are ordered by uploaded_at descending.
-        
+
         Scenario:
             1. Create multiple File instances
             2. Retrieve queryset
@@ -645,7 +645,9 @@ class TestModelMeta:
 
         # Act
         actual_names = list(
-            File.objects.filter(owner=user_account).values_list("original_name", flat=True)  # pylint: disable=no-member
+            File.objects.filter(owner=user_account).values_list(
+                "original_name", flat=True
+            )  # pylint: disable=no-member
         )
 
         # Assert
@@ -654,7 +656,7 @@ class TestModelMeta:
     def test_db_table_name(self, db, user_account, create_file):
         """
         Verify that database table name is correct.
-        
+
         Scenario:
             1. Create File
             2. Retrieve table name

@@ -656,8 +656,8 @@ def throttle_override(mocker):
     from users.throttles import RegisterRateThrottle, LoginRateThrottle
 
     # Mock allow_request to always return True (disable throttling)
-    mocker.patch.object(RegisterRateThrottle, 'allow_request', return_value=True)
-    mocker.patch.object(LoginRateThrottle, 'allow_request', return_value=True)
+    mocker.patch.object(RegisterRateThrottle, "allow_request", return_value=True)
+    mocker.patch.object(LoginRateThrottle, "allow_request", return_value=True)
 
     yield
 
@@ -858,9 +858,11 @@ def mock_storage_stats(mocker) -> Callable[[Dict], Any]:
 
     return _mock
 
+
 # ==================================================================================================
 # FIXTURES: PASSWORD CHANGE TEST DATA
 # ==================================================================================================
+
 
 @pytest.fixture
 def wrong_current_password_data():
@@ -913,6 +915,7 @@ def valid_password_change_data():
         "new_password": "NewSecurePass456!",
         "new_password_confirm": "NewSecurePass456!",
     }
+
 
 @pytest.fixture
 def weak_password_change_data():

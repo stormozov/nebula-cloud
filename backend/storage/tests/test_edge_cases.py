@@ -357,9 +357,7 @@ class TestFilenameEdgeCases:
         file_obj = File.objects.first()
         assert file_obj.original_name == file_name
 
-    def test_upload_file_with_multiple_extensions_returns_201(
-        self, authenticated_client
-    ):
+    def test_upload_file_with_multiple_extensions_returns_201(self, authenticated_client):
         """
         Verify that filename with multiple extensions is accepted.
 
@@ -495,9 +493,7 @@ class TestConcurrentOperations:
         assert file1.original_name == file2.original_name
         assert file1.owner != file2.owner
 
-    def test_same_user_upload_same_filename_twice_unique_paths(
-        self, authenticated_client
-    ):
+    def test_same_user_upload_same_filename_twice_unique_paths(self, authenticated_client):
         """
         Verify that same user uploading same filename twice gets unique paths.
 
@@ -772,9 +768,7 @@ class TestPerformanceBoundaries:
         assert len(response.data) == users_count
         assert elapsed_time < 10  # Should complete in under 10 seconds
 
-    def test_comment_with_maximum_length_returns_200(
-        self, authenticated_client, create_file
-    ):
+    def test_comment_with_maximum_length_returns_200(self, authenticated_client, create_file):
         """
         Verify that comment at maximum length is accepted.
 
@@ -798,9 +792,7 @@ class TestPerformanceBoundaries:
         file_obj.refresh_from_db()
         assert file_obj.comment == max_comment
 
-    def test_comment_over_maximum_length_returns_400(
-        self, authenticated_client, create_file
-    ):
+    def test_comment_over_maximum_length_returns_400(self, authenticated_client, create_file):
         """
         Verify that comment exceeding maximum length is rejected.
 
@@ -824,9 +816,7 @@ class TestPerformanceBoundaries:
         file_obj.refresh_from_db()
         assert file_obj.comment != too_long_comment
 
-    def test_rapid_sequential_operations_return_200(
-        self, authenticated_client
-    ):
+    def test_rapid_sequential_operations_return_200(self, authenticated_client):
         """
         Verify that rapid sequential operations complete successfully.
 

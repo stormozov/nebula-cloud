@@ -9,8 +9,8 @@ from nanoid import generate
 
 from core.settings import AUTH_USER_MODEL
 from core.utils import PUBLIC_URL_LEN
-from storage.utils import generate_unique_path
 from storage.loggers import file_logger
+from storage.utils import generate_unique_path
 
 
 class File(models.Model):

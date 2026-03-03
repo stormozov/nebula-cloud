@@ -138,7 +138,11 @@ class TestPublicFileView:
         """
 
         # Arrange
-        file_obj = create_file(owner=user_account, original_name="to_delete.txt", size=100,)
+        file_obj = create_file(
+            owner=user_account,
+            original_name="to_delete.txt",
+            size=100,
+        )
         file_obj.generate_public_link(force=True)
         file_obj.save(update_fields=["public_link"])
         public_link = file_obj.public_link
@@ -780,8 +784,11 @@ class TestPublicLinkIntegration:
 
     @pytest.mark.parametrize("file_index", range(5))
     def test_each_public_link_returns_correct_file(
-        self, authenticated_client: APIClient, api_client: APIClient, 
-        multiple_files: list[File], file_index: int
+        self,
+        authenticated_client: APIClient,
+        api_client: APIClient,
+        multiple_files: list[File],
+        file_index: int,
     ) -> None:
         """
         Test: Each public link returns correct file data.
