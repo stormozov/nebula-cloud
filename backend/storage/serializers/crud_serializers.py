@@ -1,12 +1,16 @@
 """
-Serializers for File model operations.
+Serializers for file write operations:
+- upload (FileUploadSerializer)
+- rename (FileRenameSerializer)
+- comment (FileCommentSerializer)
+- public link (FilePublicLinkSerializer)
 """
 
 from rest_framework import serializers
 
+from core.utils import format_size
+from storage.models import File
 from storage.utils import validate_file_size, validate_filename
-
-from .models import File
 
 
 class FileSerializer(serializers.ModelSerializer):
@@ -36,7 +40,20 @@ class FileSerializer(serializers.ModelSerializer):
             "public_link_url",
             "download_url",
         ]
-        read_only_fields = fields
+        read_only_fields = [
+            "id",
+            "size",
+            "size_formatted",
+            "uploaded_at",
+            "last_downloaded",
+            "has_public_link",
+            "public_link_url",
+            "download_url",
+        ]
+        extra_kwargs = {
+            "original_name": {"validators": [validate_filename]},
+            "comment": {"max_length": 1000, "allow_blank": True, "required": False},
+        }
 
     def get_has_public_link(self, obj: File) -> bool:
         """Return True if public link exists."""
@@ -44,6 +61,7 @@ class FileSerializer(serializers.ModelSerializer):
 
     def get_public_link_url(self, obj: File) -> str | None:
         """Return full public URL if link exists."""
+
         if not obj.public_link:
             return None
 
@@ -64,15 +82,8 @@ class FileSerializer(serializers.ModelSerializer):
         )
 
     def get_size_formatted(self, obj: File) -> str:
-        """Convert bytes to human-readable format (KB/MB/GB)."""
-
-        size = obj.size
-        for unit in ["Б", "КБ", "МБ", "ГБ"]:
-            if size < 1024.0:
-                return f"{size:.2f} {unit}"
-            size /= 1024.0
-
-        return f"{size:.2f} ТБ"
+        """Convert bytes to human-readable format."""
+        return format_size(obj.size)
 
 
 class FileUploadSerializer(serializers.ModelSerializer):
@@ -143,93 +154,3 @@ class FileCommentSerializer(serializers.Serializer):
         instance.comment = validated_data.get("comment", instance.comment)
         instance.save(update_fields=["comment"])
         return instance
-
-
-class FilePublicLinkSerializer(serializers.Serializer):
-    """
-    Serializer for generating/deleting public link.
-    Action must be 'generate' or 'delete'.
-    """
-
-    ACTION_CHOICES = (
-        ("generate", "Создать публичную ссылку"),
-        ("delete", "Удалить публичную ссылку"),
-    )
-    action = serializers.ChoiceField(choices=ACTION_CHOICES)
-
-    def validate(self, attrs: dict) -> dict:
-        file_instance = self.context.get("file_instance")
-
-        if attrs["action"] == "generate" and file_instance.public_link:
-            raise serializers.ValidationError(
-                {
-                    "detail": "Публичная ссылка уже существует",
-                    "public_link": file_instance.public_link,
-                }
-            )
-        if attrs["action"] == "delete" and not file_instance.public_link:
-            raise serializers.ValidationError({"detail": "Публичная ссылка отсутствует"})
-
-        return attrs
-
-    def create(self, validated_data: dict) -> None:
-        """Not implemented for public link serializer."""
-        return NotImplementedError("Public link serializer does not implement create")
-
-    def update(self, instance: File, validated_data: dict) -> File:
-        """Not implemented for public link serializer."""
-        return NotImplementedError("Public link serializer does not implement update")
-
-    def save(self):  # pylint: disable=arguments-differ
-        file_instance = self.context.get("file_instance")
-        action = self.validated_data.get("action")
-
-        if action == "generate":
-            file_instance.generate_public_link(force=True)
-        elif action == "delete":
-            file_instance.public_link = None
-            file_instance.save(update_fields=["public_link"])
-
-        return file_instance
-
-
-class PublicFileSerializer(serializers.ModelSerializer):
-    """
-    Serializer for public file preview (before download via public link).
-    Minimal safe metadata only. No owner info, no internal paths.
-    """
-
-    download_url = serializers.SerializerMethodField()
-    size_formatted = serializers.SerializerMethodField()
-
-    class Meta:
-        """Meta class for PublicFileSerializer."""
-
-        model = File
-        fields = [
-            "original_name",
-            "size",
-            "size_formatted",
-            "uploaded_at",
-            "comment",
-            "download_url",
-        ]
-        read_only_fields = fields
-
-    def get_download_url(self, obj):
-        """Public download URL (no auth required)."""
-        request = self.context.get("request")
-        url = f"/api/storage/public/{obj.public_link}/download/"
-        return request.build_absolute_uri(url) if request else url
-
-    def get_size_formatted(self, obj):
-        """Reuse formatting logic."""
-
-        size = obj.size
-
-        for unit in ["Б", "КБ", "МБ", "ГБ"]:
-            if size < 1024.0:
-                return f"{size:.2f} {unit}"
-            size /= 1024.0
-
-        return f"{size:.2f} ТБ"

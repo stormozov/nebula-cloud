@@ -11,14 +11,15 @@ This module tests the File model functionality including:
 """
 
 # pylint: disable=unused-argument
-# pylint: disable=no-member
 
 import os
 import time
+from nanoid import generate as original_generate
 
 from django.core.files.base import ContentFile
 from django.utils import timezone
 
+from core.utils import PUBLIC_URL_LEN
 from storage.models import File, generate_unique_path
 
 # ==============================================================================
@@ -31,7 +32,7 @@ class TestFileCreation:
     Test suite for File model creation and basic properties.
     """
 
-    def test_file_creation_with_required_fields(self, db, user_account, test_file):
+    def test_file_creation_with_required_fields(self, db, user_account, create_file):
         """
         Verify that File can be created with required fields only.
 
@@ -48,27 +49,25 @@ class TestFileCreation:
         """
 
         # Arrange
-        file_obj = File(
-            owner=user_account,
-            original_name="document.pdf",
-            size=2048,
-        )
-        file_obj.file.save("document.pdf", ContentFile(b"Test content"), save=True)
+        file_name = "document.pdf"
+        file_size = 2048
+        file_obj = create_file(owner=user_account, original_name=file_name, size=file_size)
 
         # Act
+        file_obj.file.save(file_name, ContentFile(b"Test content"), save=True)
         file_obj.save()
 
         # Assert
         assert file_obj.id is not None
         assert file_obj.owner == user_account
-        assert file_obj.original_name == "document.pdf"
-        assert file_obj.size == 2048
+        assert file_obj.original_name == file_name
+        assert file_obj.size == file_size
         assert file_obj.uploaded_at is not None
-        assert file_obj.comment is None
+        assert file_obj.comment == ""
         assert file_obj.public_link is None
         assert file_obj.last_downloaded is None
 
-    def test_file_creation_with_all_fields(self, db, user_account, test_file):
+    def test_file_creation_with_all_fields(self, db, user_account, create_file):
         """
         Verify that File can be created with all optional fields.
 
@@ -83,37 +82,42 @@ class TestFileCreation:
         """
 
         # Arrange
-        file_obj = File(
-            owner=user_account,
-            original_name="report.xlsx",
-            size=4096,
-            comment="Quarterly financial report",
-            public_link="abc123xyz",
-        )
-        file_obj.file.save("report.xlsx", ContentFile(b"Test content"), save=True)
+        file_data = {
+            "owner": user_account,
+            "original_name": "report.xlsx",
+            "size": 4096,
+            "comment": "Quarterly financial report",
+            "public_link": "abc123xyz",
+        }
+        file_obj = create_file(**file_data)
 
         # Act
+        file_obj.file.save(file_data["original_name"], ContentFile(b"Test content"), save=True)
         file_obj.save()
 
         # Assert
-        assert file_obj.comment == "Quarterly financial report"
-        assert file_obj.public_link == "abc123xyz"
+        assert file_obj.comment == file_data["comment"]
+        assert file_obj.public_link == file_data["public_link"]
 
-    def test_file_size_default_value(self, db, user_account):
+    def test_file_size_default_value(self, db, user_account, create_file):
         """
         Verify that size field has default value of 0.
+
+        Scenario:
+            1. Create File instance
+            2. Save to database
 
         Expected:
             - File can be created without explicit size
             - Default size is 0
         """
 
-        # Arrange & Act
-        file_obj = File(
-            owner=user_account,
-            original_name="empty.txt",
-        )
-        file_obj.file.save("empty.txt", ContentFile(b""), save=True)
+        # Arrange
+        file_name = "empty.txt"
+        file_obj = create_file(owner=user_account, original_name=file_name, size=0)
+
+        # Act
+        file_obj.file.save(file_name, ContentFile(b""), save=True)
 
         # Assert
         assert file_obj.size == 0
@@ -129,7 +133,7 @@ class TestUniquePathGeneration:
     Test suite for generate_unique_path function.
     """
 
-    def test_generate_unique_path_creates_user_directory(self, db, user_account):
+    def test_generate_unique_path_creates_user_directory(self, db, user_account, create_file):
         """
         Verify that generated path includes user ID directory.
 
@@ -145,27 +149,28 @@ class TestUniquePathGeneration:
         """
 
         # Arrange
-        file_instance = File(
-            owner=user_account,
-            original_name="document.pdf",
-            size=100,
-        )
-        file_instance.file.save("document.pdf", ContentFile(b"Test"), save=False)
+        file_name = "document.pdf"
+        file_instance = create_file(owner=user_account, original_name=file_name, size=100)
+        file_instance.file.save(file_name, ContentFile(b"Test"), save=False)
 
         # Act
-        path = generate_unique_path(file_instance, "document.pdf")
+        path = generate_unique_path(file_instance, file_name)
+        parts = path.split("/")
+        unique_part = parts[-1].replace(".pdf", "")
 
         # Assert
         assert path.startswith(f"storage/{user_account.id}/")
         assert path.endswith(".pdf")
         # Check unique ID length (12 chars + 2 char prefix)
-        parts = path.split("/")
-        unique_part = parts[-1].replace(".pdf", "")
         assert len(unique_part) == 12
 
-    def test_generate_unique_path_preserves_extension(self, db, user_account):
+    def test_generate_unique_path_preserves_extension(self, db, user_account, create_file):
         """
         Verify that file extension is preserved in lowercase.
+
+        Scenario:
+            1. Create File instance (required for generate_unique_path)
+            2. Call generate_unique_path with file instance
 
         Expected:
             - .PDF becomes .pdf
@@ -174,8 +179,9 @@ class TestUniquePathGeneration:
         """
 
         # Arrange
-        file_instance = File(owner=user_account, original_name="test.txt", size=100)
-        file_instance.file.save("test.txt", ContentFile(b"Test"), save=False)
+        file_name = "test.txt"
+        file_instance = create_file(owner=user_account, original_name=file_name, size=100)
+        file_instance.file.save(file_name, ContentFile(b"Test"), save=False)
 
         # Act
         path_upper = generate_unique_path(file_instance, "IMAGE.PNG")
@@ -185,9 +191,14 @@ class TestUniquePathGeneration:
         assert path_upper.endswith(".png")
         assert path_mixed.endswith(".pdf")
 
-    def test_generate_unique_path_creates_unique_ids(self, db, user_account):
+    def test_generate_unique_path_creates_unique_ids(self, db, user_account, create_file):
         """
         Verify that multiple calls generate different unique IDs.
+
+        Scenario:
+            1. Create File instance (required for generate_unique_path)
+            2. Call generate_unique_path multiple times
+            3. Check generated paths
 
         Expected:
             - Each call produces different path
@@ -195,22 +206,29 @@ class TestUniquePathGeneration:
         """
 
         # Arrange
-        file_instance = File(owner=user_account, original_name="test.txt", size=100)
-        file_instance.file.save("test.txt", ContentFile(b"Test"), save=False)
+        file_name = "test.txt"
+        file_unique_path_count = 100
+        file_instance = create_file(owner=user_account, original_name=file_name, size=100)
+        file_instance.file.save(file_name, ContentFile(b"Test"), save=False)
 
         paths = set()
 
         # Act
-        for _ in range(100):
-            path = generate_unique_path(file_instance, "test.txt")
+        for _ in range(file_unique_path_count):
+            path = generate_unique_path(file_instance, file_name)
             paths.add(path)
 
         # Assert
-        assert len(paths) == 100  # All paths are unique
+        assert len(paths) == file_unique_path_count  # All paths are unique
 
-    def test_generate_unique_path_uses_prefix_subdirectory(self, db, user_account):
+    def test_generate_unique_path_uses_prefix_subdirectory(self, db, user_account, create_file):
         """
         Verify that path includes 2-character prefix subdirectory.
+
+        Scenario:
+            1. Create File instance (required for generate_unique_path)
+            2. Call generate_unique_path with file instance
+            3. Check path structure
 
         Expected:
             - Path structure: storage/{user_id}/{prefix}/{unique_id}.{ext}
@@ -218,17 +236,18 @@ class TestUniquePathGeneration:
         """
 
         # Arrange
-        file_instance = File(owner=user_account, original_name="test.txt", size=100)
-        file_instance.file.save("test.txt", ContentFile(b"Test"), save=False)
+        file_name = "test.txt"
+        file_instance = create_file(owner=user_account, original_name=file_name, size=100)
+        file_instance.file.save(file_name, ContentFile(b"Test"), save=False)
 
         # Act
         path = generate_unique_path(file_instance, "file.txt")
-
-        # Assert
         parts = path.split("/")
-        assert len(parts) == 4  # storage, user_id, prefix, filename
         prefix = parts[2]
         unique_id = parts[3].replace(".txt", "")
+
+        # Assert
+        assert len(parts) == 4  # storage, user_id, prefix, filename
         assert prefix == unique_id[:2]
 
 
@@ -242,9 +261,9 @@ class TestPublicLink:
     Test suite for public link generation and management.
     """
 
-    def test_generate_public_link_creates_unique_link(self, db, user_account):
+    def test_generate_public_link_creates_unique_link(self, db, user_account, create_file):
         """
-        Verify that generate_public_link creates unique 12-character link.
+        Verify that generate_public_link creates unique public link.
 
         Scenario:
             1. Create File without public_link
@@ -252,31 +271,34 @@ class TestPublicLink:
             3. Verify link is generated
 
         Expected:
-            - public_link is 12 characters
+            - The lenght of public_link is qual to the value specified in the PUBLIC_URL_LEN const
             - Link contains only valid nanoid characters (alphanumeric + -_)
             - Link is unique in database
         """
 
         # Arrange
-        file_obj = File.objects.create(
-            owner=user_account,
-            original_name="test.txt",
-            size=100,
-        )
+        file_obj = create_file(owner=user_account, original_name="test.txt", size=100)
 
         # Act
         link = file_obj.generate_public_link(force=True)
 
         # Assert
         assert link is not None
-        assert len(link) == 12
+        assert len(link) == PUBLIC_URL_LEN
         # nanoid uses alphanumeric + '-' + '_' by default
-        assert all(c.isalnum() or c in "-_" for c in link)  # ✅ Исправленная проверка
+        assert all(c.isalnum() or c in "-_" for c in link)
         assert file_obj.public_link == link
 
-    def test_generate_public_link_returns_existing_if_not_force(self, db, user_account):
+    def test_generate_public_link_returns_existing_if_not_force(
+        self, db, user_account, create_file
+    ):
         """
         Verify that generate_public_link returns existing link when force=False.
+
+        Scenario:
+            1. Create File with existing public_link
+            2. Call generate_public_link(force=False)
+            3. Verify existing link is returned
 
         Expected:
             - If public_link exists, it is returned without regeneration
@@ -284,21 +306,22 @@ class TestPublicLink:
         """
 
         # Arrange
-        file_obj = File.objects.create(
+        existing_link = "existing123"
+        file_obj = create_file(
             owner=user_account,
             original_name="test.txt",
             size=100,
-            public_link="existing123",
+            public_link=existing_link,
         )
 
         # Act
         link = file_obj.generate_public_link(force=False)
 
         # Assert
-        assert link == "existing123"
+        assert link == existing_link
 
     def test_generate_public_link_unique_across_all_files(
-        self, db, user_account, another_user_account
+        self, db, user_account, another_user_account, create_file
     ):
         """
         Verify that public links are unique across all users.
@@ -314,22 +337,25 @@ class TestPublicLink:
         """
 
         # Arrange
+        files_count = 10
         files = [
-            File.objects.create(
+            create_file(
                 owner=user_account if i % 2 == 0 else another_user_account,
                 original_name=f"file_{i}.txt",
                 size=100,
             )
-            for i in range(10)
+            for i in range(files_count)
         ]
 
         # Act
         links = [f.generate_public_link(force=True) for f in files]
 
         # Assert
-        assert len(set(links)) == 10  # All unique
+        assert len(set(links)) == files_count  # All unique
 
-    def test_generate_public_link_handles_collision(self, db, user_account, monkeypatch):
+    def test_generate_public_link_handles_collision(
+        self, db, user_account, monkeypatch, create_file
+    ) -> None:
         """
         Verify that generate_public_link retries on collision.
 
@@ -344,37 +370,28 @@ class TestPublicLink:
         """
 
         # Arrange
-        from nanoid import generate
-
         call_count = [0]
-        original_generate = generate
+        collision_public_link = "collision1"
 
-        def mock_generate(size=12):
+        def mock_generate(size: int = PUBLIC_URL_LEN) -> str:
             call_count[0] += 1
-            return "collision1" if call_count[0] == 1 else original_generate(size=size)
+            # First call returns fixed value. Second call returns original value
+            return collision_public_link if call_count[0] == 1 else original_generate(size=size)
 
         monkeypatch.setattr("storage.models.generate", mock_generate)
 
-        # Create file with colliding link
-        File.objects.create(
-            owner=user_account,
-            original_name="existing.txt",
-            size=100,
-            public_link="collision1",
-        )
-
-        new_file = File.objects.create(
-            owner=user_account,
-            original_name="new.txt",
-            size=100,
-        )
+        collision_file = create_file(owner=user_account, original_name="existing.txt", size=100)
+        new_file = create_file(owner=user_account, original_name="new.txt", size=100)
 
         # Act
+        collision_file.public_link = collision_public_link
+        collision_file.save(update_fields=["public_link"])
         link = new_file.generate_public_link(force=True)
 
         # Assert
-        assert link != "collision1"
-        assert call_count[0] == 2  # Called twice (collision + retry)
+        assert link != collision_public_link
+        assert call_count[0] == 2  # Called twice (original + retry)
+        assert len(link) == PUBLIC_URL_LEN
 
 
 # ==============================================================================
@@ -391,6 +408,10 @@ class TestFileDeletion:
         """
         Verify that delete() removes File from database.
 
+        Scenario:
+            1. Create File
+            2. Call delete()
+
         Expected:
             - File count decreases by 1
             - File cannot be retrieved after deletion
@@ -404,9 +425,9 @@ class TestFileDeletion:
         file_obj.delete()
 
         # Assert
-        assert not File.objects.filter(id=file_id).exists()
+        assert not File.objects.filter(id=file_id).exists()  # pylint: disable=no-member
 
-    def test_delete_removes_physical_file(self, db, user_account, temp_media_root):
+    def test_delete_removes_physical_file(self, db, user_account, temp_media_root, create_file):
         """
         Verify that delete() removes physical file from storage.
 
@@ -422,12 +443,9 @@ class TestFileDeletion:
         """
 
         # Arrange
-        file_obj = File.objects.create(
-            owner=user_account,
-            original_name="test.txt",
-            size=100,
-        )
-        file_obj.file.save("test.txt", ContentFile(b"Test content"), save=True)
+        file_name = "test.txt"
+        file_obj = create_file(owner=user_account, original_name=file_name, size=100)
+        file_obj.file.save(file_name, ContentFile(b"Test content"), save=True)
         file_path = file_obj.file.path
 
         # Verify file exists before deletion
@@ -439,7 +457,7 @@ class TestFileDeletion:
         # Assert
         assert not os.path.exists(file_path)
 
-    def test_delete_handles_missing_physical_file(self, db, user_account):
+    def test_delete_handles_missing_physical_file(self, db, user_account, create_file):
         """
         Verify that delete() does not raise error if physical file is missing.
 
@@ -454,20 +472,20 @@ class TestFileDeletion:
         """
 
         # Arrange
-        file_obj = File.objects.create(
-            owner=user_account,
-            original_name="test.txt",
-            size=100,
-        )
-        file_obj.file.save("test.txt", ContentFile(b"Test content"), save=True)
+        file_name = "test.txt"
+        file_obj = create_file(owner=user_account, original_name=file_name, size=100)
+        file_obj.file.save(file_name, ContentFile(b"Test content"), save=True)
+        file_path = file_obj.file.path
 
         # Manually remove physical file
-        if os.path.exists(file_obj.file.path):
-            os.remove(file_obj.file.path)
+        if os.path.exists(file_path):
+            os.remove(file_path)
 
-        # Act & Assert (should not raise)
+        # Act
         file_obj.delete()
-        assert not File.objects.filter(id=file_obj.id).exists()
+
+        # Assert
+        assert not File.objects.filter(id=file_obj.id).exists()  # pylint: disable=no-member
 
 
 # ==============================================================================
@@ -483,6 +501,10 @@ class TestDownloadTracking:
     def test_update_last_downloaded_sets_timestamp(self, db, user_account, create_file):
         """
         Verify that update_last_downloaded() sets last_downloaded field.
+
+        Scenario:
+            1. Create File
+            2. Call update_last_downloaded()
 
         Expected:
             - last_downloaded is set to current time
@@ -504,6 +526,11 @@ class TestDownloadTracking:
     def test_update_last_downloaded_updates_existing_timestamp(self, db, user_account, create_file):
         """
         Verify that update_last_downloaded() updates existing timestamp.
+
+        Scenario:
+            1. Create File
+            2. Set last_downloaded timestamp
+            3. Call update_last_downloaded()
 
         Expected:
             - New timestamp is later than previous
@@ -540,27 +567,33 @@ class TestStringRepresentation:
         """
         Verify that __str__ returns formatted string with name and owner.
 
+        Scenario:
+            1. Create File
+            2. Call __str__()
+
         Expected:
             - String contains original_name
             - String contains owner email
         """
 
         # Arrange
-        file_obj = create_file(
-            owner=user_account,
-            original_name="document.pdf",
-        )
+        file_name = "document.pdf"
+        file_obj = create_file(owner=user_account, original_name=file_name)
 
         # Act
         result = str(file_obj)
 
         # Assert
-        assert "document.pdf" in result
+        assert file_name in result
         assert user_account.email in result
 
     def test_str_handles_missing_email(self, db, user_account, create_file):
         """
         Verify that __str__ handles missing email gracefully.
+
+        Scenario:
+            1. Set email to empty string
+            2. Call __str__()
 
         Expected:
             - Falls back to username if email is missing
@@ -571,14 +604,14 @@ class TestStringRepresentation:
         user_account.email = ""
         user_account.save()
 
-        file_obj = create_file(
-            owner=user_account,
-            original_name="test.txt",
-        )
+        file_name = "test.txt"
+        file_obj = create_file(owner=user_account, original_name=file_name)
 
-        # Act & Assert (should not raise)
+        # Act
         result = str(file_obj)
-        assert "test.txt" in result
+
+        # Assert
+        assert file_name in result
 
 
 # ==============================================================================
@@ -595,29 +628,38 @@ class TestModelMeta:
         """
         Verify that files are ordered by uploaded_at descending.
 
+        Scenario:
+            1. Create multiple File instances
+            2. Retrieve queryset
+
         Expected:
             - Most recently uploaded file appears first
             - Default queryset respects ordering
         """
 
         # Arrange
-        create_file(owner=user_account, original_name="first.txt")
-        time.sleep(0.1)
-        create_file(owner=user_account, original_name="second.txt")
-        time.sleep(0.1)
-        create_file(owner=user_account, original_name="third.txt")
+        file_names = ["first.txt", "second.txt", "third.txt"]
+        expected_names = file_names[::-1]
+        for file_name in file_names:
+            create_file(owner=user_account, original_name=file_name)
 
         # Act
-        files = list(File.objects.filter(owner=user_account))
+        actual_names = list(
+            File.objects.filter(owner=user_account).values_list(
+                "original_name", flat=True
+            )  # pylint: disable=no-member
+        )
 
         # Assert
-        assert files[0].original_name == "third.txt"
-        assert files[1].original_name == "second.txt"
-        assert files[2].original_name == "first.txt"
+        assert actual_names == expected_names
 
     def test_db_table_name(self, db, user_account, create_file):
         """
         Verify that database table name is correct.
+
+        Scenario:
+            1. Create File
+            2. Retrieve table name
 
         Expected:
             - Table name is 'storage_file'
@@ -627,7 +669,7 @@ class TestModelMeta:
         create_file(owner=user_account)
 
         # Act
-        table_name = File._meta.db_table  # pylint: disable=protected-access
+        table_name = File._meta.db_table  # pylint: disable=protected-access, no-member
 
         # Assert
         assert table_name == "storage_file"

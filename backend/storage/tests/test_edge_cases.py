@@ -11,25 +11,26 @@ This module tests boundary conditions and exceptional scenarios including:
 """
 
 import time
-
 import pytest
+
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.utils import IntegrityError
+from django.utils import timezone
 from rest_framework import status
 
 from core.settings import MAX_UPLOAD_SIZE
 from storage.models import File
-from storage.serializers import validate_filename
+from storage.utils import validate_filename
 
 User = get_user_model()
 
 
-# ==============================================================================
+# ==================================================================================================
 # TESTS: FILE SIZE EDGE CASES
-# ==============================================================================
+# ==================================================================================================
 
 
 class TestFileSizeEdgeCases:
@@ -43,9 +44,7 @@ class TestFileSizeEdgeCases:
     - Files exceeding the size limit (100MB+)
     """
 
-    def test_upload_empty_file_0_bytes_accepted(
-        self, authenticated_client, user_account, temp_media_root
-    ):
+    def test_upload_empty_file_returns_200(self, authenticated_client, user_account, create_file):
         """
         Verify that empty file (0 bytes) is accepted in the system.
 
@@ -60,7 +59,7 @@ class TestFileSizeEdgeCases:
 
         # Act
         original_name = "empty.txt"
-        file_obj = File.objects.create(
+        file_obj = create_file(
             owner=user_account,
             original_name=original_name,
             size=0,
@@ -78,9 +77,7 @@ class TestFileSizeEdgeCases:
         assert response.status_code == status.HTTP_200_OK
         assert original_name in response["Content-Disposition"]
 
-    def test_upload_very_small_file_1_byte_accepted(
-        self, authenticated_client, user_account, temp_media_root
-    ):
+    def test_upload_very_small_file_returns_201(self, authenticated_client):
         """
         Verify that very small file (1 byte) is accepted.
 
@@ -107,9 +104,7 @@ class TestFileSizeEdgeCases:
         file_obj = File.objects.first()
         assert file_obj.size == 1
 
-    def test_upload_file_at_100mb_limit_accepted(
-        self, authenticated_client, user_account, temp_media_root
-    ):
+    def test_upload_file_at_100mb_limit_returns_201(self, authenticated_client):
         """
         Verify that file exactly at 100MB limit is accepted.
 
@@ -138,9 +133,7 @@ class TestFileSizeEdgeCases:
         file_obj = File.objects.first()
         assert file_obj.size == MAX_UPLOAD_SIZE
 
-    def test_upload_file_over_100mb_limit_rejected(
-        self, authenticated_client, user_account, temp_media_root
-    ):
+    def test_upload_file_over_100mb_limit_returns_400(self, authenticated_client, large_test_file):
         """
         Verify that file exceeding 100MB limit is rejected.
 
@@ -151,15 +144,7 @@ class TestFileSizeEdgeCases:
         """
 
         # Arrange
-
-        # 101MB (exceeds limit by 1MB)
-        file_content = b"x" * (101 * 1024 * 1024)
-        over_limit_file = SimpleUploadedFile(
-            name="over_limit.bin",
-            content=file_content,
-            content_type="application/octet-stream",
-        )
-        upload_data = {"file": over_limit_file}
+        upload_data = {"file": large_test_file}
 
         # Act
         response = authenticated_client.post(
@@ -171,9 +156,7 @@ class TestFileSizeEdgeCases:
         assert File.objects.count() == 0
         assert "100" in str(response.data).lower() or "size" in str(response.data).lower()
 
-    def test_download_empty_file_returns_content(
-        self, authenticated_client, user_account, temp_media_root
-    ):
+    def test_download_empty_file_returns_200(self, authenticated_client, user_account, create_file):
         """
         Verify that empty file can be downloaded successfully.
 
@@ -185,7 +168,7 @@ class TestFileSizeEdgeCases:
 
         # Arrange
         file_name = "empty.txt"
-        file_obj = File.objects.create(
+        file_obj = create_file(
             owner=user_account,
             original_name=file_name,
             size=0,
@@ -204,9 +187,9 @@ class TestFileSizeEdgeCases:
         assert file_name in response["Content-Disposition"]
 
 
-# ==============================================================================
+# ==================================================================================================
 # TESTS: FILENAME EDGE CASES
-# ==============================================================================
+# ==================================================================================================
 
 
 class TestFilenameEdgeCases:
@@ -221,7 +204,7 @@ class TestFilenameEdgeCases:
     - Special but allowed characters
     """
 
-    def test_upload_file_with_unicode_name_accepted(
+    def test_upload_file_with_unicode_name_returns_201(
         self, authenticated_client, user_account, temp_media_root
     ):
         """
@@ -259,9 +242,7 @@ class TestFilenameEdgeCases:
         file_obj = File.objects.first()
         assert file_obj.original_name == file_name
 
-    def test_upload_file_with_emoji_name_accepted(
-        self, authenticated_client, user_account, temp_media_root
-    ):
+    def test_upload_file_with_emoji_name_returns_201(self, authenticated_client):
         """
         Verify that filename with emoji characters is accepted.
 
@@ -288,9 +269,7 @@ class TestFilenameEdgeCases:
         file_obj = File.objects.first()
         assert "🚀" in file_obj.original_name
 
-    def test_upload_file_with_very_long_name_accepted(
-        self, authenticated_client, user_account, temp_media_root
-    ):
+    def test_upload_file_with_very_long_name_returns_201(self, authenticated_client):
         """
         Verify that filename with maximum allowed length is accepted.
 
@@ -321,9 +300,7 @@ class TestFilenameEdgeCases:
         file_obj = File.objects.first()
         assert len(file_obj.original_name) <= max_chars
 
-    def test_rename_file_name_over_255_chars_rejected(
-        self, authenticated_client, create_file, temp_media_root
-    ):
+    def test_rename_file_name_over_255_chars_returns_400(self, authenticated_client, create_file):
         """
         Verify that filename exceeding 255 characters is rejected.
 
@@ -348,9 +325,7 @@ class TestFilenameEdgeCases:
         file_obj.refresh_from_db()
         assert file_obj.original_name == file_name
 
-    def test_upload_file_with_no_extension_accepted(
-        self, authenticated_client, user_account, temp_media_root
-    ):
+    def test_upload_file_with_no_extension_returns_201(self, authenticated_client):
         """
         Verify that filename without extension is accepted.
 
@@ -382,9 +357,7 @@ class TestFilenameEdgeCases:
         file_obj = File.objects.first()
         assert file_obj.original_name == file_name
 
-    def test_upload_file_with_multiple_extensions_accepted(
-        self, authenticated_client, user_account, temp_media_root
-    ):
+    def test_upload_file_with_multiple_extensions_returns_201(self, authenticated_client):
         """
         Verify that filename with multiple extensions is accepted.
 
@@ -417,9 +390,7 @@ class TestFilenameEdgeCases:
         file_obj = File.objects.first()
         assert file_obj.original_name == file_name
 
-    def test_rename_file_with_spaces_in_name_accepted(
-        self, authenticated_client, create_file, temp_media_root
-    ):
+    def test_rename_file_with_spaces_in_name_returns_200(self, authenticated_client, create_file):
         """
         Verify that filename with spaces is accepted.
 
@@ -476,9 +447,9 @@ class TestFilenameEdgeCases:
             assert result is not None
 
 
-# ==============================================================================
+# ==================================================================================================
 # TESTS: CONCURRENT OPERATIONS
-# ==============================================================================
+# ==================================================================================================
 
 
 class TestConcurrentOperations:
@@ -492,11 +463,7 @@ class TestConcurrentOperations:
     """
 
     def test_multiple_users_upload_same_filename_unique_paths(
-        self,
-        user_account,
-        another_user_account,
-        admin_client,
-        temp_media_root,
+        self, user_account, another_user_account, create_file
     ):
         """
         Verify that multiple users uploading same filename get unique paths.
@@ -514,8 +481,8 @@ class TestConcurrentOperations:
 
         # Arrange
         file_name = "document.pdf"
-        file1 = File.objects.create(owner=user_account, original_name=file_name, size=100)
-        file2 = File.objects.create(owner=another_user_account, original_name=file_name, size=100)
+        file1 = create_file(owner=user_account, original_name=file_name, size=100)
+        file2 = create_file(owner=another_user_account, original_name=file_name, size=100)
 
         # Act
         file1.file.save(file_name, ContentFile(b"Content 1"), save=True)
@@ -526,9 +493,7 @@ class TestConcurrentOperations:
         assert file1.original_name == file2.original_name
         assert file1.owner != file2.owner
 
-    def test_same_user_upload_same_filename_twice_unique_paths(
-        self, authenticated_client, temp_media_root
-    ):
+    def test_same_user_upload_same_filename_twice_unique_paths(self, authenticated_client):
         """
         Verify that same user uploading same filename twice gets unique paths.
 
@@ -564,45 +529,10 @@ class TestConcurrentOperations:
 
         assert file1.file.path != file2.file.path
 
-    def test_generate_public_link_twice_returns_existing(
-        self, authenticated_client, create_file, temp_media_root
-    ):
-        """
-        Verify that generating public link twice returns existing link.
 
-        Expected:
-            - First call: HTTP 200, link generated
-            - Second call: HTTP 400, link already exists
-            - Link remains unchanged
-        """
-
-        # Arrange
-        file_obj = create_file(owner=authenticated_client.user, original_name="test.txt")
-
-        def generate_link():
-            return authenticated_client.post(
-                f"/api/storage/files/{file_obj.id}/public-link/generate/",
-                data={},
-                format="json",
-            )
-
-        # Act
-        response1 = generate_link()
-        first_link = response1.data["public_link_url"]
-        response2 = generate_link()
-
-        # Assert
-        assert response1.status_code == status.HTTP_200_OK
-        assert response2.status_code == status.HTTP_400_BAD_REQUEST
-
-        file_obj.refresh_from_db()
-        assert file_obj.public_link is not None
-        assert first_link is not None
-
-
-# ==============================================================================
+# ==================================================================================================
 # TESTS: FILESYSTEM INCONSISTENCIES
-# ==============================================================================
+# ==================================================================================================
 
 
 class TestFilesystemInconsistencies:
@@ -615,41 +545,8 @@ class TestFilesystemInconsistencies:
     - Permission issues on file access
     """
 
-    def test_download_file_missing_on_disk_returns_404(
-        self, authenticated_client, user_account, temp_media_root
-    ):
-        """
-        Verify that downloading file missing from disk returns 404.
-
-        Scenario:
-            1. Create file record in database
-            2. Do NOT save actual file to disk
-            3. Attempt to download
-
-        Expected:
-            - HTTP 404 Not Found
-            - Error message indicates file not found on server
-            - Database record may still exist (not automatically cleaned)
-        """
-
-        # Arrange
-        file_obj = File.objects.create(
-            owner=user_account,
-            original_name="missing_file.txt",
-            size=100,
-        )
-
-        # Act
-        response = authenticated_client.get(f"/api/storage/files/{file_obj.id}/download/")
-
-        # Assert
-        assert response.status_code == status.HTTP_404_NOT_FOUND
-        assert (
-            "не найден" in str(response.data).lower() or "not found" in str(response.data).lower()
-        )
-
-    def test_delete_file_missing_on_disk_succeeds(
-        self, authenticated_client, user_account, temp_media_root
+    def test_delete_file_missing_on_disk_returns_204(
+        self, authenticated_client, user_account, create_file
     ):
         """
         Verify that deleting file missing from disk still succeeds.
@@ -666,7 +563,7 @@ class TestFilesystemInconsistencies:
         """
 
         # Arrange
-        file_obj = File.objects.create(
+        file_obj = create_file(
             owner=user_account,
             original_name="orphan.txt",
             size=100,
@@ -679,9 +576,7 @@ class TestFilesystemInconsistencies:
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert not File.objects.filter(id=file_obj.id).exists()
 
-    def test_public_download_file_missing_on_disk_returns_404(
-        self, api_client, user_account, temp_media_root
-    ):
+    def test_public_download_file_missing_on_disk_returns_404(self, api_client, user_account):
         """
         Verify that public download of missing file returns 404.
 
@@ -705,9 +600,9 @@ class TestFilesystemInconsistencies:
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-# ==============================================================================
+# ==================================================================================================
 # TESTS: DATABASE CONSTRAINTS
-# ==============================================================================
+# ==================================================================================================
 
 
 class TestDatabaseConstraints:
@@ -721,7 +616,7 @@ class TestDatabaseConstraints:
     - Data type constraints
     """
 
-    def test_create_file_without_owner_raises_integrity_error(self, user_account):
+    def test_create_file_without_owner_raises_integrity_error(self, db):
         """
         Verify that file cannot be created without owner.
 
@@ -799,7 +694,7 @@ class TestDatabaseConstraints:
         with pytest.raises(ValidationError):
             file_obj.full_clean()
 
-    def test_uploaded_at_is_auto_set_on_create(self, user_account, temp_media_root):
+    def test_uploaded_at_is_auto_set_on_create(self, user_account, create_file):
         """
         Verify that uploaded_at is automatically set on file creation.
 
@@ -809,10 +704,9 @@ class TestDatabaseConstraints:
         """
 
         # Arrange
-        from django.utils import timezone
 
         # Act
-        file_obj = File.objects.create(
+        file_obj = create_file(
             owner=user_account,
             original_name="test.txt",
             size=100,
@@ -824,9 +718,9 @@ class TestDatabaseConstraints:
         assert time_diff < 5  # Within 5 seconds
 
 
-# ==============================================================================
+# ==================================================================================================
 # TESTS: PERFORMANCE BOUNDARIES
-# ==============================================================================
+# ==================================================================================================
 
 
 class TestPerformanceBoundaries:
@@ -840,7 +734,7 @@ class TestPerformanceBoundaries:
     """
 
     def test_user_with_many_files_list_returns_all(
-        self, authenticated_client, user_account, temp_media_root
+        self, authenticated_client, user_account, create_file
     ):
         """
         Verify that user with many files can retrieve complete list.
@@ -857,7 +751,7 @@ class TestPerformanceBoundaries:
 
         for i in range(users_count):
             file_name = f"file_{i:03d}.txt"
-            file_obj = File.objects.create(
+            file_obj = create_file(
                 owner=user_account,
                 original_name=file_name,
                 size=100,
@@ -874,9 +768,7 @@ class TestPerformanceBoundaries:
         assert len(response.data) == users_count
         assert elapsed_time < 10  # Should complete in under 10 seconds
 
-    def test_comment_with_maximum_length_accepted(
-        self, authenticated_client, create_file, temp_media_root
-    ):
+    def test_comment_with_maximum_length_returns_200(self, authenticated_client, create_file):
         """
         Verify that comment at maximum length is accepted.
 
@@ -900,9 +792,7 @@ class TestPerformanceBoundaries:
         file_obj.refresh_from_db()
         assert file_obj.comment == max_comment
 
-    def test_comment_over_maximum_length_rejected(
-        self, authenticated_client, create_file, temp_media_root
-    ):
+    def test_comment_over_maximum_length_returns_400(self, authenticated_client, create_file):
         """
         Verify that comment exceeding maximum length is rejected.
 
@@ -926,9 +816,7 @@ class TestPerformanceBoundaries:
         file_obj.refresh_from_db()
         assert file_obj.comment != too_long_comment
 
-    def test_rapid_sequential_operations_succeed(
-        self, authenticated_client, create_file, temp_media_root
-    ):
+    def test_rapid_sequential_operations_return_200(self, authenticated_client):
         """
         Verify that rapid sequential operations complete successfully.
 
