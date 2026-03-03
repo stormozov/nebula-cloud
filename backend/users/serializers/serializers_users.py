@@ -24,6 +24,16 @@ class UserSerializer(serializers.ModelSerializer):
         read_only=True,
         help_text="Полное имя пользователя",
     )
+    first_name = serializers.CharField(
+        required=False,
+        help_text="Имя пользователя",
+        allow_blank=True,
+    )
+    last_name = serializers.CharField(
+        required=False,
+        help_text="Фамилия пользователя",
+        allow_blank=True,
+    )
     storage_path = serializers.CharField(
         read_only=True,
         help_text="Путь к хранилищу пользователя",
@@ -55,6 +65,12 @@ class UserSerializer(serializers.ModelSerializer):
     def get_full_name(self, obj):
         """Get user's full name."""
         return obj.get_full_name()
+
+    def to_internal_value(self, data):
+        """Silently ignore read-only fields."""
+        read_only_fields = getattr(self.Meta, "read_only_fields", [])
+        cleaned_data = {key: value for key, value in data.items() if key not in read_only_fields}
+        return super().to_internal_value(cleaned_data)
 
     def update(self, instance, validated_data):
         """Update user profile."""

@@ -6,26 +6,28 @@ and admin endpoints. Uses DRF DefaultRouter for ViewSet-based routing.
 
 Endpoints:
     Authentication:
-        POST   /api/users/auth/register/          - User registration
-        POST   /api/users/auth/login/             - User login
-        POST   /api/users/auth/logout/            - User logout
-        POST   /api/users/auth/refresh/           - Token refresh
-        POST   /api/users/auth/password/change/   - Password change
+        POST /api/users/auth/register/  - Register new user
+        POST /api/users/auth/login/     - Login and get tokens
+        POST /api/users/auth/logout/    - Logout and blacklist token
+        POST /api/users/auth/refresh/   - Refresh access token
 
     User Profile:
-        GET    /api/users/users/me/               - Current user profile
-        PUT    /api/users/users/me/               - Update current user
-        PATCH  /api/users/users/me/               - Partial update
+        GET    /api/users/me/                    - Get current user profile
+        PUT    /api/users/me/                    - Full update profile
+        PATCH  /api/users/me/                    - Partial update profile
+        POST   /api/users/me/password/           - Change password
+        GET    /api/users/me/storage-summary/    - Get storage statistics
+        GET    /api/users/me/session-info/       - Get current session details
+        POST   /api/users/me/deactivate/         - Deactivate own account
 
     Admin User Management:
-        GET    /api/users/admin/users/            - List all users (admin only)
-        GET    /api/users/admin/users/{id}/       - Get user details (admin only)
-        PUT    /api/users/admin/users/{id}/       - Update user (admin only)
-        PATCH  /api/users/admin/users/{id}/       - Partial update (admin only)
-        DELETE /api/users/admin/users/{id}/       - Delete user (admin only)
-        POST   /api/users/admin/users/{id}/password/ - Reset password (admin only)
-        POST   /api/users/admin/users/{id}/toggle-admin/ - Toggle admin status
-        GET    /api/users/admin/users/{id}/storage-stats/ - Get storage stats
+        GET    /api/admin/users/              - List all users
+        GET    /api/admin/users/{id}/         - Get user details
+        PUT    /api/admin/users/{id}/         - Update user data
+        DELETE /api/admin/users/{id}/         - Delete user
+        POST   /api/admin/users/{id}/password/ - Reset user password
+        POST   /api/admin/users/{id}/toggle-admin/ - Toggle admin status
+        GET    /api/admin/users/{id}/storage-stats/ - Get storage statistics
 """
 
 from django.urls import include, path
@@ -37,7 +39,6 @@ from users.views import (
     CustomTokenRefreshView,
     LoginView,
     LogoutView,
-    PasswordChangeView,
     RegisterView,
 )
 
@@ -56,15 +57,40 @@ urlpatterns = [
     path("auth/login/", LoginView.as_view(), name="login"),
     path("auth/logout/", LogoutView.as_view(), name="logout"),
     path("auth/refresh/", CustomTokenRefreshView.as_view(), name="token_refresh"),
-    path(
-        "auth/password/change/",
-        PasswordChangeView.as_view(),
-        name="password_change",
-    ),
     # ==============================================================================================
     # User profile endpoints
     # ==============================================================================================
-    path("users/me/", CurrentUserView.as_view(), name="current_user"),
+    path(
+        "users/me/",
+        CurrentUserView.as_view(
+            {
+                "get": "retrieve",
+                "put": "update",
+                "patch": "partial_update",
+            }
+        ),
+        name="current-user-detail",
+    ),
+    path(
+        "users/me/password/",
+        CurrentUserView.as_view({"post": "change_password"}),
+        name="current-user-password",
+    ),
+    path(
+        "users/me/storage-summary/",
+        CurrentUserView.as_view({"get": "storage_summary"}),
+        name="current-user-storage-summary",
+    ),
+    path(
+        "users/me/session-info/",
+        CurrentUserView.as_view({"get": "session_info"}),
+        name="current-user-session-info",
+    ),
+    path(
+        "users/me/deactivate/",
+        CurrentUserView.as_view({"post": "deactivate_account"}),
+        name="current-user-deactivate",
+    ),
     # ==============================================================================================
     # Admin endpoints
     # ==============================================================================================

@@ -857,3 +857,73 @@ def mock_storage_stats(mocker) -> Callable[[Dict], Any]:
         return stats
 
     return _mock
+
+# ==================================================================================================
+# FIXTURES: PASSWORD CHANGE TEST DATA
+# ==================================================================================================
+
+@pytest.fixture
+def wrong_current_password_data():
+    """
+    Provide password change data with incorrect current password.
+
+    Returns:
+        dict: Payload with wrong current password.
+
+    Example:
+        def test_wrong_password(authenticated_client, wrong_current_password_data):
+            response = authenticated_client.post(
+                "/api/users/me/password/",
+                wrong_current_password_data
+            )
+            assert response.status_code == 400
+    """
+    return {
+        "current_password": "WrongPass999!",
+        "new_password": "NewSecurePass456!",
+        "new_password_confirm": "NewSecurePass456!",
+    }
+
+
+@pytest.fixture
+def invalid_password_change_data():
+    """
+    Provide invalid password change request data (mismatched confirmation).
+
+    Returns:
+        dict: Invalid payload with mismatched passwords.
+    """
+    return {
+        "current_password": "TestPass123!",
+        "new_password": "NewSecurePass456!",
+        "new_password_confirm": "DifferentPass789!",
+    }
+
+
+@pytest.fixture
+def valid_password_change_data():
+    """
+    Provide valid password change request data.
+
+    Returns:
+        dict: Valid payload with matching passwords.
+    """
+    return {
+        "current_password": "TestPass123!",
+        "new_password": "NewSecurePass456!",
+        "new_password_confirm": "NewSecurePass456!",
+    }
+
+@pytest.fixture
+def weak_password_change_data():
+    """
+    Provide password change data with weak new password.
+
+    Returns:
+        dict: Payload with password that fails Django validators.
+    """
+    return {
+        "current_password": "TestPass123!",
+        "new_password": "weak",
+        "new_password_confirm": "weak",
+    }

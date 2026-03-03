@@ -1052,7 +1052,7 @@ class TestAuthenticationFlow:
         }
 
         # Act
-        response = api_client.post("/api/auth/password/change/", password_change_data)
+        response = api_client.post("/api/users/me/password/", password_change_data)
 
         # Assert
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
