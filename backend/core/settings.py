@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
+    "drf_spectacular",
     # Local apps
     "users",
     "storage",
@@ -161,6 +162,7 @@ REST_FRAMEWORK = {
         "register": "5/hour",
         "reset_password": "5/hour",
     },
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 SIMPLE_JWT = {
@@ -275,10 +277,10 @@ if not DEBUG and not IS_TESTING:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
 
-# ==============================================================================
+# ==================================================================================================
 # TEST-SPECIFIC SETTINGS
 # Applied automatically when running tests via pytest or manage.py test
-# ==============================================================================
+# ==================================================================================================
 
 if IS_TESTING:
     # Fast password hashing (speeds up test execution)
@@ -305,3 +307,20 @@ if IS_TESTING:
             for handler in LOGGING["handlers"].values():
                 if handler.get("class") == "logging.StreamHandler":
                     handler["level"] = "WARNING"
+
+# ==================================================================================================
+# SPECTACULAR (SWAGGER/OpenAPI) SETTINGS
+# ==================================================================================================
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Nebula Cloud API",
+    "DESCRIPTION": "API documentation for the Nebula Cloud application.",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "COMPONENT_SPLIT_REQUEST": True,
+    "TAGS": [
+        {"name": "Auth", "description": "Authentication and registration endpoints"},
+        {"name": "Users", "description": "User management (Admin only)"},
+        {"name": "Files", "description": "File storage operations"},
+    ],
+}

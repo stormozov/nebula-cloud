@@ -55,11 +55,11 @@ class AdminUserListSerializer(serializers.ModelSerializer):
             "last_login",
         ]
 
-    def get_full_name(self, obj):
+    def get_full_name(self, obj) -> str:
         """Get user's full name."""
         return obj.get_full_name()
 
-    def get_storage_stats(self, obj):
+    def get_storage_stats(self, obj) -> dict:
         """Get user's storage statistics."""
 
         user_files = File.objects.filter(owner=obj)  # pylint: disable=no-member
@@ -108,11 +108,11 @@ class AdminUserDetailSerializer(serializers.ModelSerializer):
             "storage_path",
         ]
 
-    def get_full_name(self, obj):
+    def get_full_name(self, obj) -> str:
         """Get user's full name."""
         return obj.get_full_name()
 
-    def get_storage_stats(self, obj):
+    def get_storage_stats(self, obj) -> dict:
         """Get user's storage statistics."""
 
         user_files = File.objects.filter(owner=obj)  # pylint: disable=no-member
@@ -140,7 +140,7 @@ class AdminUserUpdateSerializer(serializers.ModelSerializer):
             "is_active",
         ]
 
-    def validate_email(self, value):
+    def validate_email(self, value) -> str:
         """Ensure email is unique across all users except current."""
 
         user = self.context.get("request").user if self.context else None
@@ -169,7 +169,7 @@ class AdminPasswordResetSerializer(serializers.Serializer):
         help_text="Подтверждение нового пароля",
     )
 
-    def validate(self, attrs):
+    def validate(self, attrs) -> dict:
         """Validate password reset data."""
 
         new_password = attrs.get("new_password")

@@ -41,6 +41,7 @@ class PublicFileView(views.APIView):
         - File must have active public_link to be accessible
     """
 
+    serializer_class = None
     permission_classes = [permissions.AllowAny]
 
     def get(self, request, public_link: str | None = None) -> Response:
@@ -110,6 +111,7 @@ class PublicFileDownloadView(views.APIView):
         - Access logged for audit purposes
     """
 
+    serializer_class = None
     permission_classes = [permissions.AllowAny]
 
     def get(self, request, public_link: str | None = None) -> FileResponse:

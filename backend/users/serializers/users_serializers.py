@@ -62,17 +62,17 @@ class UserSerializer(serializers.ModelSerializer):
             "last_login",
         ]
 
-    def get_full_name(self, obj):
+    def get_full_name(self, obj) -> str:
         """Get user's full name."""
         return obj.get_full_name()
 
-    def to_internal_value(self, data):
+    def to_internal_value(self, data) -> dict:
         """Silently ignore read-only fields."""
         read_only_fields = getattr(self.Meta, "read_only_fields", [])
         cleaned_data = {key: value for key, value in data.items() if key not in read_only_fields}
         return super().to_internal_value(cleaned_data)
 
-    def update(self, instance, validated_data):
+    def update(self, instance, validated_data) -> UserAccount:
         """Update user profile."""
 
         instance.first_name = validated_data.get("first_name", instance.first_name)

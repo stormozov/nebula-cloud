@@ -291,6 +291,7 @@ class LogoutView(APIView):
         Error: Invalid token or other failures.
     """
 
+    serializer_class = None
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request: Request) -> Response:
@@ -413,6 +414,7 @@ class CustomTokenRefreshView(TokenRefreshView):
         Custom logging can be added via token validation overrides.
     """
 
+    serializer_class = None
     permission_classes = [permissions.AllowAny]
 
     def post(self, request: Request, *args: Any, **kwargs: Any) -> Response:
