@@ -2,19 +2,19 @@
 Module packeged serializers for users app.
 """
 
-from .serializers_admin import (
+from .admin_serializers import (
     AdminPasswordResetSerializer,
     AdminToggleAdminSerializer,
     AdminUserDetailSerializer,
     AdminUserListSerializer,
     AdminUserUpdateSerializer,
 )
-from .serializers_auth import (
+from .auth_serializers import (
     TokenResponseSerializer,
     UserLoginSerializer,
     UserRegistrationSerializer,
 )
-from .serializers_users import PasswordChangeSerializer, UserSerializer
+from .users_serializers import PasswordChangeSerializer, UserSerializer
 
 __all__ = [
     # User serializers
