@@ -10,9 +10,11 @@ from django.dispatch import receiver
 
 from users.models import UserAccount
 
+from .loggers import auth_logger, logger
+
 
 @receiver(post_save, sender=UserAccount)
-def create_user_storage(sender, instance, created, **kwargs):
+def create_user_storage(sender, instance: UserAccount, created: bool, **kwargs) -> None:
     """
     Create storage directory for new user.
 
@@ -26,6 +28,36 @@ def create_user_storage(sender, instance, created, **kwargs):
 
         try:
             os.makedirs(storage_path, exist_ok=True)
-            print(f"Created storage directory: {storage_path}")
+            logger.info(
+                "Created storage directory for user: user=%s, storage_path=%s",
+                instance.username,
+                storage_path,
+            )
+            auth_logger.info(
+                "Created storage directory for user: user=%s, storage_path=%s",
+                instance.username,
+                storage_path,
+            )
+        except OSError as e:
+            logger.error(
+                "Error creating storage directory for user: user=%s, storage_path=%s, error=%s",
+                instance.username,
+                storage_path,
+                e,
+            )
+            auth_logger.error(
+                "Error creating storage directory for user: user=%s, storage_path=%s, error=%s",
+                instance.username,
+                storage_path,
+                e,
+            )
+            raise
         except Exception as e:
-            print(f"Error creating storage directory: {e}")
+            logger.error(
+                "Unexpected error creating storage directory for user: \
+                    user=%s, storage_path=%s, error=%s",
+                instance.username,
+                storage_path,
+                e,
+            )
+            raise

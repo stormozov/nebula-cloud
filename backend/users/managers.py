@@ -5,7 +5,7 @@ Module for custom user manager.
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
 
-from .logging import auth_logger, logger
+from .loggers import auth_logger, logger
 
 
 class UserAccountManager(BaseUserManager):

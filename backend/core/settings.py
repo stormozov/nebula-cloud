@@ -11,10 +11,11 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 import os
+import sys
+import tempfile
 from datetime import timedelta
 from pathlib import Path
 
-# Read environment variables from .env file
 import environ
 
 from core.logging_config import get_logging_config
@@ -54,8 +55,10 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
+    "drf_spectacular",
     # Local apps
     "users",
+    "storage",
 ]
 
 MIDDLEWARE = [
@@ -120,6 +123,18 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+    {
+        "NAME": "users.validators.UppercaseValidator",
+    },
+    {
+        "NAME": "users.validators.LowercaseValidator",
+    },
+    {
+        "NAME": "users.validators.DigitValidator",
+    },
+    {
+        "NAME": "users.validators.SpecialCharValidator",
+    },
 ]
 
 # REST framework settings
@@ -147,6 +162,7 @@ REST_FRAMEWORK = {
         "register": "5/hour",
         "reset_password": "5/hour",
     },
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 SIMPLE_JWT = {
@@ -239,8 +255,15 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Logging settings
 LOGGING = get_logging_config(BASE_DIR, DEBUG)
 
+# Detect test mode - multiple detection methods
+IS_TESTING = (
+    "test" in sys.argv
+    or "pytest" in sys.modules
+    or os.environ.get("PYTEST_CURRENT_TEST") is not None
+)
+
 # Security settings for production (auto-applied when DEBUG=False)
-if not DEBUG:
+if not DEBUG and not IS_TESTING:
     # HTTPS enforcement
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
@@ -253,3 +276,51 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+
+# ==================================================================================================
+# TEST-SPECIFIC SETTINGS
+# Applied automatically when running tests via pytest or manage.py test
+# ==================================================================================================
+
+if IS_TESTING:
+    # Fast password hashing (speeds up test execution)
+    PASSWORD_HASHERS = [
+        "django.contrib.auth.hashers.MD5PasswordHasher",
+    ]
+
+    # Temporary media root (files deleted after tests)
+    # Use a subdirectory to avoid conflicts
+    TEMP_MEDIA_DIR = tempfile.mkdtemp(prefix="test_media_")
+    MEDIA_ROOT = TEMP_MEDIA_DIR
+
+    # Debug: print media root during tests
+    print(f"[TEST MODE] MEDIA_ROOT set to: {MEDIA_ROOT}")
+
+    # Disable throttling (prevents rate limit errors during testing)
+    REST_FRAMEWORK["DEFAULT_THROTTLE_CLASSES"] = []
+
+    # Reduce logging noise during tests
+    if "LOGGING" in locals():
+        if "root" in LOGGING:
+            LOGGING["root"]["level"] = "WARNING"
+        if "handlers" in LOGGING:
+            for handler in LOGGING["handlers"].values():
+                if handler.get("class") == "logging.StreamHandler":
+                    handler["level"] = "WARNING"
+
+# ==================================================================================================
+# SPECTACULAR (SWAGGER/OpenAPI) SETTINGS
+# ==================================================================================================
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Nebula Cloud API",
+    "DESCRIPTION": "API documentation for the Nebula Cloud application.",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "COMPONENT_SPLIT_REQUEST": True,
+    "TAGS": [
+        {"name": "Auth", "description": "Authentication and registration endpoints"},
+        {"name": "Users", "description": "User management (Admin only)"},
+        {"name": "Files", "description": "File storage operations"},
+    ],
+}

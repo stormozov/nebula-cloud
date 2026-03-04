@@ -27,7 +27,7 @@ def get_logging_config(base_dir: Path, debug: bool = False) -> dict:
         "disable_existing_loggers": False,
         "formatters": {
             "verbose": {
-                "format": "[{levelname}] {asctime} — {name} — {message}",
+                "format": "[{levelname}] {asctime} — {name} — {module}:{lineno} — {message}",
                 "style": "{",
                 "datefmt": "%Y-%m-%d %H:%M:%S",
             },
@@ -114,6 +114,16 @@ def get_logging_config(base_dir: Path, debug: bool = False) -> dict:
             },
             "users.auth": {
                 "handlers": ["auth", "security", "console"],
+                "level": "INFO",
+                "propagate": False,
+            },
+            "storage": {
+                "handlers": ["console", "file", "errors"],
+                "level": "INFO",
+                "propagate": False,
+            },
+            "storage.files": {
+                "handlers": ["console", "file", "errors"],
                 "level": "INFO",
                 "propagate": False,
             },

@@ -1,5 +1,10 @@
 """
 Serializers for user authentication and management.
+
+The module provides serializers for:
+- User registration (UserRegistrationSerializer)
+- User login (UserLoginSerializer)
+- Token response (TokenResponseSerializer)
 """
 
 from django.contrib.auth import authenticate
@@ -9,9 +14,9 @@ from rest_framework import serializers
 
 from users.models import UserAccount
 
-# ==============================================================================
+# ==================================================================================================
 # REGISTRATION AND LOGIN
-# ==============================================================================
+# ==================================================================================================
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -113,9 +118,9 @@ class UserLoginSerializer(serializers.Serializer):
         raise NotImplementedError("Login serializer does not implement update")
 
 
-# ==============================================================================
+# ==================================================================================================
 # TOKENS
-# ==============================================================================
+# ==================================================================================================
 
 
 class TokenResponseSerializer(serializers.Serializer):
@@ -157,56 +162,3 @@ class TokenResponseSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
         """Not implemented for token response serializer."""
         raise NotImplementedError("TokenResponseSerializer does not implement update")
-
-
-# ==============================================================================
-# USER PROFILE
-# ==============================================================================
-
-
-class UserSerializer(serializers.ModelSerializer):
-    """Serializer for user profile information."""
-
-    full_name = serializers.SerializerMethodField(
-        read_only=True,
-        help_text="Полное имя пользователя",
-    )
-    storage_path = serializers.CharField(
-        read_only=True,
-        help_text="Путь к хранилищу пользователя",
-    )
-
-    class Meta:
-        """Meta class for UserSerializer."""
-
-        model = UserAccount
-        fields = [
-            "id",
-            "username",
-            "email",
-            "first_name",
-            "last_name",
-            "full_name",
-            "storage_path",
-            "date_joined",
-            "last_login",
-        ]
-        read_only_fields = [
-            "id",
-            "username",
-            "email",
-            "date_joined",
-            "last_login",
-        ]
-
-    def get_full_name(self, obj):
-        """Get user's full name."""
-        return obj.get_full_name()
-
-    def update(self, instance, validated_data):
-        """Update user profile."""
-        instance.first_name = validated_data.get("first_name", instance.first_name)
-        instance.last_name = validated_data.get("last_name", instance.last_name)
-        instance.save()
-
-        return instance
