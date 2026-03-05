@@ -1,0 +1,15 @@
+// =============================================================================
+// Стили для работы с шрифтом
+// =============================================================================
+
+@import url("https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&subset=cyrillic-ext");
+@import url("https://fonts.googleapis.com/css?family=Roboto+Condensed&subset=cyrillic-ext");
+
+body {
+  font-family: "Roboto", sans-serif;
+}
+
+h1 {
+  font-size: 2em;
+  line-height: 1.1;
+}
