@@ -8,63 +8,63 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
-	const env = loadEnv(mode, process.cwd(), "");
-	const API_URL = env.VITE_API_URL || "http://localhost:8000";
+  const env = loadEnv(mode, process.cwd(), "");
+  const API_URL = env.VITE_API_URL || "http://localhost:8000";
 
-	return {
-		plugins: [react(), analyzer()],
+  return {
+    plugins: [react(), analyzer()],
 
-		base: "./",
+    base: "./",
 
-		resolve: {
-			alias: {
-				"@": path.resolve(__dirname, "./src"),
-				"@pages": path.resolve(__dirname, "./src/pages"),
-				"@components": path.resolve(__dirname, "./src/components"),
-				"@utils": path.resolve(__dirname, "./src/shared/utils"),
-				"@hooks": path.resolve(__dirname, "./src/hooks"),
-				"@shared": path.resolve(__dirname, "./src/shared"),
-				"@assets": path.resolve(__dirname, "./src/assets"),
-			},
-		},
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "./src"),
+        "@pages": path.resolve(__dirname, "./src/pages"),
+        "@components": path.resolve(__dirname, "./src/components"),
+        "@utils": path.resolve(__dirname, "./src/shared/utils"),
+        "@hooks": path.resolve(__dirname, "./src/hooks"),
+        "@shared": path.resolve(__dirname, "./src/shared"),
+        "@assets": path.resolve(__dirname, "./src/assets"),
+      },
+    },
 
-		server: {
-			port: 5173,
-			proxy: {
-				"/api": {
-					target: API_URL,
-					changeOrigin: true,
-					secure: false,
+    server: {
+      port: 5173,
+      proxy: {
+        "/api": {
+          target: API_URL,
+          changeOrigin: true,
+          secure: false,
 
-					// eslint-disable-next-line @typescript-eslint/no-unused-vars
-					configure: (proxy, _options) => {
-						// eslint-disable-next-line @typescript-eslint/no-unused-vars
-						proxy.on("proxyReq", (proxyReq, _req, _res) => {
-							proxyReq.setHeader("Accept", "application/json");
-						});
-					},
-				},
-			},
-		},
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          configure: (proxy, _options) => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            proxy.on("proxyReq", (proxyReq, _req, _res) => {
+              proxyReq.setHeader("Accept", "application/json");
+            });
+          },
+        },
+      },
+    },
 
-		build: {
-			outDir: "dist",
-			emptyOutDir: true,
-			sourcemap: mode === "development",
-			rollupOptions: {
-				input: {
-					main: path.resolve(__dirname, "index.html"),
-				},
-				output: {
-					entryFileNames: "assets/[name]-[hash].js",
-					chunkFileNames: "assets/[name]-[hash].js",
-					assetFileNames: "assets/[name]-[hash].[ext]",
-				},
-			},
-		},
+    build: {
+      outDir: "dist",
+      emptyOutDir: true,
+      sourcemap: mode === "development",
+      rollupOptions: {
+        input: {
+          main: path.resolve(__dirname, "index.html"),
+        },
+        output: {
+          entryFileNames: "assets/[name]-[hash].js",
+          chunkFileNames: "assets/[name]-[hash].js",
+          assetFileNames: "assets/[name]-[hash].[ext]",
+        },
+      },
+    },
 
-		define: {
-			"process.env.API_URL": JSON.stringify(API_URL),
-		},
-	};
+    define: {
+      "process.env.API_URL": JSON.stringify(API_URL),
+    },
+  };
 });

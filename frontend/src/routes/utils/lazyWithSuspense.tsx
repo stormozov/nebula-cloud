@@ -1,7 +1,7 @@
 import { lazy, Suspense } from "react";
 
 interface ILoaderPromise {
-	default: React.ComponentType;
+  default: React.ComponentType;
 }
 
 type LoaderType = () => Promise<ILoaderPromise>;
@@ -13,10 +13,10 @@ type LoaderType = () => Promise<ILoaderPromise>;
  * 	to a component.
  */
 export const lazyWithSuspense = (loader: LoaderType) => {
-	const LazyComponent = lazy(loader);
-	return (
-		<Suspense fallback={"loading"}>
-			<LazyComponent />
-		</Suspense>
-	);
+  const LazyComponent = lazy(loader);
+  return (
+    <Suspense fallback={"loading"}>
+      <LazyComponent />
+    </Suspense>
+  );
 };

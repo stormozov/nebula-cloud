@@ -5,7 +5,7 @@ import { server } from "./mocks/server";
 
 // Cleanup после каждого теста
 afterEach(() => {
-	cleanup();
+  cleanup();
 });
 
 // Запуск MSW сервера
