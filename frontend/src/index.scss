@@ -1,0 +1,7 @@
+// =============================================================================
+// The root SCSS file of the app that imports the other SCSS files
+// =============================================================================
+
+@use "./shared/styles/colors";
+@use "./shared/styles/fonts";
+@use "./shared/styles/normalize";
