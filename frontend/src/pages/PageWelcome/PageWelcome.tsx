@@ -10,5 +10,5 @@ export default function PageWelcome() {
         <h1>PageWelcome</h1>
       </div>
     </div>
-  )
+  );
 }

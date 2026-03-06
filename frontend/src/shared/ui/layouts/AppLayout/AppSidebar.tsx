@@ -8,5 +8,5 @@ export function AppSidebar() {
     <div className="app-sidebar">
       <p>AppSidebar</p>
     </div>
-  )
+  );
 }

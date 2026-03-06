@@ -8,5 +8,5 @@ export function AppHeader() {
     <header className="app-header">
       <p>AppHeader</p>
     </header>
-  )
+  );
 }
