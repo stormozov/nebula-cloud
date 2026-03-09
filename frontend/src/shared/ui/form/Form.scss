@@ -1,11 +1,12 @@
 // =============================================================================
-// Style module for register form component
+// Style module for form component
 // =============================================================================
 
-.register-form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.form {
+  --form-gap: 16px;
+
+  display: grid;
+  gap: var(--form-gap);
 
   margin: 0 auto;
 
@@ -14,12 +15,11 @@
 
   &__row {
     display: flex;
-    gap: 16px;
+    gap: var(--form-gap);
 
     &--double {
       @media (max-width: 600px) {
         flex-direction: column;
-        gap: 16px;
       }
 
       > * {

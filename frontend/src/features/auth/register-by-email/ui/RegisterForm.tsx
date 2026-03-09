@@ -1,18 +1,18 @@
 import type { JSX } from "react";
 
-import { Button, ControlledInput } from "@/shared/ui";
+import { Button, ControlledInput, Form } from "@/shared/ui";
 
 import { useRegisterForm } from "../lib/useRegisterForm";
-
-import "./RegisterForm.scss";
 
 /**
  * Registration form component for new user account creation.
  * Renders input fields for all required registration data with validation.
  *
  * @param {Object} props - Component props
- * @param {() => void} props.onSuccess - Callback on successful registration (optional)
- * @param {(error: string) => void} props.onError - Callback on registration error (optional)
+ * @param {() => void} props.onSuccess - Callback on successful registration
+ *  (optional)
+ * @param {(error: string) => void} props.onError - Callback on registration
+ *  error (optional)
  *
  * @returns {JSX.Element} Registration form component
  *
@@ -22,13 +22,13 @@ import "./RegisterForm.scss";
  *   onError={(msg) => setGlobalError(msg)}
  * />
  */
-export const RegisterForm = ({
+export function RegisterForm({
   onSuccess,
   onError,
 }: {
   onSuccess?: () => void;
   onError?: (error: string) => void;
-}): JSX.Element => {
+}): JSX.Element {
   const {
     formData,
     errors,
@@ -39,8 +39,8 @@ export const RegisterForm = ({
   } = useRegisterForm({ onSuccess, onError });
 
   return (
-    <form className="register-form" onSubmit={handleSubmit} noValidate>
-      <div className="register-form__row register-form__row--double">
+    <Form className="register-form" onSubmit={handleSubmit} noValidate>
+      <Form.Row className="register-form__row register-form__row--double">
         <ControlledInput
           value={formData.firstName}
           onChange={handleChange("firstName")}
@@ -64,7 +64,7 @@ export const RegisterForm = ({
           required
           autoComplete="family-name"
         />
-      </div>
+      </Form.Row>
 
       <ControlledInput
         value={formData.username}
@@ -117,11 +117,7 @@ export const RegisterForm = ({
         autoComplete="new-password"
       />
 
-      {errors.submit && (
-        <div className="register-form__submit-error" role="alert">
-          {errors.submit}
-        </div>
-      )}
+      {errors.submit && <Form.SubmitErrorBlock errors={errors.submit} />}
 
       <Button
         type="submit"
@@ -133,6 +129,6 @@ export const RegisterForm = ({
       >
         Зарегистрироваться
       </Button>
-    </form>
+    </Form>
   );
-};
+}

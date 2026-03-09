@@ -1,10 +1,9 @@
 import type { JSX } from "react";
 
-import { Button, ControlledInput } from "@/shared/ui";
+import { Button, ControlledInput, Form } from "@/shared/ui";
+
 import type { IUseLoginFormProps } from "../lib/types";
 import { useLoginForm } from "../lib/useLoginForm";
-
-import "./LoginForm.scss";
 
 /**
  * Login form component for user authentication.
@@ -23,10 +22,10 @@ import "./LoginForm.scss";
  *   onError={(msg) => setGlobalError(msg)}
  * />
  */
-export const LoginForm = ({
+export function LoginForm({
   onSuccess,
   onError,
-}: IUseLoginFormProps): JSX.Element => {
+}: IUseLoginFormProps): JSX.Element {
   const {
     formData,
     errors,
@@ -37,7 +36,7 @@ export const LoginForm = ({
   } = useLoginForm({ onSuccess, onError });
 
   return (
-    <form className="login-form" onSubmit={handleSubmit} noValidate>
+    <Form className="login-form" onSubmit={handleSubmit} noValidate>
       <ControlledInput
         value={formData.username}
         onChange={handleChange("username")}
@@ -63,11 +62,7 @@ export const LoginForm = ({
         autoComplete="current-password"
       />
 
-      {errors.submit && (
-        <div className="login-form__submit-error" role="alert">
-          {errors.submit}
-        </div>
-      )}
+      {errors.submit && <Form.SubmitErrorBlock errors={errors.submit} />}
 
       <Button
         type="submit"
@@ -79,6 +74,6 @@ export const LoginForm = ({
       >
         Войти
       </Button>
-    </form>
+    </Form>
   );
-};
+}
