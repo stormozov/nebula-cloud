@@ -1,44 +1,52 @@
 import { createBrowserRouter } from "react-router";
 
-import { lazyWithSuspense } from "./utils";
+import { AuthGuard } from "@/app/providers/AuthGuard";
 
-const basename: string = import.meta.env.VITE_BASENAME;
+import { lazyWithSuspense } from "./utils/lazyWithSuspense";
 
 /**
- * Main router for the application.
+ * Main router for the application with protected routes.
  */
-const routesConfig = createBrowserRouter(
-  [
-    {
-      path: "/",
-      element: lazyWithSuspense(
-        () => import("@/pages/PageWelcome/PageWelcome"),
-      ),
-    },
+const routesConfig = createBrowserRouter([
+  // Public route: Welcome page (guest only)
+  {
+    path: "/",
+    element: (
+      <AuthGuard accessLevel="guest">
+        {lazyWithSuspense(() => import("@/pages/PageWelcome/PageWelcome"))}
+      </AuthGuard>
+    ),
+  },
 
-    {
-      path: "/",
-      element: lazyWithSuspense(
-        () => import("@/shared/ui/layouts/AppLayout/AppLayout"),
-      ),
-      children: [
-        {
-          path: "disk",
-          element: lazyWithSuspense(
-            () => import("@/pages/PageClientDisk/PageClientDisk"),
-          ),
-        },
-      ],
-    },
+  // Public route: Auth page (guest only)
+  {
+    path: "/auth",
+    element: (
+      <AuthGuard accessLevel="guest">
+        {lazyWithSuspense(() => import("@/pages/PageAuth/ui/Page/PageAuth"))}
+      </AuthGuard>
+    ),
+  },
 
-    {
-      path: "*",
-      element: lazyWithSuspense(
-        () => import("@/pages/PageNotFound/PageNotFound"),
-      ),
-    },
-  ],
-  { basename },
-);
+  // Protected route: Client Disk (authenticated users)
+  {
+    path: "/disk",
+    element: (
+      <AuthGuard accessLevel="user">
+        {lazyWithSuspense(
+          () => import("@/pages/PageClientDisk/PageClientDisk"),
+        )}
+      </AuthGuard>
+    ),
+  },
+
+  // 404 page (always accessible)
+  {
+    path: "*",
+    element: lazyWithSuspense(
+      () => import("@/pages/PageNotFound/PageNotFound"),
+    ),
+  },
+]);
 
 export default routesConfig;
