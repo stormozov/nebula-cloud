@@ -1,3 +1,5 @@
+import { Logo, PageLayout } from "@/shared/ui";
+
 import "./PageWelcome.scss";
 
 /**
@@ -5,10 +7,18 @@ import "./PageWelcome.scss";
  */
 export default function PageWelcome() {
   return (
-    <div className="page-welcome">
-      <div className="container">
-        <h1>PageWelcome</h1>
-      </div>
-    </div>
+    <PageLayout className="page-welcome">
+      <PageLayout.Header>
+        <PageLayout.Container>
+          <Logo />
+        </PageLayout.Container>
+      </PageLayout.Header>
+
+      <PageLayout.Main>
+        <PageLayout.Container>
+          <h1>Добро пожаловать в Nebula Cloud</h1>
+        </PageLayout.Container>
+      </PageLayout.Main>
+    </PageLayout>
   );
 }
