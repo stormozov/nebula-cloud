@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { useRegisterMutation } from "@/entities/user";
+import { hasFieldErrors, parseDjangoApiErrors } from "@/shared/api";
 import { isFormValid } from "@/shared/utils";
 import { validateRegistrationForm } from "@/shared/validators";
 
@@ -143,19 +144,33 @@ export const useRegisterForm = ({
         onSuccess?.();
         navigate("/disk", { replace: true });
       } catch (error: unknown) {
-        const message =
-          error && typeof error === "object" && "data" in error
-            ? (
-                error as {
-                  data?: { detail?: string; non_field_errors?: string[] };
-                }
-              ).data?.detail ||
-              (error as { data?: { non_field_errors?: string[] } }).data
-                ?.non_field_errors?.[0]
-            : "Ошибка регистрации. Попробуйте позже.";
+        let apiFieldErrors: IRegisterFormErrors = {};
+        let submitError: string | undefined;
 
-        setErrors((prev) => ({ ...prev, submit: message as string }));
-        onError?.(message as string);
+        if (error && typeof error === "object" && "data" in error) {
+          const errorData = (error as { data?: unknown }).data;
+          const parsedErrors = parseDjangoApiErrors(errorData);
+
+          apiFieldErrors = parsedErrors.fieldErrors as IRegisterFormErrors;
+          submitError = parsedErrors.submitError;
+        }
+
+        if (!hasFieldErrors(apiFieldErrors) && !submitError) {
+          // If no field errors, set generic submit error
+          submitError = "Ошибка регистрации. Попробуйте позже.";
+        }
+
+        setErrors((prev) => ({
+          ...prev,
+          ...apiFieldErrors,
+          submit: submitError,
+        }));
+
+        onError?.(
+          submitError ||
+            Object.values(apiFieldErrors)[0] ||
+            "Ошибка регистрации",
+        );
       }
     },
     [formData, register, navigate, onSuccess, onError],

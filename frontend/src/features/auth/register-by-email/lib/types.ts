@@ -21,6 +21,7 @@ export interface IRegisterFormErrors {
   firstName?: string;
   lastName?: string;
   submit?: string;
+  [key: string]: string | undefined;
 }
 
 /**

@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { useLoginMutation } from "@/entities/user";
+import { hasFieldErrors, parseDjangoApiErrors } from "@/shared/api";
 import type { IValidationResult } from "@/shared/types/validation";
 import { validateLogin, validatePassword } from "@/shared/validators";
 
@@ -121,14 +122,30 @@ export const useLoginForm = ({
         onSuccess?.();
         navigate("/disk", { replace: true });
       } catch (error: unknown) {
-        // Error handling
-        const message =
-          error && typeof error === "object" && "data" in error
-            ? (error as { data?: { detail?: string } }).data?.detail
-            : "Ошибка входа. Проверьте логин и пароль.";
+        let submitError: string | undefined;
 
-        setErrors((prev) => ({ ...prev, submit: message as string }));
-        onError?.(message as string);
+        if (error && typeof error === "object" && "data" in error) {
+          const errorData = (error as { data?: unknown }).data;
+          const parsedErrors = parseDjangoApiErrors(errorData);
+
+          if (hasFieldErrors(parsedErrors.fieldErrors)) {
+            setErrors((prev) => ({
+              ...prev,
+              ...(parsedErrors.fieldErrors as ILoginFormErrors),
+            }));
+            onError?.(Object.values(parsedErrors.fieldErrors)[0] as string);
+            return;
+          }
+
+          submitError = parsedErrors.submitError;
+        }
+
+        if (!submitError) {
+          submitError = "Ошибка входа. Проверьте логин и пароль.";
+        }
+
+        setErrors((prev) => ({ ...prev, submit: submitError }));
+        onError?.(submitError);
       }
     },
     [formData, login, navigate, onSuccess, onError],
