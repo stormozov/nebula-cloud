@@ -124,7 +124,21 @@ export const useLoginForm = ({
       } catch (error: unknown) {
         let submitError: string | undefined;
 
-        if (error && typeof error === "object" && "data" in error) {
+        if (
+          error &&
+          typeof error === "object" &&
+          "status" in error &&
+          error.status === 500
+        ) {
+          submitError = "Внутренняя ошибка сервера. Попробуйте позже.";
+        }
+
+        if (
+          error &&
+          typeof error === "object" &&
+          "data" in error &&
+          error.data
+        ) {
           const errorData = (error as { data?: unknown }).data;
           const parsedErrors = parseDjangoApiErrors(errorData);
 
