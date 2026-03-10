@@ -6,7 +6,10 @@ $app-header-height: 60px;
 
 .page {
   &__header {
-    padding: 1.125em 0;
+    display: flex;
+    align-items: center;
+
+    padding: 0.25em 0;
 
     width: 100%;
     height: $app-header-height;
@@ -23,7 +26,6 @@ $app-header-height: 60px;
   }
 
   &__main {
-    padding: 1.125em 1em;
     width: 100%;
     height: calc(100vh - $app-header-height);
   }
@@ -33,5 +35,12 @@ $app-header-height: 60px;
     width: 272px;
     height: 100vh;
     background-color: var(--color-bg-tertiary);
+  }
+
+  &__header-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
   }
 }

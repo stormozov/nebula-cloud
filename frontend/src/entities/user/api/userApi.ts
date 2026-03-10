@@ -138,6 +138,9 @@ export const userApi = createApi({
       query: () => ({
         url: "/auth/logout/",
         method: "POST",
+        body: {
+          refresh: localStorage.getItem("refreshToken") || undefined,
+        },
       }),
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {

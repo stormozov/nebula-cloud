@@ -1,4 +1,5 @@
 import { type JSX, useCallback, useState } from "react";
+import { useSearchParams } from "react-router";
 
 import { LoginForm } from "@/features/auth/login-by-email";
 import { RegisterForm } from "@/features/auth/register-by-email";
@@ -35,14 +36,23 @@ export const AuthForm = ({
   onSuccess?: () => void;
   onError?: (error: string) => void;
 }): JSX.Element => {
-  const [activeTab, setActiveTab] = useState<AuthTab>(DEFAULT_AUTH_TAB);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [activeTab, setActiveTab] = useState<AuthTab>(() => {
+    const tabParam = searchParams.get("tab") as AuthTab | null;
+    return tabParam === "register" ? "register" : DEFAULT_AUTH_TAB;
+  });
 
   /**
    * Handle tab change.
    */
-  const handleTabChange = useCallback((tab: AuthTab): void => {
-    setActiveTab(tab);
-  }, []);
+  const handleTabChange = useCallback(
+    (tab: AuthTab): void => {
+      setActiveTab(tab);
+      setSearchParams(tab === "register" ? { tab: "register" } : {});
+    },
+    [setSearchParams],
+  );
 
   return (
     <section className="auth-form" aria-label="Форма авторизации">

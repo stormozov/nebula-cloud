@@ -1,9 +1,12 @@
 // =============================================================================
-// Styles for Welcome page component
+// Styles for AuthActions component
 // =============================================================================
 
-.page-welcome {
-  &__main {
-    padding-top: 4rem;
+.auth-actions {
+  display: flex;
+  gap: 1rem;
+
+  &--reverse {
+    flex-direction: row-reverse;
   }
 }

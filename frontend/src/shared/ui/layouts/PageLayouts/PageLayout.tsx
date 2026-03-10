@@ -4,6 +4,7 @@ import { AppContainer } from "./PageContainer";
 import { AppHeader } from "./PageHeader";
 import { PageMain } from "./PageMain";
 import { PageSidebar } from "./PageSidebar";
+import { PageWrapper } from "./PageWrapper";
 
 import "./PageLayouts.scss";
 
@@ -34,4 +35,5 @@ export const PageLayout = Object.assign(PageLayoutBase, {
   Main: PageMain,
   Container: AppContainer,
   Sidebar: PageSidebar,
+  Wrapper: PageWrapper,
 });

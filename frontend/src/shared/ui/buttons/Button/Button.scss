@@ -63,7 +63,7 @@
     color: var(--color-text-primary);
 
     &:hover:not(:disabled) {
-      background-color: var(--color-border);
+      background-color: var(--color-border-primary);
     }
   }
 
