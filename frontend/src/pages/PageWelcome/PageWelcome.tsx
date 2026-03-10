@@ -1,4 +1,4 @@
-import { Logo, PageLayout } from "@/shared/ui";
+import { Heading, Logo, PageLayout } from "@/shared/ui";
 
 import "./PageWelcome.scss";
 
@@ -16,7 +16,9 @@ export default function PageWelcome() {
 
       <PageLayout.Main>
         <PageLayout.Container>
-          <h1>Добро пожаловать в Nebula Cloud</h1>
+          <Heading level={1} size="2xl" align="center">
+            Добро пожаловать в Nebula Cloud
+          </Heading>
         </PageLayout.Container>
       </PageLayout.Main>
     </PageLayout>
