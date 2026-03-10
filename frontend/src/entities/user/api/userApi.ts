@@ -1,5 +1,10 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
+import {
+  getAccessTokenFromPersist,
+  getRefreshTokenFromPersist,
+} from "@/shared/utils";
+
 import { logout, setAuthData } from "../model/slice";
 import type {
   IUser,
@@ -36,7 +41,7 @@ const baseQuery = fetchBaseQuery({
    *  and content-type set.
    */
   prepareHeaders: (headers: Headers): Headers => {
-    const token = localStorage.getItem("accessToken");
+    const token = getAccessTokenFromPersist();
     if (token) headers.set("Authorization", `Bearer ${token}`);
     headers.set("Content-Type", "application/json");
     return headers;
@@ -87,8 +92,6 @@ export const userApi = createApi({
         try {
           const { data } = await queryFulfilled;
           dispatch(setAuthData(data));
-          localStorage.setItem("accessToken", data.access);
-          localStorage.setItem("refreshToken", data.refresh);
         } catch {
           // Error handling in component
         }
@@ -117,8 +120,6 @@ export const userApi = createApi({
         try {
           const { data } = await queryFulfilled;
           dispatch(setAuthData(data));
-          localStorage.setItem("accessToken", data.access);
-          localStorage.setItem("refreshToken", data.refresh);
         } catch {
           // Error handling in component
         }
@@ -139,7 +140,7 @@ export const userApi = createApi({
         url: "/auth/logout/",
         method: "POST",
         body: {
-          refresh: localStorage.getItem("refreshToken") || undefined,
+          refresh: getRefreshTokenFromPersist(),
         },
       }),
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
@@ -147,8 +148,6 @@ export const userApi = createApi({
           await queryFulfilled;
         } finally {
           dispatch(logout());
-          localStorage.removeItem("accessToken");
-          localStorage.removeItem("refreshToken");
         }
       },
     }),
