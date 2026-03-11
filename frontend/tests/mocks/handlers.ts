@@ -111,7 +111,7 @@ export const handlers = [
   }),
 
   // Get current user endpoint
-  http.get("/api/auth/me/", ({ request }) => {
+  http.get("/api/users/me/", ({ request }) => {
     const authHeader = request.headers.get("Authorization");
 
     // Check for valid token
