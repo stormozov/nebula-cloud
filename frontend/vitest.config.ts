@@ -11,11 +11,9 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-
   test: {
     // Test execution environment (browser emulation)
-    environment: "jsdom",
-
+    environment: "happy-dom",
     // Global functions: describe, it, expect, vi, etc.
     globals: true,
 
@@ -38,6 +36,8 @@ export default defineConfig({
         "**/*.config.*",
         "**/*.json",
         "tests/**",
+        "**/*.test.ts",
+        "**/*.test.tsx",
       ],
     },
 
