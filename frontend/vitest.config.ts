@@ -27,9 +27,11 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],
+      include: ["src/**/*"],
       exclude: [
         "node_modules/**",
         "dist/**",
+        "**/*.scss",
         "src/main.tsx",
         "src/vite-env.d.ts",
         "**/*.d.ts",
@@ -38,7 +40,19 @@ export default defineConfig({
         "tests/**",
         "**/*.test.ts",
         "**/*.test.tsx",
+        "**/types/**",
+        "**/types.ts",
+        "**/index.ts",
+        "**/selectors.ts",
+        "store/**",
+        "routes/utils/**"
       ],
+      thresholds: {
+        branches: 80,
+        functions: 80,
+        lines: 80,
+        statements: 80,
+      },
     },
 
     // Settings for MSW (Mock Service Worker)
