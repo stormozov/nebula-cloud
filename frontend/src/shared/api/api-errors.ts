@@ -49,10 +49,21 @@ export const parseDjangoApiErrors = (
     non_field_errors: "submit",
   };
 
-  const map = fieldMap || defaultFieldMap;
+  let map: Record<string, string>;
+  if (fieldMap === undefined) {
+    map = defaultFieldMap;
+  } else if (Object.keys(fieldMap).length === 0) {
+    map = {};
+  } else {
+    map = { ...defaultFieldMap, ...fieldMap };
+  }
 
   // Handle generic "detail" error (e.g., login errors)
-  if ("detail" in data && typeof data.detail === "string") {
+  if (
+    "detail" in data &&
+    typeof data.detail === "string" &&
+    data.detail !== ""
+  ) {
     result.submitError = data.detail;
     return result;
   }
