@@ -172,7 +172,6 @@ describe("userApi with MSW", () => {
       expect(data?.user.username).toBe("newuser2");
     });
 
-
     /**
      * @description Should execute logout mutation
      * @scenario Executing logout mutation should return auth response

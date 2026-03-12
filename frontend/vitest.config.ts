@@ -45,7 +45,7 @@ export default defineConfig({
         "**/index.ts",
         "**/selectors.ts",
         "store/**",
-        "routes/**"
+        "routes/**",
       ],
       thresholds: {
         branches: 80,

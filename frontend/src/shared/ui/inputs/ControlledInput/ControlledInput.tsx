@@ -60,11 +60,14 @@ export const ControlledInput = forwardRef<
       onChange(event.target.value);
     };
 
-    const inputClasses = classNames("controlled-input", {
-      "controlled-input--error": !!error,
-      "controlled-input--disabled": disabled,
+    const inputClasses = classNames(
+      "controlled-input",
+      {
+        "controlled-input--error": !!error,
+        "controlled-input--disabled": disabled,
+      },
       className,
-    });
+    );
 
     return (
       <div className={inputClasses}>

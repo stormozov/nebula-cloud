@@ -1,3 +1,5 @@
+import classNames from "classnames";
+
 import "./PageLayouts.scss";
 
 /**
@@ -5,14 +7,17 @@ import "./PageLayouts.scss";
  */
 interface PageContainerProps {
   children: React.ReactNode;
+  className?: string;
 }
 
 /**
- * A layout component that wraps the main content of the application in a container.
- *
- * Provides consistent spacing, alignment, and max-width constraints across pages.
- * Used to center content and limit its maximum width for better readability and design consistency.
+ * A layout component that wraps the main content of the application
+ * in a container.
  */
-export function AppContainer({ children }: PageContainerProps) {
-  return <div className="page__container">{children}</div>;
+export function AppContainer({ children, ...props }: PageContainerProps) {
+  return (
+    <div {...props} className={classNames("page__container", props.className)}>
+      {children}
+    </div>
+  );
 }
