@@ -7,7 +7,7 @@ import { lazyWithSuspense } from "./utils/lazyWithSuspense";
 /**
  * Main router for the application with protected routes.
  */
-const routesConfig = createBrowserRouter([
+export const routesConfig = createBrowserRouter([
   // Public route: Welcome page (guest only)
   {
     path: "/",
@@ -48,5 +48,3 @@ const routesConfig = createBrowserRouter([
     ),
   },
 ]);
-
-export default routesConfig;
