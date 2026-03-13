@@ -1,0 +1,174 @@
+// ============================================
+// Normalize CSS
+// ============================================
+
+// 1. Box sizing для всех элементов
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+// 2. Reset margin and padding for all elements
+* {
+  margin: 0;
+  padding: 0;
+}
+
+// 3. Base styles for html
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  -moz-tab-size: 4;
+  tab-size: 4;
+}
+
+// 4. Base styles for body
+body {
+  min-height: 100vh;
+
+  background-color: var(--color-bg-secondary);
+
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// 5. Media
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+// 6. Forms and inputs
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+// 7. Link
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+// 8. List
+ul,
+ol {
+  list-style: none;
+}
+
+// 9. Tables
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+// 10. Titles
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+// 11. Paragraph
+p {
+  &:not(:last-child) {
+    margin-bottom: 1rem;
+  }
+}
+
+// 12. Code
+code,
+pre {
+  font-family: "Fira Code", "Consolas", "Monaco", monospace;
+  font-size: 0.875rem;
+}
+
+// 13. Horizontal line
+hr {
+  margin: 1.5rem 0;
+  border: none;
+  border-top: 1px solid #e5e7eb;
+}
+
+// 14. Highlight
+::selection {
+  background-color: #e0e7ff;
+  color: #111827;
+}
+
+// 15. Focus
+:focus-visible {
+  outline: 2px solid #4f46e5;
+  outline-offset: 2px;
+}
+
+// 16. Scrollbar (webkit)
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #9ca3af;
+  border-radius: 4px;
+
+  &:hover {
+    background: #6b7280;
+  }
+}
+
+// 17. Adaptive styles
+@media (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+// 18. Reducing animations for users with preference
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

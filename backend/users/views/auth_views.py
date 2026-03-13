@@ -125,10 +125,11 @@ class RegisterView(generics.CreateAPIView):
 
         # 6. Log successful registration
         auth_logger.info(
-            "User registered successfully: email=%s, username=%s, IP=%s",
+            "User registered successfully: email=%s, username=%s, IP=%s, response=%s",
             new_user.email,
             new_user.username,
             get_client_ip(request),
+            response_serializer.data,
         )
 
         return Response(response_serializer.data, status=status.HTTP_201_CREATED)
@@ -243,10 +244,11 @@ class LoginView(APIView):
 
         # 6. Log successful login
         auth_logger.info(
-            "User logged in successfully: email=%s, username=%s, IP=%s",
+            "User logged in successfully: email=%s, username=%s, IP=%s, response=%s",
             user.email,
             user.username,
             get_client_ip(request),
+            response_serializer.data,
         )
 
         return Response(response_serializer.data, status=status.HTTP_200_OK)

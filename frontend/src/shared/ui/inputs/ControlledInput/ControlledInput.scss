@@ -1,0 +1,75 @@
+// =============================================================================
+// Style module for ControlledInput component
+// =============================================================================
+
+.controlled-input {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+
+  &__label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+
+    &__required {
+      margin-left: 4px;
+      color: var(--color-error);
+    }
+  }
+
+  &__field {
+    padding: 10px 12px;
+
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: 6px;
+
+    font-size: 16px;
+    color: var(--color-text-primary);
+
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px rgba(var(--color-primary), 0.2);
+    }
+
+    &:disabled {
+      background-color: var(--color-bg-disabled);
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    &::placeholder {
+      color: var(--color-text-secondary);
+    }
+  }
+
+  &--error {
+    .controlled-input__field {
+      border-color: var(--color-error);
+
+      &:focus {
+        box-shadow: 0 0 0 2px rgba(var(--color-error), 0.2);
+      }
+    }
+  }
+
+  &--disabled {
+    .controlled-input__field {
+      background-color: var(--color-bg-disabled);
+      cursor: not-allowed;
+    }
+  }
+
+  &__error {
+    margin-top: 2px;
+    font-size: 12px;
+    color: var(--color-error);
+  }
+}
