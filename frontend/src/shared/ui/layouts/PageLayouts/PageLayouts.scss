@@ -1,0 +1,46 @@
+// =============================================================================
+// Styles module for Page Layout components
+// =============================================================================
+
+$app-header-height: 60px;
+
+.page {
+  &__header {
+    display: flex;
+    align-items: center;
+
+    padding: 0.25em 0;
+
+    width: 100%;
+    height: $app-header-height;
+
+    background-color: var(--color-bg-primary);
+    border-bottom: 1px solid var(--color-border-secondary);
+  }
+
+  &__container {
+    margin: 0 auto;
+    padding: 0 1em;
+    width: 100%;
+    max-width: 1200px;
+  }
+
+  &__main {
+    width: 100%;
+    height: calc(100vh - $app-header-height);
+  }
+
+  &__sidebar {
+    padding: 1.125em 1em;
+    width: 272px;
+    height: 100vh;
+    background-color: var(--color-bg-tertiary);
+  }
+
+  &__header-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+}

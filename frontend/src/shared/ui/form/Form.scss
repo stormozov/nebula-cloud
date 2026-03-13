@@ -1,0 +1,45 @@
+// =============================================================================
+// Style module for form component
+// =============================================================================
+
+.form {
+  --form-gap: 16px;
+
+  display: grid;
+  gap: var(--form-gap);
+
+  margin: 0 auto;
+
+  width: 100%;
+  max-width: 480px;
+
+  &__row {
+    display: flex;
+    gap: var(--form-gap);
+
+    &--double {
+      @media (max-width: 600px) {
+        flex-direction: column;
+      }
+
+      > * {
+        flex: 1;
+      }
+    }
+  }
+
+  &__submit-error {
+    padding: 8px 12px;
+
+    background-color: var(--color-error-light);
+    border-left: 3px solid var(--color-error);
+    border-radius: 4px;
+
+    font-size: 14px;
+    color: var(--color-error);
+  }
+
+  &__submit-btn {
+    margin-top: 8px;
+  }
+}

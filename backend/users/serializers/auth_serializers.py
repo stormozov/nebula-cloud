@@ -54,6 +54,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         """Validate password confirmation and other fields."""
+
         if attrs["password"] != attrs["password_confirm"]:
             raise serializers.ValidationError({"password_confirm": "Пароли не совпадают."})
 
@@ -66,6 +67,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """Create and return a new user."""
+
         validated_data.pop("password_confirm")
 
         user = UserAccount.objects.create_user(
@@ -95,6 +97,7 @@ class UserLoginSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         """Validate user credentials."""
+
         username = attrs.get("username")
         password = attrs.get("password")
 
@@ -141,6 +144,7 @@ class TokenResponseSerializer(serializers.Serializer):
 
     def get_user(self, obj):
         """Get user data for token response."""
+
         user = obj.get("user")
 
         if user:
@@ -151,6 +155,7 @@ class TokenResponseSerializer(serializers.Serializer):
                 "first_name": user.first_name,
                 "last_name": user.last_name,
                 "full_name": user.get_full_name(),
+                "is_staff": user.is_staff,
             }
 
         return None
