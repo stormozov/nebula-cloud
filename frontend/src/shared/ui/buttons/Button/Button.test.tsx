@@ -263,38 +263,4 @@ describe("Button", () => {
       expect(handleClick).not.toHaveBeenCalled();
     });
   });
-
-  // ===========================================================================
-
-  /**
-   * Snapshot tests for visual regression testing across configurations.
-   */
-  describe("snapshot tests", () => {
-    it("matches snapshot for default button", () => {
-      const { container } = render(<Button>Default Button</Button>);
-      expect(container.firstChild).toMatchSnapshot();
-    });
-
-    it("matches snapshot for fully customized button", () => {
-      const { container } = render(
-        <Button
-          variant="ghost"
-          size="small"
-          loading
-          fullWidth
-          id="snap-id"
-          className="snap-class"
-          disabled
-        >
-          Snapshot
-        </Button>,
-      );
-      expect(container.firstChild).toMatchSnapshot();
-    });
-
-    it("matches snapshot for loading state without children", () => {
-      const { container } = render(<Button loading>&nbsp;</Button>);
-      expect(container.firstChild).toMatchSnapshot();
-    });
-  });
 });

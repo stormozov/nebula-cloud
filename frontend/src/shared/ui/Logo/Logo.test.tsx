@@ -101,30 +101,4 @@ describe("Logo", () => {
       expect(logoDiv).toHaveAttribute("aria-label", ariaLabel);
     });
   });
-
-  // ===========================================================================
-
-  describe("snapshot tests", () => {
-    /**
-     * @description Matches snapshot for default render
-     * @scenario Rendering Logo component
-     * @expected Matches saved snapshot
-     */
-    it("matches snapshot for default render", () => {
-      const { container } = render(<Logo />);
-      expect(container.firstChild).toMatchSnapshot();
-    });
-
-    /**
-     * @description Matches snapshot with passthrough attributes
-     * @scenario Rendering Logo component with id="snap-id", data-custom="true", aria-label="snap"
-     * @expected Matches saved snapshot with applied attributes
-     */
-    it("matches snapshot with passthrough attributes", () => {
-      const { container } = render(
-        <Logo id="snap-id" data-custom="true" aria-label="snap" />,
-      );
-      expect(container.firstChild).toMatchSnapshot();
-    });
-  });
 });

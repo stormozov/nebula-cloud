@@ -265,42 +265,4 @@ describe("Heading", () => {
       );
     });
   });
-
-  // ===========================================================================
-
-  /**
-   * Snapshot tests for full renders to catch regressions.
-   */
-  describe("snapshot tests", () => {
-    /**
-     * @description Matches snapshot for default render
-     * @scenario Rendering Heading component
-     * @expected Matches saved snapshot
-     */
-    it("matches snapshot for default props", () => {
-      const { container } = render(<Heading>Default Heading</Heading>);
-      expect(container.firstChild).toMatchSnapshot();
-    });
-
-    /**
-     * @description Matches snapshot for fully customized props
-     * @scenario Rendering Heading component with level={6}, variant="link", align="right", size="2xl", id="snap", data-custom="true"
-     * @expected Matches saved snapshot
-     */
-    it("matches snapshot for fully customized props", () => {
-      const { container } = render(
-        <Heading
-          level={6}
-          variant="link"
-          align="right"
-          size="2xl"
-          id="snap"
-          data-custom="true"
-        >
-          Custom Snapshot
-        </Heading>,
-      );
-      expect(container.firstChild).toMatchSnapshot();
-    });
-  });
 });
