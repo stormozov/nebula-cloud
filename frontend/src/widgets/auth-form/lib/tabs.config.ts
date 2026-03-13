@@ -25,3 +25,20 @@ export const AUTH_TABS: ITabConfig[] = [
  * Default active tab on form mount.
  */
 export const DEFAULT_AUTH_TAB: AuthTab = "login";
+
+/**
+ * Props for TabSwitcher component
+ */
+export interface ITabSwitcherProps {
+  activeTab: AuthTab;
+  onTabChange: (tab: AuthTab) => void;
+  disabled?: boolean;
+}
+
+/**
+ * Props for AuthForm component.
+ */
+export interface IAuthFormProps {
+  onSuccess?: () => void;
+  onError?: (error: string) => void;
+}

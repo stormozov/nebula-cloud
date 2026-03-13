@@ -1,10 +1,10 @@
-import { type JSX, useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { useSearchParams } from "react-router";
 
 import { LoginForm } from "@/features/auth/login-by-email";
 import { RegisterForm } from "@/features/auth/register-by-email";
 
-import type { AuthTab } from "../../lib/tabs.config";
+import type { AuthTab, IAuthFormProps } from "../../lib/tabs.config";
 import { DEFAULT_AUTH_TAB } from "../../lib/tabs.config";
 import { TabsSwitcher } from "../TabSwitcher/TabsSwitcher";
 
@@ -21,21 +21,13 @@ import "./AuthForm.scss";
  * @param {(error: string) => void} props.onError - Callback on auth error
  *  (optional)
  *
- * @returns {JSX.Element} Authentication form widget
- *
  * @example
  * <AuthForm
  *   onSuccess={() => navigate('/disk')}
  *   onError={(msg) => setGlobalError(msg)}
  * />
  */
-export const AuthForm = ({
-  onSuccess,
-  onError,
-}: {
-  onSuccess?: () => void;
-  onError?: (error: string) => void;
-}): JSX.Element => {
+export const AuthForm = ({ onSuccess, onError }: IAuthFormProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [activeTab, setActiveTab] = useState<AuthTab>(() => {

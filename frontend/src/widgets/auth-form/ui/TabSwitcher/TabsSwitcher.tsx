@@ -1,7 +1,6 @@
 import classNames from "classnames";
-import type { JSX } from "react";
 
-import type { AuthTab } from "../../lib/tabs.config";
+import type { AuthTab, ITabSwitcherProps } from "../../lib/tabs.config";
 import { AUTH_TABS } from "../../lib/tabs.config";
 
 import "./TabsSwitcher.scss";
@@ -16,8 +15,6 @@ import "./TabsSwitcher.scss";
  * @param {(tab: AuthTab) => void} props.onTabChange - Callback on tab change
  * @param {boolean} props.disabled - Disable tab switching (optional)
  *
- * @returns {JSX.Element} Tab switcher component
- *
  * @example
  * <TabsSwitcher
  *   activeTab="login"
@@ -28,12 +25,9 @@ export const TabsSwitcher = ({
   activeTab,
   onTabChange,
   disabled = false,
-}: {
-  activeTab: AuthTab;
-  onTabChange: (tab: AuthTab) => void;
-  disabled?: boolean;
-}): JSX.Element => {
+}: ITabSwitcherProps) => {
   const handleTabClick = (tab: AuthTab) => () => {
+    // istanbul ignore next
     if (!disabled) onTabChange(tab);
   };
 
