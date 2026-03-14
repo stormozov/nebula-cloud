@@ -10,6 +10,8 @@ import {
   REHYDRATE,
 } from "redux-persist";
 
+import { fileApi } from "@/entities/file";
+import fileReducer from "@/entities/file/model/slice";
 import { userApi } from "@/entities/user";
 import userReducer from "@/entities/user/model/slice";
 
@@ -38,7 +40,9 @@ const persistedUserReducer = persistReducer(authPersistConfig, userReducer);
 
 const rootReducer = combineReducers({
   user: persistedUserReducer,
+  file: fileReducer,
   [userApi.reducerPath]: userApi.reducer,
+  [fileApi.reducerPath]: fileApi.reducer,
 });
 
 export const store = configureStore({
@@ -48,7 +52,9 @@ export const store = configureStore({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
-    }).concat(userApi.middleware),
+    })
+      .concat(userApi.middleware)
+      .concat(fileApi.middleware),
 });
 
 export const persistor = persistStore(store);
