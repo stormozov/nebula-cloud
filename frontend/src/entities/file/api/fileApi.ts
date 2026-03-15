@@ -274,7 +274,9 @@ export const uploadFile = async (
   const formData = new FormData();
   formData.append("file", data.file);
 
-  if (data.comment) formData.append("comment", data.comment);
+  if (data.comment !== undefined) {
+    formData.append("comment", data.comment);
+  }
 
   const response = await uploadAxios.post<IFile>("/storage/files/", formData, {
     headers: {
