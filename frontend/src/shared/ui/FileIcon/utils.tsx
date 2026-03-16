@@ -1,6 +1,21 @@
+import type { IconType } from "react-icons";
+import {
+  FaFileAudio,
+  FaFileCode,
+  FaFileImage,
+  FaFileLines,
+  FaFileVideo,
+  FaFileZipper,
+  FaFolder,
+} from "react-icons/fa6";
+
 import FILE_EXTENSIONS from "@/shared/configs/file-extensions.json";
 
 import type { FileType } from "./types";
+
+// =============================================================================
+// FILE EXTENSIONS MAPPING
+// =============================================================================
 
 /** Maps file extension to file type */
 const EXTENSION_TO_TYPE = new Map<string, FileType>();
@@ -10,6 +25,36 @@ Object.entries(FILE_EXTENSIONS).forEach(([type, extensions]) => {
     EXTENSION_TO_TYPE.set(ext.toLowerCase(), type as FileType);
   });
 });
+
+// =============================================================================
+// CONSTANTS
+// =============================================================================
+
+/** Localized labels for file types. */
+const LABELS_RU: Record<FileType, string> = {
+  image: "Изображение",
+  video: "Видео",
+  audio: "Аудио",
+  document: "Документ",
+  archive: "Архив",
+  code: "Код",
+  unknown: "Файл",
+};
+
+/** File type icons. */
+export const FILE_TYPE_ICONS: Record<FileType, IconType> = {
+  image: FaFileImage,
+  video: FaFileVideo,
+  audio: FaFileAudio,
+  document: FaFileLines,
+  archive: FaFileZipper,
+  code: FaFileCode,
+  unknown: FaFolder,
+};
+
+// =============================================================================
+// FILE TYPE UTILS
+// =============================================================================
 
 /**
  * Determines the file type based on the file extension.
@@ -40,42 +85,4 @@ export const getFileType = (filename: string): FileType => {
  * getFileTypeLabel("video");   // Returns "Видео"
  * getFileTypeLabel("unknown"); // Returns "Файл"
  */
-export const getFileTypeRuLabel = (type: FileType): string => {
-  const labels: Record<FileType, string> = {
-    image: "Изображение",
-    video: "Видео",
-    audio: "Аудио",
-    document: "Документ",
-    archive: "Архив",
-    code: "Код",
-    unknown: "Файл",
-  };
-
-  return labels[type];
-};
-
-/**
- * Returns an emoji symbol representing the given file type.
- *
- * @param type - The `FileType` enum value for which to retrieve
- *  the corresponding emoji symbol.
- * @returns A string containing an emoji that visually represents the file type.
- *
- * @example
- * getFileIconSymbol("image");   // Returns "🖼️"
- * getFileIconSymbol("document"); // Returns "📄"
- * getFileIconSymbol("unknown"); // Returns "📁"
- */
-export const getFileIconSymbol = (type: FileType): string => {
-  const symbols: Record<FileType, string> = {
-    image: "🖼️",
-    video: "🎬",
-    audio: "🎵",
-    document: "📄",
-    archive: "📦",
-    code: "💻",
-    unknown: "📁",
-  };
-
-  return symbols[type];
-};
+export const getFileTypeRuLabel = (type: FileType): string => LABELS_RU[type];

@@ -2,7 +2,17 @@
   "image": ["jpg", "jpeg", "png", "gif", "bmp", "svg", "webp", "ico"],
   "video": ["mp4", "avi", "mov", "wmv", "mkv", "webm", "flv"],
   "audio": ["mp3", "wav", "flac", "aac", "ogg", "wma"],
-  "docs": ["pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt", "rtf"],
+  "document": [
+    "pdf",
+    "doc",
+    "docx",
+    "xls",
+    "xlsx",
+    "ppt",
+    "pptx",
+    "txt",
+    "rtf"
+  ],
   "archive": ["zip", "rar", "7z", "tar", "gz", "bz2"],
   "code": [
     "js",
