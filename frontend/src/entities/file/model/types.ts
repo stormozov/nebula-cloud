@@ -50,7 +50,5 @@ export interface IFileState {
   fileList: IFile[];
   selectedFile: IFile | null;
   isLoading: boolean;
-  isUploading: boolean; // Separate flag for upload progress
-  uploadProgress: number; // 0-100
   error: string | null;
 }

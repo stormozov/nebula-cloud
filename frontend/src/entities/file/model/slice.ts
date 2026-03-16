@@ -9,8 +9,6 @@ const initialState: IFileState = {
   fileList: [],
   selectedFile: null,
   isLoading: false,
-  isUploading: false,
-  uploadProgress: 0,
   error: null,
 };
 
@@ -120,33 +118,6 @@ export const fileSlice = createSlice({
     },
 
     /**
-     * Sets the uploading state.
-     *
-     * Used to control UI elements related to file uploads.
-     *
-     * @param state - The current Redux state.
-     * @param action - An action containing a boolean value indicating whether
-     *  uploading is in progress.
-     */
-    setUploading: (state, action: PayloadAction<boolean>) => {
-      state.isUploading = action.payload;
-    },
-
-    /**
-     * Sets the upload progress percentage.
-     *
-     * This value is typically updated during file upload via Axios interceptors
-     * or upload events.
-     *
-     * @param state - The current Redux state.
-     * @param action - An action containing a number between 0 and 100
-     *  representing upload progress.
-     */
-    setUploadProgress: (state, action: PayloadAction<number>) => {
-      state.uploadProgress = action.payload;
-    },
-
-    /**
      * Sets an error message and resets loading/uploading states.
      *
      * Also sets `isLoading` and `isUploading` to `false` to ensure stalled
@@ -159,7 +130,6 @@ export const fileSlice = createSlice({
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
       state.isLoading = false;
-      state.isUploading = false;
     },
 
     /**
@@ -185,8 +155,6 @@ export const fileSlice = createSlice({
       state.fileList = [];
       state.selectedFile = null;
       state.isLoading = false;
-      state.isUploading = false;
-      state.uploadProgress = 0;
       state.error = null;
     },
   },
@@ -199,8 +167,6 @@ export const {
   updateFile,
   removeFile,
   setLoading,
-  setUploading,
-  setUploadProgress,
   setError,
   clearError,
   resetState,

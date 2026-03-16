@@ -9,8 +9,6 @@ import {
   setFileList,
   setLoading,
   setSelectedFile,
-  setUploading,
-  setUploadProgress,
   updateFile,
 } from "./slice";
 import type { IFile, IFileState } from "./types";
@@ -48,8 +46,6 @@ const getInitialState = (): IFileState => ({
   fileList: [],
   selectedFile: null,
   isLoading: false,
-  isUploading: false,
-  uploadProgress: 0,
   error: null,
 });
 
@@ -86,8 +82,6 @@ describe("fileSlice", () => {
       expect(state.fileList).toEqual([]);
       expect(state.selectedFile).toBeNull();
       expect(state.isLoading).toBe(false);
-      expect(state.isUploading).toBe(false);
-      expect(state.uploadProgress).toBe(0);
       expect(state.error).toBeNull();
     });
 
@@ -195,16 +189,12 @@ describe("fileSlice", () => {
       const stateWithLoading: IFileState = {
         ...initialState,
         isLoading: true,
-        isUploading: true,
-        uploadProgress: 50,
       };
 
       const state = fileSlice.reducer(stateWithLoading, setSelectedFile(file));
 
       expect(state.selectedFile).toEqual(file);
       expect(state.isLoading).toBe(true);
-      expect(state.isUploading).toBe(true);
-      expect(state.uploadProgress).toBe(50);
     });
   });
 
@@ -479,112 +469,7 @@ describe("fileSlice", () => {
      */
     it("should not affect other state properties", () => {
       const state = fileSlice.reducer(initialState, setLoading(true));
-
       expect(state.isLoading).toBe(true);
-      expect(state.isUploading).toBe(false);
-      expect(state.uploadProgress).toBe(0);
-      expect(state.error).toBeNull();
-    });
-  });
-
-  // ---------------------------------------------------------------------------
-  // setUploading Tests
-  // ---------------------------------------------------------------------------
-
-  describe("setUploading", () => {
-    /**
-     * @description Should set uploading state to true
-     * @scenario setUploading dispatched with true
-     * @expected isUploading is true
-     */
-    it("should set uploading state to true", () => {
-      const state = fileSlice.reducer(initialState, setUploading(true));
-      expect(state.isUploading).toBe(true);
-    });
-
-    /**
-     * @description Should set uploading state to false
-     * @scenario setUploading dispatched with false
-     * @expected isUploading is false
-     */
-    it("should set uploading state to false", () => {
-      const stateWithUploading: IFileState = {
-        ...initialState,
-        isUploading: true,
-      };
-
-      const state = fileSlice.reducer(stateWithUploading, setUploading(false));
-
-      expect(state.isUploading).toBe(false);
-    });
-
-    /**
-     * @description Should not affect other state properties
-     * @scenario setUploading dispatched
-     * @expected Only isUploading changes
-     */
-    it("should not affect other state properties", () => {
-      const state = fileSlice.reducer(initialState, setUploading(true));
-
-      expect(state.isUploading).toBe(true);
-      expect(state.isLoading).toBe(false);
-      expect(state.uploadProgress).toBe(0);
-      expect(state.error).toBeNull();
-    });
-  });
-
-  // ---------------------------------------------------------------------------
-  // setUploadProgress Tests
-  // ---------------------------------------------------------------------------
-
-  describe("setUploadProgress", () => {
-    /**
-     * @description Should set upload progress percentage
-     * @scenario setUploadProgress dispatched with number
-     * @expected uploadProgress matches provided value
-     */
-    it("should set upload progress percentage", () => {
-      const state = fileSlice.reducer(initialState, setUploadProgress(75));
-      expect(state.uploadProgress).toBe(75);
-    });
-
-    /**
-     * @description Should handle zero progress
-     * @scenario setUploadProgress dispatched with 0
-     * @expected uploadProgress is 0
-     */
-    it("should handle zero progress", () => {
-      const stateWithProgress: IFileState = {
-        ...initialState,
-        uploadProgress: 50,
-      };
-
-      const state = fileSlice.reducer(stateWithProgress, setUploadProgress(0));
-
-      expect(state.uploadProgress).toBe(0);
-    });
-
-    /**
-     * @description Should handle 100 percent progress
-     * @scenario setUploadProgress dispatched with 100
-     * @expected uploadProgress is 100
-     */
-    it("should handle 100 percent progress", () => {
-      const state = fileSlice.reducer(initialState, setUploadProgress(100));
-      expect(state.uploadProgress).toBe(100);
-    });
-
-    /**
-     * @description Should not affect other state properties
-     * @scenario setUploadProgress dispatched
-     * @expected Only uploadProgress changes
-     */
-    it("should not affect other state properties", () => {
-      const state = fileSlice.reducer(initialState, setUploadProgress(50));
-
-      expect(state.uploadProgress).toBe(50);
-      expect(state.isLoading).toBe(false);
-      expect(state.isUploading).toBe(false);
       expect(state.error).toBeNull();
     });
   });
@@ -643,13 +528,11 @@ describe("fileSlice", () => {
     it("should reset uploading state when error set", () => {
       const stateWithUploading: IFileState = {
         ...initialState,
-        isUploading: true,
       };
 
       const state = fileSlice.reducer(stateWithUploading, setError("Error"));
 
       expect(state.error).toBe("Error");
-      expect(state.isUploading).toBe(false);
     });
   });
 
@@ -684,16 +567,12 @@ describe("fileSlice", () => {
         ...initialState,
         error: "Error",
         isLoading: true,
-        isUploading: true,
-        uploadProgress: 50,
       };
 
       const state = fileSlice.reducer(stateWithMultiple, clearError());
 
       expect(state.error).toBeNull();
       expect(state.isLoading).toBe(true);
-      expect(state.isUploading).toBe(true);
-      expect(state.uploadProgress).toBe(50);
     });
 
     /**
@@ -723,8 +602,6 @@ describe("fileSlice", () => {
         fileList: [file],
         selectedFile: file,
         isLoading: true,
-        isUploading: true,
-        uploadProgress: 75,
         error: "Error",
       };
 
@@ -733,8 +610,6 @@ describe("fileSlice", () => {
       expect(state.fileList).toEqual([]);
       expect(state.selectedFile).toBeNull();
       expect(state.isLoading).toBe(false);
-      expect(state.isUploading).toBe(false);
-      expect(state.uploadProgress).toBe(0);
       expect(state.error).toBeNull();
     });
 
@@ -749,8 +624,6 @@ describe("fileSlice", () => {
         fileList: [file],
         selectedFile: file,
         isLoading: true,
-        isUploading: true,
-        uploadProgress: 75,
         error: "Error",
       };
 
