@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import axios from "axios";
 
+import { downloadFile, getAccessTokenFromPersist } from "@/shared/utils";
 import {
   removeFile,
   setError,
@@ -15,6 +16,8 @@ import type {
   IFileUpload,
 } from "../model/types";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
+
 /**
  * Base configuration for RTK Query API calls.
  *
@@ -23,7 +26,7 @@ import type {
  * - Attaches authorization and content-type headers to every request.
  */
 const baseQuery = fetchBaseQuery({
-  baseUrl: import.meta.env.VITE_API_BASE_URL || "/api",
+  baseUrl: API_BASE_URL,
   prepareHeaders: (headers) => {
     const token = localStorage.getItem("persist:auth");
 
@@ -48,7 +51,7 @@ const baseQuery = fetchBaseQuery({
  * Separate axios instance for file upload
  */
 const uploadAxios = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "/api",
+  baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "multipart/form-data",
   },
@@ -293,6 +296,35 @@ export const uploadFile = async (
   });
 
   return response.data;
+};
+
+/**
+ * Downloads file from API with authentication.
+ *
+ * Uses fetch directly for blob handling (not RTK Query).
+ */
+export const downloadFileFromApi = async (
+  fileId: number,
+  filename: string,
+): Promise<void> => {
+  const accessToken = getAccessTokenFromPersist();
+
+  const response = await fetch(
+    `${API_BASE_URL}/storage/files/${fileId}/download/`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: accessToken ? `Bearer ${accessToken}` : "",
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Download failed: ${response.status}`);
+  }
+
+  const blob: Blob = await response.blob();
+  await downloadFile(blob, filename);
 };
 
 export const {

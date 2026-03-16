@@ -51,11 +51,9 @@ const createTestStore = () => {
 // =============================================================================
 
 describe("fileApi - Configuration", () => {
-  let store: ReturnType<typeof createTestStore>;
-
   beforeEach(() => {
     setAuthTokens("mock_access_token");
-    store = createTestStore();
+    createTestStore();
   });
 
   afterEach(() => {
