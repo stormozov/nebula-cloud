@@ -8,16 +8,15 @@ import type {
   IUploadFile,
   IUploadState,
 } from "./types";
-import {
-  areAllUploadsCompleted,
-  findNextPendingFile,
-  generateUploadId,
-} from "./utils";
+import { areAllUploadsCompleted, findNextPendingFile } from "./utils";
 
 //==============================================================================
 // SLICE
 //==============================================================================
 
+/**
+ * Initial state for the file upload slice.
+ */
 const initialState: IUploadState = {
   queue: [],
   isPanelVisible: false,
@@ -28,6 +27,14 @@ const initialState: IUploadState = {
   isQueueCompleted: false,
 };
 
+/**
+ * Redux slice for managing the state of file uploads within the application.
+ *
+ * This slice handles actions related to adding files, updating their upload
+ * progress, pausing, resuming, canceling, and removing uploads, as well
+ * as controlling the visibility of the global dropzone UI during drag-and-drop
+ * operations.
+ */
 export const fileUploadSlice = createSlice({
   name: "fileUpload",
   initialState,
@@ -40,11 +47,12 @@ export const fileUploadSlice = createSlice({
      * Maximum 5 files per batch (enforced by validator before dispatch).
      */
     addFiles: (state, action: PayloadAction<IAddFilesPayload>) => {
-      const { files, comment } = action.payload;
+      const { files, comment, uploadIds } = action.payload;
 
-      // Create upload items for each file
-      const newUploads: IUploadFile[] = files.map((file) => ({
-        id: generateUploadId(),
+      const ids = uploadIds || files.map(() => crypto.randomUUID());
+
+      const newUploads: IUploadFile[] = files.map((file, index) => ({
+        id: ids[index], // ← Используем ID из компонента
         file: {
           name: file.name,
           size: file.size,
@@ -59,16 +67,10 @@ export const fileUploadSlice = createSlice({
         completedAt: undefined,
       }));
 
-      // Add to queue
       state.queue.push(...newUploads);
-
-      // Show panel when files are added
       state.isPanelVisible = true;
-
-      // Reset completion flag when new files added
       state.isQueueCompleted = false;
 
-      // Start first file if nothing is uploading
       if (!state.activeUploadId) {
         const nextFile = findNextPendingFile(state.queue);
         if (nextFile) {
@@ -279,11 +281,11 @@ export const fileUploadSlice = createSlice({
 
       // Start first pending file
       const nextFile = findNextPendingFile(state.queue);
-      if (nextFile) {
-        state.activeUploadId = nextFile.id;
-        nextFile.status = "uploading";
-        nextFile.startedAt = Date.now();
-      }
+      if (!nextFile) return;
+
+      state.activeUploadId = nextFile.id;
+      nextFile.status = "uploading";
+      nextFile.startedAt = Date.now();
     },
 
     /**

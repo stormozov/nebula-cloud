@@ -141,7 +141,21 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+        // Игнорируем стандартные действия redux-persist
+        ignoredActions: [
+          FLUSH,
+          REHYDRATE,
+          PAUSE,
+          PERSIST,
+          PURGE,
+          REGISTER,
+          // 🔧 Игнорируем экшены file-upload, которые содержат File объекты
+          "fileUpload/addFiles",
+        ],
+        // 🔧 Игнорируем путь к файлам в экшенах
+        ignoredActionPaths: ["payload.files", "payload.file"],
+        // 🔧 Игнорируем очередь в state (там хранятся метаданные + File объекты)
+        ignoredPaths: ["fileUpload.queue"],
       },
     })
       .concat(userApi.middleware)

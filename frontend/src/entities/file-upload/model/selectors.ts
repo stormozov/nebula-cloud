@@ -1,4 +1,5 @@
 import type { RootState } from "@/app/store/store";
+import { createSelector } from "@reduxjs/toolkit";
 
 /**
  * Get full upload state.
@@ -85,21 +86,6 @@ export const selectTotalFailed = (state: RootState) =>
   state.fileUpload.totalFailed;
 
 /**
- * Get upload statistics.
- */
-export const selectUploadStats = (state: RootState) => ({
-  total: state.fileUpload.queue.length,
-  pending: state.fileUpload.queue.filter((i) => i.status === "pending").length,
-  uploading: state.fileUpload.queue.filter((i) => i.status === "uploading")
-    .length,
-  success: state.fileUpload.queue.filter((i) => i.status === "success").length,
-  error: state.fileUpload.queue.filter((i) => i.status === "error").length,
-  totalUploaded: state.fileUpload.totalUploaded,
-  totalFailed: state.fileUpload.totalFailed,
-  isCompleted: state.fileUpload.isQueueCompleted,
-});
-
-/**
  * Get specific upload by ID.
  */
 export const selectUploadById = (uploadId: string) => (state: RootState) =>
@@ -110,3 +96,49 @@ export const selectUploadById = (uploadId: string) => (state: RootState) =>
  */
 export const selectCanClosePanel = (state: RootState) =>
   state.fileUpload.isQueueCompleted || state.fileUpload.queue.length === 0;
+
+/**
+ * Get upload statistics.
+ */
+export const selectUploadStats = createSelector(
+  [
+    selectUploadQueue,
+    (state) => state.fileUpload.totalUploaded,
+    (state) => state.fileUpload.totalFailed,
+    (state) => state.fileUpload.isQueueCompleted,
+  ],
+  (queue, totalUploaded, totalFailed, isCompleted) => {
+    let pending = 0,
+      uploading = 0,
+      success = 0,
+      error = 0;
+
+    for (const item of queue) {
+      switch (item.status) {
+        case "pending":
+          pending++;
+          break;
+        case "uploading":
+          uploading++;
+          break;
+        case "success":
+          success++;
+          break;
+        case "error":
+          error++;
+          break;
+      }
+    }
+
+    return {
+      total: queue.length,
+      pending,
+      uploading,
+      success,
+      error,
+      totalUploaded,
+      totalFailed,
+      isCompleted,
+    };
+  },
+);

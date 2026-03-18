@@ -273,6 +273,7 @@ export const fileApi = createApi({
 export const uploadFile = async (
   data: IFileUpload,
   onProgress?: (progress: number) => void,
+  _signal?: AbortSignal,
 ): Promise<IFile> => {
   const formData = new FormData();
   formData.append("file", data.file);

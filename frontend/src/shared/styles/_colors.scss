@@ -32,6 +32,7 @@
   // ---------------------------------------------------------------------------
   --color-border-primary: #dee2e6;
   --color-border-secondary: #ecedef;
+  --color-border-tertiary: #ced4da;
   --color-border-hover: #adb5bd;
   --color-border-focus: #2563eb;
 
@@ -50,17 +51,21 @@
   --color-success: #22c55e;
   --color-success-hover: #16a34a;
   --color-success-light: #dcfce7;
+  --color-success-light-border: #b8e4c7;
 
   --color-warning: #f59e0b;
   --color-warning-hover: #d97706;
   --color-warning-light: #fef3c7;
+  --color-warning-light-border: #fde68a;
 
   --color-error: #ef4444;
   --color-error-hover: #dc2626;
   --color-error-light: #fee2e2;
+  --color-error-light-border: #f8c5c5;
 
   --color-info: #3b82f6;
   --color-info-light: #dbeafe;
+  --color-info-light-border: #bfdbfe;
 
   // ---------------------------------------------------------------------------
   // Utility colors
@@ -110,6 +115,7 @@
   // ---------------------------------------------------------------------------
   --color-border-primary: #475569;
   --color-border-secondary: #64748b;
+  --color-border-tertiary: #475569;
   --color-border-hover: #64748b;
   --color-border-focus: #60a5fa;
 
@@ -128,17 +134,21 @@
   --color-success: #4ade80;
   --color-success-hover: #86efac;
   --color-success-light: #14532d;
+  --color-success-light-border: #86efac;
 
   --color-warning: #fbbf24;
   --color-warning-hover: #fcd34d;
   --color-warning-light: #78350f;
+  --color-warning-light-border: #fcd34d;
 
   --color-error: #f87171;
   --color-error-hover: #fca5a5;
   --color-error-light: #7f1d1d;
+  --color-error-light-border: #fca5a5;
 
   --color-info: #60a5fa;
   --color-info-light: #1e3a5f;
+  --color-info-light-border: #93c5fd;
 
   // ---------------------------------------------------------------------------
   // Utility colors

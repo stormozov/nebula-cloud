@@ -71,6 +71,8 @@ export interface IAddFilesPayload {
   files: File[];
   /** Optional comment for all files */
   comment?: string;
+  /** Optional upload IDs */
+  uploadIds?: string[];
 }
 
 /**
