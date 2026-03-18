@@ -4,20 +4,20 @@ import {
   FLUSH,
   PAUSE,
   PERSIST,
-  PURGE,
   persistReducer,
   persistStore,
+  PURGE,
   REGISTER,
   REHYDRATE,
 } from "redux-persist";
 
 import { fileApi } from "@/entities/file";
-import fileReducer from "@/entities/file/model/slice";
 import type {
   IUploadFileSerialized,
   IUploadState,
 } from "@/entities/file-upload";
 import fileUploadReducer from "@/entities/file-upload/model/slice";
+import fileReducer from "@/entities/file/model/slice";
 import { userApi } from "@/entities/user";
 import userReducer from "@/entities/user/model/slice";
 
@@ -141,7 +141,6 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        // Игнорируем стандартные действия redux-persist
         ignoredActions: [
           FLUSH,
           REHYDRATE,
@@ -149,12 +148,13 @@ export const store = configureStore({
           PERSIST,
           PURGE,
           REGISTER,
-          // 🔧 Игнорируем экшены file-upload, которые содержат File объекты
           "fileUpload/addFiles",
         ],
-        // 🔧 Игнорируем путь к файлам в экшенах
-        ignoredActionPaths: ["payload.files", "payload.file"],
-        // 🔧 Игнорируем очередь в state (там хранятся метаданные + File объекты)
+        ignoredActionPaths: [
+          "payload.files",
+          "payload.file",
+          "meta.baseQueryMeta",
+        ],
         ignoredPaths: ["fileUpload.queue"],
       },
     })
