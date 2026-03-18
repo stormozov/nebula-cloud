@@ -37,10 +37,57 @@ $app-header-height: 60px;
     background-color: var(--color-bg-tertiary);
   }
 
-  &__header-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
+  &__wrapper {
+    // -------------------------------------------------------------------------
+    // Direction
+    // -------------------------------------------------------------------------
+
+    &--direction-row {
+      display: flex;
+      flex-direction: row;
+      gap: 1rem;
+    }
+
+    &--direction-column {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    // -------------------------------------------------------------------------
+    // Justify
+    // -------------------------------------------------------------------------
+
+    &--justify-start {
+      justify-content: start;
+    }
+
+    &--justify-end {
+      justify-content: end;
+    }
+
+    &--justify-center {
+      justify-content: center;
+    }
+
+    &--justify-space-between {
+      justify-content: space-between;
+    }
+
+    // -------------------------------------------------------------------------
+    // Align
+    // -------------------------------------------------------------------------
+
+    &--align-start {
+      align-items: start;
+    }
+
+    &--align-end {
+      align-items: end;
+    }
+
+    &--align-center {
+      align-items: center;
+    }
   }
 }
