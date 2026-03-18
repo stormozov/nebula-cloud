@@ -1,0 +1,26 @@
+// =============================================================================
+// Style module for FileManager component
+// =============================================================================
+
+.file-manager {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  padding: 24px;
+
+  background-color: var(--color-bg-primary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: 8px;
+
+  &__toolbar {
+    display: flex;
+    justify-content: flex-end;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--color-border-secondary);
+  }
+
+  &__dropzone {
+    margin-bottom: 16px;
+  }
+}

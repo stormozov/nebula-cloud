@@ -1,7 +1,9 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
 import axios from "axios";
 
+import { API_BASE_URL, baseQueryWithTransform } from "@/shared/api";
 import { downloadFile, getAccessTokenFromPersist } from "@/shared/utils";
+
 import {
   removeFile,
   setError,
@@ -16,36 +18,9 @@ import type {
   IFileUpload,
 } from "../model/types";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
-
-/**
- * Base configuration for RTK Query API calls.
- *
- * Defines the common settings used across all endpoints in the API slice:
- * - Sets the base URL from environment variables or defaults to `/api`.
- * - Attaches authorization and content-type headers to every request.
- */
-const baseQuery = fetchBaseQuery({
-  baseUrl: API_BASE_URL,
-  prepareHeaders: (headers) => {
-    const token = localStorage.getItem("persist:auth");
-
-    if (token) {
-      try {
-        const parsed = JSON.parse(token) as { accessToken?: string };
-        const accessToken = parsed.accessToken
-          ? JSON.parse(parsed.accessToken)
-          : null;
-        if (accessToken) headers.set("Authorization", `Bearer ${accessToken}`);
-      } catch {
-        // Ignore parse errors
-      }
-    }
-
-    headers.set("Content-Type", "application/json");
-    return headers;
-  },
-});
+// =============================================================================
+// UPLOAD AXIOS
+// =============================================================================
 
 /**
  * Separate axios instance for file upload
@@ -76,12 +51,16 @@ uploadAxios.interceptors.request.use((config) => {
   return config;
 });
 
+// =============================================================================
+// RTK QUERY API SLICE
+// =============================================================================
+
 /**
  * RTK Query API slice for file-related operations.
  */
 export const fileApi = createApi({
   reducerPath: "fileApi",
-  baseQuery,
+  baseQuery: baseQueryWithTransform,
   tagTypes: ["File"],
   endpoints: (build) => ({
     /**

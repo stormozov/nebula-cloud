@@ -11,9 +11,12 @@
   }
 
   &__cell {
-    padding: 12px 16px;
+    padding: 12px;
     border-bottom: 1px solid var(--color-border-primary);
     vertical-align: middle;
+
+    font-size: 13px;
+    color: var(--color-text-tertiary);
 
     &--icon {
       width: 50px;
@@ -30,14 +33,11 @@
 
     &--size {
       width: 100px;
-      color: var(--color-text-secondary);
     }
 
     &--uploaded,
     &--downloaded {
       width: 140px;
-      font-size: 14px;
-      color: var(--color-text-secondary);
     }
 
     &--actions {
@@ -49,19 +49,9 @@
   &__name {
     display: block;
 
+    font-size: 0.875rem;
     font-weight: 500;
     color: var(--color-text-primary);
-    text-overflow: ellipsis;
-    white-space: nowrap;
-
-    overflow: hidden;
-  }
-
-  &__comment {
-    display: block;
-
-    font-size: 13px;
-    color: var(--color-text-tertiary);
     text-overflow: ellipsis;
     white-space: nowrap;
 

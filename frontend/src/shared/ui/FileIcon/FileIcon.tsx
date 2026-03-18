@@ -9,7 +9,7 @@ import "./FileIcon.scss";
  * File icon component based on file extension.
  */
 export function FileIcon({
-  filename,
+  filename = "",
   size = 24,
   className = "",
   showTooltip = false,

@@ -3,6 +3,7 @@ import { useGlobalDragDrop } from "@/features/file/file-upload";
 import { Logo, PageLayout } from "@/shared/ui";
 
 import "./PageClientDisk.scss";
+import { FileManager } from "@/widgets/file-manager";
 
 /**
  * Page client disk component.
@@ -20,6 +21,12 @@ export default function PageClientDisk() {
           </PageLayout.Wrapper>
         </PageLayout.Container>
       </PageLayout.Header>
+
+      <PageLayout.Main className="page-client-disk__main">
+        <PageLayout.Container>
+          <FileManager />
+        </PageLayout.Container>
+      </PageLayout.Main>
     </PageLayout>
   );
 }
