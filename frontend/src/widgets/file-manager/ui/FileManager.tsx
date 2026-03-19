@@ -1,7 +1,13 @@
 import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import { useState } from "react";
 
 import type { IFile } from "@/entities/file";
-import { downloadFileFromApi, useGetFilesQuery } from "@/entities/file";
+import {
+  downloadFileFromApi,
+  useDeleteFileMutation,
+  useGetFilesQuery,
+} from "@/entities/file";
+import { DeleteFileModal } from "@/features/file/file-delete";
 import { FileList } from "@/features/file/file-list";
 import {
   FileUploadButton,
@@ -36,6 +42,11 @@ export function FileManager({
 }: IFileManagerProps) {
   const { data: files = [], isLoading, error } = useGetFilesQuery();
 
+  const [deleteFile, { isLoading: isDeleting }] = useDeleteFileMutation();
+
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<IFile | null>(null);
+
   const hasFiles = files.length > 0;
 
   /**
@@ -65,17 +76,30 @@ export function FileManager({
   // HANDLERS
   // ---------------------------------------------------------------------------
 
-  /**
-   * Handle file deletion.
-   */
+  // -- Delete file handlers ---------------------------------------------------
+
   const handleDelete = (file: IFile): void => {
-    const confirmed = window.confirm(
-      `Удалить файл "${file.originalName}"? Это действие нельзя отменить.`,
-    );
-    if (confirmed) {
-      console.log("Delete file:", file.id);
-      // TODO: Integrate with useDeleteFileMutation
+    setSelectedFile(file);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async (): Promise<void> => {
+    if (!selectedFile) return;
+
+    try {
+      await deleteFile(selectedFile.id).unwrap();
+      setDeleteModalOpen(false);
+      setSelectedFile(null);
+    } catch (err) {
+      console.error("Failed to delete file:", err);
+      // Error is handled by RTK Query onError in fileApi.ts
     }
+  };
+
+  const handleDeleteClose = (): void => {
+    if (isDeleting) return;
+    setDeleteModalOpen(false);
+    setSelectedFile(null);
   };
 
   /**
@@ -207,6 +231,15 @@ export function FileManager({
           />
         </div>
       )}
+
+      {/* Delete Modal */}
+      <DeleteFileModal
+        isOpen={deleteModalOpen}
+        file={selectedFile}
+        onConfirm={handleDeleteConfirm}
+        onClose={handleDeleteClose}
+        isDeleting={isDeleting}
+      />
     </div>
   );
 }
