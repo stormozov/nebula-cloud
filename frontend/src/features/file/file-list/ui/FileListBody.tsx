@@ -1,11 +1,8 @@
+import { memo } from "react";
 import type { IFileListBodyProps } from "../lib/types";
 import { FileListItem } from "./FileListItem";
 
-/**
- * Renders the body of a file list by mapping over an array of files
- * and creating a FileListItem for each.
- */
-export function FileListBody({
+export function FileListBodyPlain({
   files,
   disabled = false,
   onSelect,
@@ -35,3 +32,9 @@ export function FileListBody({
     </tbody>
   );
 }
+
+/**
+ * Renders the body of a file list by mapping over an array of files
+ * and creating a FileListItem for each.
+ */
+export const FileListBody = memo(FileListBodyPlain);

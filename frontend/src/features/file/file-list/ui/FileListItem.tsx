@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useState } from "react";
 
 import { FileIcon } from "@/shared/ui";
 import { formatDate, formatFileSize } from "@/shared/utils";
@@ -8,11 +8,7 @@ import { FileItemActions } from "./FileItemActions";
 
 import "./FileListItem.scss";
 
-/**
- * A component that renders a single row in a file list, displaying file
- * metadata and providing interactive actions.
- */
-export function FileListItem({
+export function FileListItemPlain({
   file,
   disabled = false,
   onSelect,
@@ -93,3 +89,17 @@ export function FileListItem({
     </tr>
   );
 }
+
+/**
+ * A component that renders a single row in a file list, displaying file
+ * metadata and providing interactive actions.
+ */
+export const FileListItem = memo(FileListItemPlain, (prevProps, nextProps) => {
+  return (
+    prevProps.file.id === nextProps.file.id &&
+    prevProps.file.originalName === nextProps.file.originalName &&
+    prevProps.file.size === nextProps.file.size &&
+    prevProps.file.comment === nextProps.file.comment &&
+    prevProps.disabled === nextProps.disabled
+  );
+});
