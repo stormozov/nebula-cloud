@@ -7,7 +7,9 @@ import {
   useDeleteFileMutation,
   useGetFilesQuery,
   useRenameFileMutation,
+  useUpdateCommentMutation,
 } from "@/entities/file";
+import { EditCommentModal } from "@/features/file/file-comment";
 import { DeleteFileModal } from "@/features/file/file-delete";
 import { FileList } from "@/features/file/file-list";
 import { RenameFileModal } from "@/features/file/file-rename";
@@ -44,12 +46,16 @@ export function FileManager({
 }: IFileManagerProps) {
   const { data: files = [], isLoading, error } = useGetFilesQuery();
 
+  // Mutations
   const [deleteFile, { isLoading: isDeleting }] = useDeleteFileMutation();
   const [renameFile, { isLoading: isRenaming }] = useRenameFileMutation();
+  const [updateComment, { isLoading: isUpdatingComment }] =
+    useUpdateCommentMutation();
 
   // Modal states
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [renameModalOpen, setRenameModalOpen] = useState(false);
+  const [commentModalOpen, setCommentModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<IFile | null>(null);
 
   const hasFiles = files.length > 0;
@@ -141,23 +147,37 @@ export function FileManager({
    * Handle close rename modal.
    */
   const handleRenameClose = (): void => {
-    if (!isRenaming) {
-      setRenameModalOpen(false);
+    if (isRenaming) return;
+    setRenameModalOpen(false);
+    setSelectedFile(null);
+  };
+
+  // -- Comment handlers -------------------------------------------------------
+
+  const handleEditComment = (file: IFile): void => {
+    setSelectedFile(file);
+    setCommentModalOpen(true);
+  };
+
+  const handleCommentSubmit = async (newComment: string): Promise<void> => {
+    if (!selectedFile) return;
+
+    try {
+      await updateComment({
+        id: selectedFile.id,
+        data: { comment: newComment },
+      }).unwrap();
+      setCommentModalOpen(false);
       setSelectedFile(null);
+    } catch (err) {
+      console.error("Failed to update comment:", err);
     }
   };
 
-  /**
-   * Handle comment edit.
-   */
-  const handleEditComment = (file: IFile): void => {
-    const newComment = window.prompt(
-      "Введите комментарий к файлу:",
-      file.comment || "",
-    );
-    if (newComment !== undefined) {
-      console.log("Edit comment:", file.id, "→", newComment);
-      // TODO: Integrate with useUpdateCommentMutation
+  const handleCommentClose = (): void => {
+    if (!isUpdatingComment) {
+      setCommentModalOpen(false);
+      setSelectedFile(null);
     }
   };
 
@@ -278,6 +298,13 @@ export function FileManager({
         file={selectedFile}
         onSubmit={handleRenameSubmit}
         isSubmitting={isRenaming}
+      />
+      <EditCommentModal
+        isOpen={commentModalOpen}
+        onClose={handleCommentClose}
+        file={selectedFile}
+        onSubmit={handleCommentSubmit}
+        isSubmitting={isUpdatingComment}
       />
     </div>
   );

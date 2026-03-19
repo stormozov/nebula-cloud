@@ -71,7 +71,7 @@ export function RenameFileModal({
       return "Имя файла слишком длинное (максимум 255 символов)";
     }
     if (name === file?.originalName) {
-      return "Имя файла не должно совпадать с исходным";
+      return "Обновляемое имя не должно совпадать с исходным";
     }
     return null;
   };
@@ -159,7 +159,11 @@ export function RenameFileModal({
           disabled={isSubmitting}
         />
 
-        <p className="rename-file-modal__hint">
+        <p className="rename-file-modal__symbol-count">
+          {newFileName.length}/255 символов
+        </p>
+
+        <p className="rename-file-modal__current">
           Текущее имя: <strong>{file?.originalName}</strong>
         </p>
       </div>
