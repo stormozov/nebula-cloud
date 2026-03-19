@@ -40,6 +40,7 @@ export const routesConfig = createBrowserRouter([
     ),
   },
 
+  // Public route: Public file metadata preview
   {
     path: "/public/:token/",
     element: lazyWithSuspense(

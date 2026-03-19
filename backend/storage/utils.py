@@ -31,6 +31,12 @@ def validate_file_size(file):
     return file
 
 
+def get_public_frontend_url(token: str, _request=None) -> str:
+    """Generate frontend public URL: {FRONTEND_PUBLIC_BASE_URL}/public/{token}"""
+    base_url = getattr(settings, "FRONTEND_PUBLIC_BASE_URL", "http://localhost:5173")
+    return f"{base_url.rstrip('/')}/public/{token}"
+
+
 def validate_filename(value):
     """
     Validate filename does not contain forbidden characters.
@@ -38,6 +44,7 @@ def validate_filename(value):
     Forbidden: \\ / : * ? " < > |
     Also rejected: trailing dot (.), trailing space ( ), empty string
     """
+
 
     if not value or not value.strip():
         raise serializers.ValidationError("Имя файла не может быть пустым")

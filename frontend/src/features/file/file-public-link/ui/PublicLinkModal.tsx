@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { BsInfoSquareFill } from "react-icons/bs";
-import { FaCheck, FaLink, FaLinkSlash } from "react-icons/fa6";
+import { FaCheck, FaShareNodes, FaLinkSlash, FaCopy } from "react-icons/fa6";
 
 import type { IFile } from "@/entities/file";
 import { Button, ControlledInput } from "@/shared/ui";
@@ -17,8 +17,6 @@ export interface IPublicLinkModalProps {
   isOpen: boolean;
   /** File to manage public link for. */
   file: IFile | null;
-  /** Frontend public link URL for copying. */
-  frontendUrl: string;
   /** Callback when modal should be closed. */
   onClose: () => void;
   /** Callback when generate link is requested. */
@@ -43,7 +41,6 @@ export interface IPublicLinkModalProps {
 export function PublicLinkModal({
   isOpen,
   file,
-  frontendUrl,
   onClose,
   onGenerate,
   onCopy,
@@ -66,8 +63,8 @@ export function PublicLinkModal({
   }, [isOpen]);
 
   const handleCopyBtnClick = async (): Promise<void> => {
-    if (!frontendUrl) return;
-    await onCopy(frontendUrl);
+    if (!file?.publicLinkUrl) return;
+    await onCopy(file.publicLinkUrl);
     setCopySuccess(true);
     setTimeout(() => setCopySuccess(false), 2000);
   };
@@ -127,7 +124,7 @@ export function PublicLinkModal({
 
             <ControlledInput
               type="text"
-              value={frontendUrl || ""}
+              value={file?.publicLinkUrl || ""}
               onChange={() => {}} // Read-only
               label="Ссылка для скачивания"
               disabled
@@ -143,13 +140,13 @@ export function PublicLinkModal({
               >
                 {copySuccess ? (
                   <>
-                    <FaCheck size={20} />
-                    "Скопировано!"
+                    <FaCheck />
+                    Скопировано!
                   </>
                 ) : (
                   <>
-                    <FaLink size={20} />
-                    "Скопировать ссылку"
+                    <FaCopy />
+                    Скопировать
                   </>
                 )}
               </Button>
@@ -173,6 +170,7 @@ export function PublicLinkModal({
                 loading={isGenerating}
                 fullWidth
               >
+                <FaShareNodes />
                 Создать публичную ссылку
               </Button>
             </div>
