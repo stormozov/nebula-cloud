@@ -42,7 +42,6 @@ export function RenameFileModal({
   const [newFileName, setNewFileName] = useState("");
   const [validationError, setValidationError] = useState<string | null>(null);
 
-  // Input ref (dual: HTMLElement for Modal, InputElement for ControlledInput)
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Init editable name on file change (safe with useLayoutEffect)
@@ -60,9 +59,6 @@ export function RenameFileModal({
     }
   }, [isOpen, file]);
 
-  /**
-   * Validate file name.
-   */
   const validateFileName = (name: string): string | null => {
     if (!name.trim()) {
       return "Имя файла не может быть пустым";
@@ -76,9 +72,6 @@ export function RenameFileModal({
     return null;
   };
 
-  /**
-   * Handle form submission.
-   */
   const handleSubmit = async (): Promise<void> => {
     const validationErr = validateFileName(newFileName);
     if (validationErr) {
@@ -91,14 +84,6 @@ export function RenameFileModal({
     // Modal closes after successful submission (handled by parent)
   };
 
-  /**
-   * Handle input change.
-   */
-  // onChange now directly updates state via ControlledInput
-
-  /**
-   * Handle key down (Enter to submit).
-   */
   const handleKeyDown = (
     event: React.KeyboardEvent<HTMLInputElement>,
   ): void => {
@@ -108,9 +93,6 @@ export function RenameFileModal({
     }
   };
 
-  /**
-   * Handle close modal.
-   */
   const handleClose = (): void => {
     if (!isSubmitting) onClose();
   };

@@ -60,9 +60,6 @@ export function EditCommentModal({
     }
   }, [isOpen, file]);
 
-  /**
-   * Validate comment.
-   */
   const validateComment = (text: string): string | null => {
     if (text.length > 500) {
       return "Комментарий слишком длинный (максимум 500 символов)";
@@ -73,9 +70,6 @@ export function EditCommentModal({
     return null;
   };
 
-  /**
-   * Handle form submission.
-   */
   const handleSubmit = async (): Promise<void> => {
     const validationErr = validateComment(comment);
     if (validationErr) {
@@ -88,37 +82,13 @@ export function EditCommentModal({
     // Modal closes after successful submission (handled by parent)
   };
 
-  /**
-   * Handle input change.
-   */
   const handleInputChange = (value: string): void => {
     setComment(value);
     if (validationError) setValidationError(null);
   };
 
-  /**
-   * Handle key down (Ctrl+Enter to submit).
-   */
-  const handleKeyDown = (
-    event: React.KeyboardEvent<HTMLTextAreaElement>,
-  ): void => {
-    if (
-      event.key === "Enter" &&
-      (event.ctrlKey || event.metaKey) &&
-      !isSubmitting
-    ) {
-      event.preventDefault();
-      handleSubmit();
-    }
-  };
-
-  /**
-   * Handle close modal.
-   */
   const handleClose = (): void => {
-    if (!isSubmitting) {
-      onClose();
-    }
+    if (!isSubmitting) onClose();
   };
 
   return (

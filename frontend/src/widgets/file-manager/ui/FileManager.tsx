@@ -5,6 +5,8 @@ import type { IFile, IFileRename } from "@/entities/file";
 import {
   downloadFileFromApi,
   useDeleteFileMutation,
+  useDeletePublicLinkMutation,
+  useGeneratePublicLinkMutation,
   useGetFilesQuery,
   useRenameFileMutation,
   useUpdateCommentMutation,
@@ -12,6 +14,7 @@ import {
 import { EditCommentModal } from "@/features/file/file-comment";
 import { DeleteFileModal } from "@/features/file/file-delete";
 import { FileList } from "@/features/file/file-list";
+import { PublicLinkModal } from "@/features/file/file-public-link";
 import { RenameFileModal } from "@/features/file/file-rename";
 import {
   FileUploadButton,
@@ -51,11 +54,17 @@ export function FileManager({
   const [renameFile, { isLoading: isRenaming }] = useRenameFileMutation();
   const [updateComment, { isLoading: isUpdatingComment }] =
     useUpdateCommentMutation();
+  const [generatePublicLink, { isLoading: isGeneratingLink }] =
+    useGeneratePublicLinkMutation();
+  const [deletePublicLink, { isLoading: isDeletingLink }] =
+    useDeletePublicLinkMutation();
 
   // Modal states
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [renameModalOpen, setRenameModalOpen] = useState(false);
   const [commentModalOpen, setCommentModalOpen] = useState(false);
+  const [linkModalOpen, setLinkModalOpen] = useState(false);
+
   const [selectedFile, setSelectedFile] = useState<IFile | null>(null);
 
   const hasFiles = files.length > 0;
@@ -115,17 +124,11 @@ export function FileManager({
 
   // -- Rename file handlers ---------------------------------------------------
 
-  /**
-   * Handle file rename - open modal.
-   */
   const handleRename = (file: IFile): void => {
     setSelectedFile(file);
     setRenameModalOpen(true);
   };
 
-  /**
-   * Handle rename submission - call API.
-   */
   const handleRenameSubmit = async (newName: string): Promise<void> => {
     if (!selectedFile) return;
 
@@ -143,9 +146,6 @@ export function FileManager({
     }
   };
 
-  /**
-   * Handle close rename modal.
-   */
   const handleRenameClose = (): void => {
     if (isRenaming) return;
     setRenameModalOpen(false);
@@ -175,10 +175,9 @@ export function FileManager({
   };
 
   const handleCommentClose = (): void => {
-    if (!isUpdatingComment) {
-      setCommentModalOpen(false);
-      setSelectedFile(null);
-    }
+    if (isUpdatingComment) return;
+    setCommentModalOpen(false);
+    setSelectedFile(null);
   };
 
   /**
@@ -194,32 +193,53 @@ export function FileManager({
     }
   };
 
-  /**
-   * Handle public link action.
-   */
+  // -- Public link handlers ---------------------------------------------------
+
   const handlePublicLink = (file: IFile): void => {
-    if (file.hasPublicLink && file.publicLinkUrl) {
-      // Copy existing link
-      navigator.clipboard.writeText(file.publicLinkUrl).then(
-        () => {
-          console.log("Public link copied:", file.publicLinkUrl);
-          alert("Ссылка скопирована в буфер обмена!");
-        },
-        () => {
-          console.error("Failed to copy link");
-          alert("Не удалось скопировать ссылку");
-        },
-      );
-    } else {
-      // Generate new link
-      const confirmed = window.confirm(
-        `Создать публичную ссылку для файла "${file.originalName}"?`,
-      );
-      if (confirmed) {
-        console.log("Generate public link:", file.id);
-        // TODO: Integrate with useGeneratePublicLinkMutation
-      }
+    setSelectedFile(file);
+    setLinkModalOpen(true);
+  };
+
+  const handleGenerateLink = async (): Promise<void> => {
+    if (!selectedFile) return;
+
+    try {
+      const updatedFile = await generatePublicLink(selectedFile.id).unwrap();
+      setSelectedFile(updatedFile);
+      // Don't close modal - user might want to copy the link
+    } catch (err) {
+      console.error("Failed to generate link:", err);
     }
+  };
+
+  const handleCopyLink = async (url: string): Promise<void> => {
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch (err) {
+      console.error("Failed to copy link:", err);
+      alert("Не удалось скопировать ссылку");
+    }
+  };
+
+  const handleDeleteLink = async (): Promise<void> => {
+    if (!selectedFile) return;
+
+    try {
+      const updatedFile = await deletePublicLink(selectedFile.id).unwrap();
+
+      setSelectedFile(updatedFile);
+
+      setLinkModalOpen(false);
+      setSelectedFile(null);
+    } catch (err) {
+      console.error("Failed to delete link:", err);
+    }
+  };
+
+  const handleLinkClose = (): void => {
+    if (isGeneratingLink && isDeletingLink) return;
+    setLinkModalOpen(false);
+    setSelectedFile(null);
   };
 
   /**
@@ -305,6 +325,16 @@ export function FileManager({
         file={selectedFile}
         onSubmit={handleCommentSubmit}
         isSubmitting={isUpdatingComment}
+      />
+      <PublicLinkModal
+        isOpen={linkModalOpen}
+        onClose={handleLinkClose}
+        file={selectedFile}
+        onGenerate={handleGenerateLink}
+        onCopy={handleCopyLink}
+        onDelete={handleDeleteLink}
+        isGenerating={isGeneratingLink}
+        isDeleting={isDeletingLink}
       />
     </div>
   );

@@ -1,0 +1,85 @@
+// =============================================================================
+// Public link modal styles
+// =============================================================================
+
+.public-link-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  &__success,
+  &__info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+
+    padding: 0.75rem;
+
+    border-radius: 6px;
+
+    font-size: 0.875rem;
+
+    cursor: default;
+
+    p {
+      margin: 0;
+      font-weight: 500;
+    }
+  }
+
+  &__success {
+    background-color: var(--color-success-light);
+    color: var(--color-success);
+    border: 1px solid var(--color-success);
+
+    p {
+      color: var(--color-success);
+    }
+  }
+
+  &__info {
+    background-color: var(--color-info-light);
+    color: var(--color-info);
+    border: 1px solid var(--color-info);
+
+    p {
+      color: var(--color-info);
+    }
+  }
+
+  &__icon {
+    font-size: 1.25rem;
+    font-weight: bold;
+    line-height: 1;
+
+    &--info {
+      font-size: 1.25rem;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  &__hint {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    line-height: 1.4;
+
+    small {
+      opacity: 0.9;
+    }
+  }
+
+  &__error {
+    padding: 0.75rem;
+    background-color: var(--color-error-light);
+    border: 1px solid var(--color-error);
+    border-radius: 6px;
+    font-size: 0.813rem;
+    color: var(--color-error);
+  }
+}
