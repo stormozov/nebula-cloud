@@ -40,6 +40,13 @@ export const routesConfig = createBrowserRouter([
     ),
   },
 
+  {
+    path: "/public/:token/",
+    element: lazyWithSuspense(
+      () => import("@/pages/PagePublicFile/ui/PagePublicFile"),
+    ),
+  },
+
   // 404 page (always accessible)
   {
     path: "*",

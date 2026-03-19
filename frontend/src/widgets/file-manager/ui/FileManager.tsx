@@ -25,6 +25,28 @@ import { camelToSnake, getAccessTokenFromPersist } from "@/shared/utils";
 import "./FileManager.scss";
 
 /**
+ * Converts backend public link URL to frontend route URL.
+ * Backend: http://127.0.0.1:8000/api/storage/public/:token/
+ * Frontend: http://localhost:5173/public/:token
+ */
+const getFrontendPublicUrl = (backendUrl: string | null | undefined): string => {
+  if (!backendUrl) return "";
+  
+  // Extract token from backend URL
+  // Pattern: /api/storage/public/:token/
+  const tokenMatch = backendUrl.match(/\/api\/storage\/public\/([^/]+)\/?$/);
+  if (!tokenMatch || !tokenMatch[1]) {
+    // Fallback: return original if pattern doesn't match
+    return backendUrl;
+  }
+  
+  const token = tokenMatch[1];
+  const frontendBaseUrl = import.meta.env.VITE_FRONTEND_BASE_URL || window.location.origin;
+  
+  return `${frontendBaseUrl}/public/${token}`;
+};
+
+/**
  * Props for FileManager widget.
  */
 export interface IFileManagerProps {
@@ -214,7 +236,8 @@ export function FileManager({
 
   const handleCopyLink = async (url: string): Promise<void> => {
     try {
-      await navigator.clipboard.writeText(url);
+      const frontendUrl = getFrontendPublicUrl(url);
+      await navigator.clipboard.writeText(frontendUrl);
     } catch (err) {
       console.error("Failed to copy link:", err);
       alert("Не удалось скопировать ссылку");
@@ -328,10 +351,11 @@ export function FileManager({
       />
       <PublicLinkModal
         isOpen={linkModalOpen}
-        onClose={handleLinkClose}
         file={selectedFile}
+        frontendUrl={getFrontendPublicUrl(selectedFile?.publicLinkUrl || "")}
         onGenerate={handleGenerateLink}
         onCopy={handleCopyLink}
+        onClose={handleLinkClose}
         onDelete={handleDeleteLink}
         isGenerating={isGeneratingLink}
         isDeleting={isDeletingLink}
