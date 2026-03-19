@@ -16,6 +16,8 @@ export interface IModalProps {
   title: string;
   /** Footer content (optional, e.g., action buttons). */
   footer?: ReactNode;
+  /** Specific element to focus when modal opens (e.g., input ref). */
+  focusTarget?: React.RefObject<HTMLElement>;
   /** Disable close on overlay click. */
   closeOnOverlayClick?: boolean;
   /** Disable close on ESC key. */
@@ -25,6 +27,7 @@ export interface IModalProps {
   /** Callback when modal should be closed. */
   onClose: () => void;
 }
+
 
 /**
  * Modal form props (for modals with forms).

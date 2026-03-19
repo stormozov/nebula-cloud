@@ -1,19 +1,21 @@
 import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { useState } from "react";
 
-import type { IFile } from "@/entities/file";
+import type { IFile, IFileRename } from "@/entities/file";
 import {
   downloadFileFromApi,
   useDeleteFileMutation,
   useGetFilesQuery,
+  useRenameFileMutation,
 } from "@/entities/file";
 import { DeleteFileModal } from "@/features/file/file-delete";
 import { FileList } from "@/features/file/file-list";
+import { RenameFileModal } from "@/features/file/file-rename";
 import {
   FileUploadButton,
   FileUploadDropzone,
 } from "@/features/file/file-upload";
-import { getAccessTokenFromPersist } from "@/shared/utils";
+import { camelToSnake, getAccessTokenFromPersist } from "@/shared/utils";
 
 import "./FileManager.scss";
 
@@ -43,8 +45,11 @@ export function FileManager({
   const { data: files = [], isLoading, error } = useGetFilesQuery();
 
   const [deleteFile, { isLoading: isDeleting }] = useDeleteFileMutation();
+  const [renameFile, { isLoading: isRenaming }] = useRenameFileMutation();
 
+  // Modal states
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [renameModalOpen, setRenameModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<IFile | null>(null);
 
   const hasFiles = files.length > 0;
@@ -102,17 +107,43 @@ export function FileManager({
     setSelectedFile(null);
   };
 
+  // -- Rename file handlers ---------------------------------------------------
+
   /**
-   * Handle file rename.
+   * Handle file rename - open modal.
    */
   const handleRename = (file: IFile): void => {
-    const newName = window.prompt(
-      "Введите новое имя файла:",
-      file.originalName,
-    );
-    if (newName && newName !== file.originalName) {
-      console.log("Rename file:", file.id, "→", newName);
-      // TODO: Integrate with useRenameFileMutation
+    setSelectedFile(file);
+    setRenameModalOpen(true);
+  };
+
+  /**
+   * Handle rename submission - call API.
+   */
+  const handleRenameSubmit = async (newName: string): Promise<void> => {
+    if (!selectedFile) return;
+
+    try {
+      const newFileName = camelToSnake({ original_name: newName });
+      await renameFile({
+        id: selectedFile.id,
+        data: newFileName as IFileRename,
+      }).unwrap();
+      setRenameModalOpen(false);
+      setSelectedFile(null);
+    } catch (err) {
+      console.error("Failed to rename file:", err);
+      // Error is handled by RTK Query onError in fileApi.ts
+    }
+  };
+
+  /**
+   * Handle close rename modal.
+   */
+  const handleRenameClose = (): void => {
+    if (!isRenaming) {
+      setRenameModalOpen(false);
+      setSelectedFile(null);
     }
   };
 
@@ -232,13 +263,21 @@ export function FileManager({
         </div>
       )}
 
-      {/* Delete Modal */}
+      {/* File actions modals */}
       <DeleteFileModal
         isOpen={deleteModalOpen}
         file={selectedFile}
         onConfirm={handleDeleteConfirm}
         onClose={handleDeleteClose}
         isDeleting={isDeleting}
+      />
+      <RenameFileModal
+        key={selectedFile?.id}
+        isOpen={renameModalOpen}
+        onClose={handleRenameClose}
+        file={selectedFile}
+        onSubmit={handleRenameSubmit}
+        isSubmitting={isRenaming}
       />
     </div>
   );

@@ -1,0 +1,21 @@
+// =============================================================================
+// Rename file modal styles
+// =============================================================================
+
+.rename-file-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  &__hint {
+    margin: 0;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+
+    strong {
+      color: var(--color-text-primary);
+      font-weight: 500;
+      word-break: break-word;
+    }
+  }
+}

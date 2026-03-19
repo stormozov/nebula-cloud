@@ -24,11 +24,13 @@ export function Modal({
   title,
   children,
   footer,
+  focusTarget,
   closeOnOverlayClick = true,
   closeOnEsc = true,
   closeOnButton = true,
   onClose,
 }: IModalProps) {
+
   const modalRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
 
@@ -67,10 +69,16 @@ export function Modal({
       // Store previous focus
       previousFocusRef.current = document.activeElement as HTMLElement;
 
-      // Focus modal content
-      const focusableElement = modalRef.current?.querySelector<HTMLElement>(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-      );
+      // Focus target first if provided, else first focusable
+      let focusableElement: HTMLElement | null = null;
+      if (focusTarget?.current) {
+        focusableElement = focusTarget.current;
+      } else {
+        const queryResult = modalRef.current?.querySelector<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        );
+        focusableElement = queryResult || null;
+      }
       focusableElement?.focus();
 
       // Add keyboard listener
@@ -85,10 +93,12 @@ export function Modal({
       document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "";
 
-      // Restore previous focus
+      // Restore previous focus or target
       previousFocusRef.current?.focus();
     };
-  }, [isOpen, handleKeyDown]);
+  }, [isOpen, handleKeyDown, focusTarget]);
+
+
 
   // ---------------------------------------------------------------------------
   // RENDER
