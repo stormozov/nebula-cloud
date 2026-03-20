@@ -13,6 +13,7 @@ import {
 } from "@/entities/file";
 import { EditCommentModal } from "@/features/file/file-comment";
 import { DeleteFileModal } from "@/features/file/file-delete";
+import { ImageViewerModal } from "@/features/file/file-image-preview";
 import { FileList } from "@/features/file/file-list";
 import { PublicLinkModal } from "@/features/file/file-public-link";
 import { RenameFileModal } from "@/features/file/file-rename";
@@ -20,7 +21,7 @@ import {
   FileUploadButton,
   FileUploadDropzone,
 } from "@/features/file/file-upload";
-import { camelToSnake, getAccessTokenFromPersist } from "@/shared/utils";
+import { camelToSnake, isImageFile } from "@/shared/utils";
 
 import "./FileManager.scss";
 
@@ -64,7 +65,11 @@ export function FileManager({
   const [renameModalOpen, setRenameModalOpen] = useState(false);
   const [commentModalOpen, setCommentModalOpen] = useState(false);
   const [linkModalOpen, setLinkModalOpen] = useState(false);
+  const [imageViewerOpen, setImageViewerOpen] = useState(false);
 
+  const [selectedImageFile, setSelectedImageFile] = useState<IFile | null>(
+    null,
+  );
   const [selectedFile, setSelectedFile] = useState<IFile | null>(null);
 
   const hasFiles = files.length > 0;
@@ -180,14 +185,11 @@ export function FileManager({
     setSelectedFile(null);
   };
 
-  /**
-   * Handle file download.
-   */
+  // -- Download handlers ------------------------------------------------------
+
   const handleDownload = async (file: IFile): Promise<void> => {
     try {
-      const accessToken = getAccessTokenFromPersist();
       await downloadFileFromApi(file.id, file.originalName);
-      console.log("Download file:", file.id, file.originalName);
     } catch (err) {
       console.error("Download failed:", err);
     }
@@ -242,18 +244,14 @@ export function FileManager({
     setSelectedFile(null);
   };
 
-  /**
-   * Handle file view.
-   */
-  const handleView = (file: IFile): void => {
-    // Open file in new tab (for viewable types like images, PDFs)
-    const accessToken = getAccessTokenFromPersist();
-    const viewUrl = `${import.meta.env.VITE_API_BASE_URL || "/api"}/storage/files/${file.id}/download/`;
+  // -- View handlers ----------------------------------------------------------
 
-    // For now, just download the file
-    // TODO: Implement proper viewer for images/PDFs
-    window.open(viewUrl, "_blank");
-    console.log("View file:", file.id, file.originalName);
+  const handleView = (file: IFile): void => {
+    if (isImageFile(file)) {
+      setSelectedImageFile(file);
+      setImageViewerOpen(true);
+      return;
+    }
   };
 
   // ---------------------------------------------------------------------------
@@ -335,6 +333,11 @@ export function FileManager({
         onDelete={handleDeleteLink}
         isGenerating={isGeneratingLink}
         isDeleting={isDeletingLink}
+      />
+      <ImageViewerModal
+        isOpen={imageViewerOpen}
+        file={selectedImageFile}
+        onClose={() => setImageViewerOpen(false)}
       />
     </div>
   );

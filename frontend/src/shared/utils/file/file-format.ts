@@ -56,3 +56,56 @@ export const parseFileSize = (sizeString: string): number => {
 
   return Math.round(value * unitMultipliers[unit]);
 };
+
+/**
+ * Shortens a string by leaving the beginning (the first N words) and the end
+ * (the last meaningful token), inserting an ellipsis between them.
+ *
+ * If the original length does not exceed the limit, returns the string
+ * unchanged.
+ *
+ * @param input - the original string
+ * @param maxLength - the maximum allowed length
+ * @param prefixWordCount - the number of words to be kept at the beginning
+ * @param suffixWordCount - the number of words to be kept at the end
+ *
+ * @returns a shortened string with an ellipsis in the middle
+ */
+export function truncateWithMiddleEllipsis(
+  input: string,
+  maxLength: number = 35,
+  prefixWordCount: number = 4,
+  suffixWordCount: number = 1,
+): string {
+  if (input.length <= maxLength) return input;
+
+  const words = input.split(/\s+/);
+  const suffix = words.slice(-suffixWordCount).join(" ");
+  const prefix = words.slice(0, prefixWordCount).join(" ");
+
+  const result = `${prefix} ... ${suffix}`;
+  if (result.length <= maxLength) return result;
+
+  let trimmedPrefix = prefix;
+  const maxPrefixLength = maxLength - suffix.length - 5;
+  if (maxPrefixLength > 0) {
+    while (
+      trimmedPrefix.length > maxPrefixLength &&
+      trimmedPrefix.includes(" ")
+    ) {
+      const parts = trimmedPrefix.split(" ");
+      parts.pop();
+      trimmedPrefix = parts.join(" ");
+    }
+    if (trimmedPrefix.length > maxPrefixLength) {
+      trimmedPrefix = `${trimmedPrefix.slice(0, maxPrefixLength - 3)}...`;
+    }
+    return `${trimmedPrefix} ... ${suffix}`;
+  }
+
+  const partLength = Math.floor((maxLength - 3) / 2);
+  const start = input.slice(0, partLength);
+  const end = input.slice(-partLength);
+
+  return `${start}...${end}`;
+}

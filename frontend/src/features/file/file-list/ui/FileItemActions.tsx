@@ -9,6 +9,7 @@ import type {
   IFileItemActionsProps,
 } from "../lib/types";
 
+import { isImageFile } from "@/shared/utils";
 import "./FileItemActions.scss";
 
 /** File action buttons configuration */
@@ -45,12 +46,13 @@ export function FileItemActions({
   onDelete,
 }: IFileItemActionsProps) {
   const actionHandlers: ActionHandlers = {
-    view: onView
-      ? (e: React.MouseEvent) => {
-          e.stopPropagation();
-          onView(file);
-        }
-      : undefined,
+    view:
+      onView && isImageFile(file)
+        ? (e: React.MouseEvent) => {
+            e.stopPropagation();
+            onView(file);
+          }
+        : undefined,
     download: onDownload
       ? (e: React.MouseEvent) => {
           e.stopPropagation();
@@ -91,6 +93,7 @@ export function FileItemActions({
     >
       {FILE_ACTIONS.map((action) => {
         const handler = actionHandlers[action.id];
+        if (action.id === "view" && !handler) return null;
         const isDisabled =
           disabled ||
           (action.id === "publicLink" && !file.hasPublicLink && !onPublicLink);

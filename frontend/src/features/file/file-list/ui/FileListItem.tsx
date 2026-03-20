@@ -1,7 +1,11 @@
 import { memo, useState } from "react";
 
 import { FileIcon } from "@/shared/ui";
-import { formatDate, formatFileSize } from "@/shared/utils";
+import {
+  formatDate,
+  formatFileSize,
+  truncateWithMiddleEllipsis,
+} from "@/shared/utils";
 
 import type { IFileListItemProps } from "../lib/types";
 import { FileItemActions } from "./FileItemActions";
@@ -48,16 +52,16 @@ export function FileListItemPlain({
 
       <td className="file-list-item__cell file-list-item__cell--name">
         <span className="file-list-item__name" title={file.originalName}>
-          {file.originalName}
+          {truncateWithMiddleEllipsis(file.originalName)}
         </span>
       </td>
 
       <td className="file-list-item__cell file-list-item__cell--comment">
         <span
           className="file-list-item__comment"
-          title={file.comment || "Нет комментария"}
+          title={truncateWithMiddleEllipsis(file.comment || "Нет комментария")}
         >
-          {file.comment || "—"}
+          {truncateWithMiddleEllipsis(file.comment || "—", 35, 3, 2)}
         </span>
       </td>
 

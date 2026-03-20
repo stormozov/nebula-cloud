@@ -328,6 +328,15 @@ export const downloadFileFromApi = async (
   fileId: number,
   filename: string,
 ): Promise<void> => {
+  const blob = await getImageBlobFromApi(fileId);
+  await downloadFile(blob, filename);
+};
+
+/**
+ * Gets file blob from API with authentication (no download).
+ * Reusable for previews/modals.
+ */
+export const getImageBlobFromApi = async (fileId: number): Promise<Blob> => {
   const accessToken = getAccessTokenFromPersist();
 
   const response = await fetch(
@@ -345,7 +354,7 @@ export const downloadFileFromApi = async (
   }
 
   const blob: Blob = await response.blob();
-  await downloadFile(blob, filename);
+  return blob;
 };
 
 export const {
