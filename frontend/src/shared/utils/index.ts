@@ -5,4 +5,5 @@ export * from "./file/file-extension-utils";
 export * from "./file/file-format";
 export * from "./getPersistedAuthState";
 export * from "./isFormValid";
+export * from "./isTokenExpired";
 export * from "./time-utils";

@@ -1,9 +1,7 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
 
-import {
-  getAccessTokenFromPersist,
-  getRefreshTokenFromPersist,
-} from "@/shared/utils";
+import { baseQueryWithAuthErrorHandling } from "@/shared/api";
+import { getRefreshTokenFromPersist } from "@/shared/utils";
 
 import { logout, setAuthData } from "../model/slice";
 import type {
@@ -15,50 +13,11 @@ import type {
 import { transformDataToApi } from "../model/utils";
 
 /**
- * Base configuration for RTK Query API calls.
- *
- * Defines the common settings used across all endpoints in the API slice:
- * - Sets the base URL from environment variables or defaults to `/api`.
- * - Attaches authorization and content-type headers to every request.
- */
-const baseQuery = fetchBaseQuery({
-  /**
-   * The root URL for all API requests.
-   *
-   * Retrieved from the VITE_API_BASE_URL environment variable, falling back
-   * to '/api' if not defined.
-   */
-  baseUrl: import.meta.env.VITE_API_BASE_URL || "/api",
-
-  /**
-   * Prepares headers to be sent with each request.
-   *
-   * Includes an Authorization header with a Bearer token if available
-   * in localStorage, and sets the Content-Type to application/json.
-   *
-   * @param headers - The Headers instance to modify.
-   * @returns The modified Headers instance with authentication
-   *  and content-type set.
-   */
-  prepareHeaders: (headers: Headers): Headers => {
-    const token = getAccessTokenFromPersist();
-    if (token) headers.set("Authorization", `Bearer ${token}`);
-    headers.set("Content-Type", "application/json");
-    return headers;
-  },
-});
-
-/**
  * RTK Query API slice for user-related operations.
- *
- * Provides methods for authentication and user data management, including
- * login, registration, fetching current user details, and logout. Automatically
- * handles authentication token storage and attaches tokens to subsequent
- * requests via {@link baseQuery}.
  */
 export const userApi = createApi({
   reducerPath: "userApi",
-  baseQuery,
+  baseQuery: baseQueryWithAuthErrorHandling,
   tagTypes: ["User"],
   endpoints: (build) => ({
     /**

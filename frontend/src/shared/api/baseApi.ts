@@ -49,15 +49,22 @@ export const baseQuery = fetchBaseQuery({
  * Uses the base baseQuery for HTTP requests and applies transformation
  * to response.
  */
-export const baseQueryWithTransform: BaseQueryFn<
+export const baseQueryWithAuthErrorHandling: BaseQueryFn<
   string | FetchArgs,
   unknown,
   unknown
 > = async (args, api, extraOptions) => {
   const result = await baseQuery(args, api, extraOptions);
 
+  if (result.error && 'status' in result.error && result.error.status === 401) {
+    const { logout } = await import("@/entities/user");
+    api.dispatch(logout());
+  }
+
   // Transform response data if present
-  if (result.data) result.data = snakeToCamel(result.data);
+  if (result.data) {
+    result.data = snakeToCamel(result.data);
+  }
 
   return result;
 };

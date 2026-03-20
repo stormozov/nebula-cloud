@@ -1,8 +1,12 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import axios from "axios";
 
-import { API_BASE_URL, baseQueryWithTransform } from "@/shared/api";
-import { downloadFile, getAccessTokenFromPersist } from "@/shared/utils";
+import {
+  API_BASE_URL,
+  baseQueryWithAuthErrorHandling,
+  fetchWithAuth,
+} from "@/shared/api";
+import { downloadFile } from "@/shared/utils";
 
 import {
   removeFile,
@@ -51,6 +55,19 @@ uploadAxios.interceptors.request.use((config) => {
   return config;
 });
 
+// Add 401 response interceptor for upload
+uploadAxios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Clear auth on upload 401 (rare case)
+      localStorage.removeItem("persist:auth");
+      window.location.replace("/auth");
+    }
+    return Promise.reject(error);
+  },
+);
+
 // =============================================================================
 // RTK QUERY API SLICE
 // =============================================================================
@@ -60,7 +77,7 @@ uploadAxios.interceptors.request.use((config) => {
  */
 export const fileApi = createApi({
   reducerPath: "fileApi",
-  baseQuery: baseQueryWithTransform,
+  baseQuery: baseQueryWithAuthErrorHandling,
   tagTypes: ["File"],
   endpoints: (build) => ({
     /**
@@ -337,21 +354,10 @@ export const downloadFileFromApi = async (
  * Reusable for previews/modals.
  */
 export const getImageBlobFromApi = async (fileId: number): Promise<Blob> => {
-  const accessToken = getAccessTokenFromPersist();
-
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_BASE_URL}/storage/files/${fileId}/download/`,
-    {
-      method: "GET",
-      headers: {
-        Authorization: accessToken ? `Bearer ${accessToken}` : "",
-      },
-    },
+    { method: "GET" },
   );
-
-  if (!response.ok) {
-    throw new Error(`Download failed: ${response.status}`);
-  }
 
   const blob: Blob = await response.blob();
   return blob;
