@@ -1,9 +1,17 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { FaDownload } from "react-icons/fa6";
 import { useNavigate, useParams } from "react-router";
 
-import { API_BASE_URL } from "@/shared/api";
-import { Button, FileIcon } from "@/shared/ui";
-import { formatDate, formatFileSize } from "@/shared/utils";
+import {
+  useDownloadPublicFileMutation,
+  useGetPublicFileQuery,
+} from "@/entities/file";
+import { Button, FileIcon, PageLayout } from "@/shared/ui";
+import {
+  downloadFile as downloadFileUtils,
+  formatDate,
+  formatFileSize,
+} from "@/shared/utils";
 
 import "./PagePublicFile.scss";
 
@@ -16,94 +24,37 @@ export default function PagePublicFile() {
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
 
-  const [file, setFile] = useState<{
-    original_name: string;
-    size: number;
-    size_formatted: string;
-    uploaded_at: string;
-    comment: string;
-    download_url: string;
-  } | null>(null);
+  const {
+    data: file,
+    isLoading,
+    error,
+  } = useGetPublicFileQuery(token || "", { skip: !token });
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadFile, { isLoading: isDownloading }] =
+    useDownloadPublicFileMutation();
+  const [downloadError, setDownloadError] = useState<string | null>(null);
 
-  /**
-   * Fetch file metadata from public API.
-   */
-  useEffect(() => {
-    if (!token) {
-      setError("Неверная ссылка");
-      setIsLoading(false);
-      return;
-    }
-
-    const fetchFileMetadata = async () => {
-      try {
-        const response = await fetch(
-          `${API_BASE_URL}/storage/public/${token}/`,
-        );
-
-        if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error("Файл не найден или ссылка недействительна");
-          }
-          throw new Error(`Ошибка сервера: ${response.status}`);
-        }
-
-        const data = await response.json();
-        setFile(data);
-      } catch (err) {
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Не удалось загрузить информацию о файле",
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchFileMetadata();
-  }, [token]);
-
-  /**
-   * Trigger file download.
-   */
   const handleDownload = async (): Promise<void> => {
-    if (!file?.download_url) return;
+    if (!file || !token) return;
 
-    setIsDownloading(true);
+    setDownloadError(null);
 
     try {
-      // 🔧 Загружаем файл как blob
-      const response = await fetch(file.download_url);
+      const result = await downloadFile({
+        token,
+        filename: file.originalName,
+      }).unwrap();
 
-      if (!response.ok) {
-        throw new Error("Не удалось скачать файл");
-      }
-
-      // 🔧 Получаем blob и создаём ссылку для скачивания
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = file.original_name; // 🔧 Оригинальное имя файла
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
+      const blob: Blob = result;
+      downloadFileUtils(blob, file.originalName);
     } catch (err) {
       console.error("Download failed:", err);
-      setError("Не удалось скачать файл");
-    } finally {
-      setIsDownloading(false);
+      setDownloadError("Не удалось скачать файл");
     }
   };
 
-  // Loading state
   if (isLoading) {
+    // Loading state
     return (
       <div className="page-public-file page-public-file--loading">
         <div className="page-public-file__loader">Загрузка...</div>
@@ -111,13 +62,17 @@ export default function PagePublicFile() {
     );
   }
 
-  // Error state
   if (error || !file) {
+    // Error state
     return (
       <div className="page-public-file page-public-file--error">
         <div className="page-public-file__error">
           <h2>Ошибка</h2>
-          <p>{error || "Файл не найден"}</p>
+          <p>
+            {error
+              ? "Файл не найден или ссылка недействительна"
+              : "Файл не найден"}
+          </p>
           <Button variant="primary" onClick={() => navigate("/")}>
             На главную
           </Button>
@@ -126,17 +81,16 @@ export default function PagePublicFile() {
     );
   }
 
-  // Success state
   return (
-    <div className="page-public-file">
+    <PageLayout className="page-public-file">
       <div className="page-public-file__card">
         <div className="page-public-file__icon">
-          <FileIcon filename={file.original_name} size={64} />
+          <FileIcon filename={file.originalName} size={80} />
         </div>
 
         <div className="page-public-file__info">
-          <h1 className="page-public-file__name" title={file.original_name}>
-            {file.original_name}
+          <h1 className="page-public-file__name" title={file.originalName}>
+            {file.originalName}
           </h1>
 
           {file.comment && (
@@ -150,7 +104,7 @@ export default function PagePublicFile() {
             </div>
             <div>
               <dt>Загружен:</dt>
-              <dd>{formatDate(file.uploaded_at)}</dd>
+              <dd>{formatDate(file.uploadedAt)}</dd>
             </div>
           </dl>
         </div>
@@ -163,16 +117,25 @@ export default function PagePublicFile() {
             loading={isDownloading}
             fullWidth
           >
+            <FaDownload />
             {isDownloading ? "Скачивание..." : "Скачать файл"}
           </Button>
         </div>
 
+        {downloadError && (
+          <div className="page-public-file__download-error">
+            <p className="page-public-file__download-error-text">
+              {downloadError}
+            </p>
+          </div>
+        )}
+
         <p className="page-public-file__hint">
           Файл будет скачан с оригинальным именем:
           <br />
-          <strong>{file.original_name}</strong>
+          <strong>{file.originalName}</strong>
         </p>
       </div>
-    </div>
+    </PageLayout>
   );
 }

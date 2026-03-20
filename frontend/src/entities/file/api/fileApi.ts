@@ -217,6 +217,47 @@ export const fileApi = createApi({
     }),
 
     /**
+     * Retrieves public file metadata by token.
+     * No authentication required.
+     *
+     * @param token - Public access token
+     * @returns File metadata (original_name, size, download_url, etc.)
+     */
+    getPublicFile: build.query<IFile, string>({
+      query: (token) => `/storage/public/${token}/`,
+      keepUnusedDataFor: 60, // 1 minute
+    }),
+
+    /**
+     * Downloads public file by token.
+     * No authentication required.
+     *
+     * @param token - Public access token
+     * @returns File blob with original filename
+     */
+    downloadPublicFile: build.mutation<
+      Blob,
+      { token: string; filename: string }
+    >({
+      queryFn: async ({ token }, _queryApi, _extraOptions) => {
+        try {
+          const response = await fetch(
+            `${API_BASE_URL}/storage/public/${token}/download/`,
+          );
+
+          if (!response.ok) {
+            throw new Error(`Download failed: ${response.status}`);
+          }
+
+          const blob: Blob = await response.blob();
+          return { data: blob };
+        } catch (error) {
+          return { error: error as Error };
+        }
+      },
+    }),
+
+    /**
      * Deletes the public link of a file by its ID.
      *
      * @param id - The unique identifier of the file.
@@ -315,4 +356,6 @@ export const {
   useUpdateCommentMutation,
   useGeneratePublicLinkMutation,
   useDeletePublicLinkMutation,
+  useGetPublicFileQuery,
+  useDownloadPublicFileMutation,
 } = fileApi;
