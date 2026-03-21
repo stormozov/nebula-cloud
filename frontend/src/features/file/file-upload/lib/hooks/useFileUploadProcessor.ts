@@ -88,10 +88,10 @@ export const useFileUploadProcessor = (): void => {
         dispatch(fileApi.util.invalidateTags(["File"]));
 
         fileStorage.remove(activeUpload.id);
-      } catch (error) {
+      } catch (err) {
         const errorMessage =
-          error && typeof error === "object" && "message" in error
-            ? (error as { message?: string }).message
+          err && typeof err === "object" && "message" in err
+            ? (err as { message?: string }).message
             : "Не удалось загрузить файл";
 
         dispatch(
@@ -104,7 +104,16 @@ export const useFileUploadProcessor = (): void => {
 
         processedUploads.current.delete(activeUpload.id);
 
-        console.error("Upload error:", error);
+        if (
+          err &&
+          typeof err === "object" &&
+          "status" in err &&
+          err.status === 401
+        ) {
+          return;
+        }
+
+        console.error("Upload error:", err);
       }
     };
 

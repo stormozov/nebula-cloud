@@ -58,11 +58,11 @@ uploadAxios.interceptors.request.use((config) => {
 // Add 401 response interceptor for upload
 uploadAxios.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     if (error.response?.status === 401) {
-      // Clear auth on upload 401 (rare case)
-      localStorage.removeItem("persist:auth");
-      window.location.replace("/auth");
+      const { logout } = await import("@/entities/user");
+      const { store } = await import("@/app/store/store");
+      store.dispatch(logout());
     }
     return Promise.reject(error);
   },
@@ -345,8 +345,13 @@ export const downloadFileFromApi = async (
   fileId: number,
   filename: string,
 ): Promise<void> => {
-  const blob = await getImageBlobFromApi(fileId);
-  await downloadFile(blob, filename);
+  try {
+    const blob = await getImageBlobFromApi(fileId);
+    await downloadFile(blob, filename);
+  } catch (error) {
+    if (error instanceof Response && error.status === 401) return;
+    console.error("Download failed:", error);
+  }
 };
 
 /**
@@ -354,13 +359,17 @@ export const downloadFileFromApi = async (
  * Reusable for previews/modals.
  */
 export const getImageBlobFromApi = async (fileId: number): Promise<Blob> => {
-  const response = await fetchWithAuth(
-    `${API_BASE_URL}/storage/files/${fileId}/download/`,
-    { method: "GET" },
-  );
-
-  const blob: Blob = await response.blob();
-  return blob;
+  try {
+    const response = await fetchWithAuth(
+      `${API_BASE_URL}/storage/files/${fileId}/download/`,
+      { method: "GET" },
+    );
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return await response.blob();
+  } catch (error) {
+    if (error instanceof Response && error.status === 401) throw error;
+    throw error;
+  }
 };
 
 export const {

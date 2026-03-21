@@ -21,6 +21,7 @@ import {
   FileUploadButton,
   FileUploadDropzone,
 } from "@/features/file/file-upload";
+import { isError401 } from "@/shared/api";
 import { camelToSnake, isImageFile } from "@/shared/utils";
 
 import "./FileManager.scss";
@@ -84,6 +85,7 @@ export function FileManager({
     if ("status" in err) {
       // FetchBaseQueryError (HTTP error)
       const httpError = err as FetchBaseQueryError;
+      if (httpError.status === 401) return null;
       const data = httpError.data as { detail?: string } | undefined;
       return data?.detail || `Ошибка ${httpError.status}`;
     }
@@ -116,6 +118,7 @@ export function FileManager({
       setDeleteModalOpen(false);
       setSelectedFile(null);
     } catch (err) {
+      if (isError401(err as FetchBaseQueryError)) return;
       console.error("Failed to delete file:", err);
       // Error is handled by RTK Query onError in fileApi.ts
     }
@@ -146,8 +149,8 @@ export function FileManager({
       setRenameModalOpen(false);
       setSelectedFile(null);
     } catch (err) {
+      if (isError401(err as FetchBaseQueryError)) return;
       console.error("Failed to rename file:", err);
-      // Error is handled by RTK Query onError in fileApi.ts
     }
   };
 
@@ -175,6 +178,7 @@ export function FileManager({
       setCommentModalOpen(false);
       setSelectedFile(null);
     } catch (err) {
+      if (isError401(err as FetchBaseQueryError)) return;
       console.error("Failed to update comment:", err);
     }
   };
@@ -191,6 +195,7 @@ export function FileManager({
     try {
       await downloadFileFromApi(file.id, file.originalName);
     } catch (err) {
+      if (isError401(err as FetchBaseQueryError)) return;
       console.error("Download failed:", err);
     }
   };
@@ -210,6 +215,7 @@ export function FileManager({
       setSelectedFile(updatedFile);
       // Don't close modal - user might want to copy the link
     } catch (err) {
+      if (isError401(err as FetchBaseQueryError)) return;
       console.error("Failed to generate link:", err);
     }
   };
@@ -234,6 +240,7 @@ export function FileManager({
       setLinkModalOpen(false);
       setSelectedFile(null);
     } catch (err) {
+      if (isError401(err as FetchBaseQueryError)) return;
       console.error("Failed to delete link:", err);
     }
   };
