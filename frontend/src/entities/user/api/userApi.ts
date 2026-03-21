@@ -5,6 +5,7 @@ import { getRefreshTokenFromPersist } from "@/shared/utils";
 
 import { logout, setAuthData } from "../model/slice";
 import type {
+  IToken,
   IUser,
   IUserAuthResponse,
   IUserLogin,
@@ -110,6 +111,20 @@ export const userApi = createApi({
         }
       },
     }),
+
+    /**
+     * RTK Query mutation endpoint for refreshing an authentication token.
+     *
+     * @returns A configured RTK Query mutation that triggers a token refresh
+     * request.
+     */
+    refresh: build.mutation<IToken, void>({
+      query: () => ({
+        url: "/auth/refresh/",
+        method: "POST",
+        body: { refresh: getRefreshTokenFromPersist() },
+      }),
+    }),
   }),
 });
 
@@ -118,4 +133,5 @@ export const {
   useLoginMutation,
   useRegisterMutation,
   useLogoutMutation,
+  useRefreshMutation,
 } = userApi;

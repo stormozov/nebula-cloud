@@ -1,4 +1,5 @@
 import { getAccessTokenFromPersist } from "../utils/getPersistedAuthState";
+import { getRefreshedToken } from "./tokenRefresh";
 
 /**
  * Global authenticated fetch with 401 auto-logout.
@@ -9,6 +10,7 @@ import { getAccessTokenFromPersist } from "../utils/getPersistedAuthState";
 export const fetchWithAuth = async (
   input: RequestInfo | URL,
   init?: RequestInit,
+  retry = true,
 ): Promise<Response> => {
   const token = getAccessTokenFromPersist();
   const headers = new Headers(init?.headers);
@@ -17,13 +19,19 @@ export const fetchWithAuth = async (
     headers.set("Authorization", `Bearer ${token}`);
   }
 
-  const response = await fetch(input, { ...init, headers });
+  let response = await fetch(input, { ...init, headers });
 
-  if (response.status === 401) {
-    const { logout } = await import("@/entities/user");
-    const { store } = await import("@/app/store/store");
-    store.dispatch(logout());
-    throw response;
+  if (response.status === 401 && retry) {
+    try {
+      const newToken = await getRefreshedToken();
+      headers.set("Authorization", `Bearer ${newToken}`);
+      response = await fetch(input, { ...init, headers });
+    } catch {
+      const { logout } = await import("@/entities/user");
+      const { store } = await import("@/app/store/store");
+      store.dispatch(logout());
+      throw response;
+    }
   }
 
   return response;

@@ -5,6 +5,7 @@ import {
   API_BASE_URL,
   baseQueryWithAuthErrorHandling,
   fetchWithAuth,
+  getRefreshedToken,
 } from "@/shared/api";
 import { downloadFile } from "@/shared/utils";
 
@@ -55,14 +56,23 @@ uploadAxios.interceptors.request.use((config) => {
   return config;
 });
 
-// Add 401 response interceptor for upload
 uploadAxios.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response?.status === 401) {
-      const { logout } = await import("@/entities/user");
-      const { store } = await import("@/app/store/store");
-      store.dispatch(logout());
+    const originalRequest = error.config;
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        const newToken = await getRefreshedToken();
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        return uploadAxios(originalRequest);
+      } catch {
+        const { logout } = await import("@/entities/user");
+        const { store } = await import("@/app/store/store");
+        store.dispatch(logout());
+        return Promise.reject(error);
+      }
     }
     return Promise.reject(error);
   },

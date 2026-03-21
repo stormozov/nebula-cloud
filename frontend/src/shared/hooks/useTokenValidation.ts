@@ -2,8 +2,12 @@ import { useEffect } from "react";
 import { useStore } from "react-redux";
 
 import { logout } from "@/entities/user";
-import { getAccessTokenFromPersist } from "@/shared/utils/getPersistedAuthState";
+import {
+  getAccessTokenFromPersist,
+  getRefreshTokenFromPersist,
+} from "@/shared/utils";
 import { isTokenExpired } from "@/shared/utils/isTokenExpired";
+import { getRefreshedToken } from "../api";
 
 /**
  * Custom React hook that handles token validation and automatic logout
@@ -28,17 +32,32 @@ export const useTokenValidation = (): void => {
   const store = useStore();
 
   useEffect(() => {
-    const validateToken = () => {
-      const token = getAccessTokenFromPersist();
-      if (token && isTokenExpired(token)) {
-        localStorage.removeItem("persist:auth");
-        store.dispatch(logout());
+    const validateToken = async () => {
+      const accessToken = getAccessTokenFromPersist();
+      const refreshToken = getRefreshTokenFromPersist();
+
+      // If there is no refresh token or it has expired,
+      // and the access token has expired → log out
+      if (!refreshToken || isTokenExpired(refreshToken)) {
+        if (accessToken && isTokenExpired(accessToken)) {
+          store.dispatch(logout());
+        }
+        return;
+      }
+
+      // If the access token has expired, try to update it
+      if (accessToken && isTokenExpired(accessToken)) {
+        try {
+          await getRefreshedToken();
+        } catch {
+          store.dispatch(logout());
+        }
       }
     };
 
     validateToken();
 
-    const interval = setInterval(validateToken, 5 * 60 * 1000); // 5 min
+    const interval = setInterval(validateToken, 5 * 60 * 1000); // every 5 min
     window.addEventListener("focus", validateToken);
 
     return () => {
