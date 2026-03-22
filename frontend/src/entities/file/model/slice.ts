@@ -1,5 +1,7 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
+import { userSlice } from "@/entities/user";
+
 import type { IFile, IFileState } from "./types";
 
 /**
@@ -157,6 +159,9 @@ export const fileSlice = createSlice({
       state.isLoading = false;
       state.error = null;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(userSlice.actions.logout, () => initialState);
   },
 });
 

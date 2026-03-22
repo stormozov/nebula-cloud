@@ -4,22 +4,24 @@ import {
   FLUSH,
   PAUSE,
   PERSIST,
+  PURGE,
   persistReducer,
   persistStore,
-  PURGE,
   REGISTER,
   REHYDRATE,
 } from "redux-persist";
 
 import { fileApi } from "@/entities/file";
+import fileReducer from "@/entities/file/model/slice";
 import type {
   IUploadFileSerialized,
   IUploadState,
 } from "@/entities/file-upload";
 import fileUploadReducer from "@/entities/file-upload/model/slice";
-import fileReducer from "@/entities/file/model/slice";
 import { userApi } from "@/entities/user";
 import userReducer from "@/entities/user/model/slice";
+
+import { resetApiMiddleware } from "../middlewares/resetApiMiddleware";
 
 // =============================================================================
 // PERSIST STORAGE
@@ -158,6 +160,7 @@ export const store = configureStore({
         ignoredPaths: ["fileUpload.queue"],
       },
     })
+      .concat(resetApiMiddleware)
       .concat(userApi.middleware)
       .concat(fileApi.middleware),
 });

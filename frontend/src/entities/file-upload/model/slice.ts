@@ -1,5 +1,7 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
+import { userSlice } from "@/entities/user";
+
 import type {
   IAddFilesPayload,
   IRemoveFilePayload,
@@ -300,6 +302,9 @@ export const fileUploadSlice = createSlice({
       state.totalFailed = 0;
       state.isQueueCompleted = false;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(userSlice.actions.logout, () => initialState);
   },
 });
 
