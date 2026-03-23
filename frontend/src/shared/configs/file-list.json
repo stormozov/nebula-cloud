@@ -1,0 +1,78 @@
+{
+  "actions": [
+    {
+      "id": "view",
+      "icon": "👁️",
+      "title": "Просмотр",
+      "ariaLabel": "Просмотр файла"
+    },
+    {
+      "id": "download",
+      "icon": "⬇️",
+      "title": "Скачать",
+      "ariaLabel": "Скачать файл"
+    },
+    {
+      "id": "publicLink",
+      "icon": "🔗",
+      "title": "Публичная ссылка",
+      "ariaLabel": "Копировать публичную ссылку"
+    },
+    {
+      "id": "rename",
+      "icon": "✏️",
+      "title": "Переименовать",
+      "ariaLabel": "Переименовать файл"
+    },
+    {
+      "id": "editComment",
+      "icon": "💬",
+      "title": "Комментарий",
+      "ariaLabel": "Изменить комментарий"
+    },
+    {
+      "id": "delete",
+      "icon": "🗑️",
+      "title": "Удалить",
+      "ariaLabel": "Удалить файл",
+      "isDanger": true
+    }
+  ],
+  "header_columns": [
+    {
+      "key": "icon",
+      "label": "#",
+      "className": "file-list__header-cell--icon"
+    },
+    {
+      "key": "name",
+      "label": "Имя файла",
+      "className": "file-list__header-cell--name"
+    },
+    {
+      "key": "comment",
+      "label": "Комментарий",
+      "className": "file-list__header-cell--comment"
+    },
+    {
+      "key": "size",
+      "label": "Размер",
+      "className": "file-list__header-cell--size"
+    },
+    {
+      "key": "uploaded",
+      "label": "Загружен",
+      "className": "file-list__header-cell--date"
+    },
+    {
+      "key": "downloaded",
+      "label": "Скачан",
+      "className": "file-list__header-cell--date"
+    },
+    {
+      "key": "actions",
+      "label": "Действия",
+      "className": "file-list__header-cell--actions"
+    }
+  ]
+}

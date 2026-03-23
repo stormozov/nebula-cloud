@@ -1,0 +1,16 @@
+// =============================================================================
+// File item actions styles
+// =============================================================================
+
+.file-item-actions {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+
+  opacity: 0;
+  transition: opacity 0.2s ease;
+
+  &--visible {
+    opacity: 1;
+  }
+}

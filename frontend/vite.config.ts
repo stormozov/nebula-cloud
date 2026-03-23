@@ -25,6 +25,7 @@ export default defineConfig(({ mode }) => {
         "@hooks": path.resolve(__dirname, "./src/hooks"),
         "@shared": path.resolve(__dirname, "./src/shared"),
         "@assets": path.resolve(__dirname, "./src/assets"),
+        "@tests": path.resolve(__dirname, "./tests"),
       },
     },
 

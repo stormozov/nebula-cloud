@@ -4,7 +4,7 @@ import {
   hasAnyErrors,
   hasFieldErrors,
   parseDjangoApiErrors,
-} from "./api-errors";
+} from "./apiErrors";
 
 /** Helper to create expected result with field errors */
 const fieldErrors = (errors: Record<string, string>) => ({

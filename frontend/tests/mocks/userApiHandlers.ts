@@ -3,7 +3,7 @@ import { HttpResponse, http } from "msw";
 /**
  * Mock handlers for authentication endpoints.
  */
-export const handlers = [
+export const userApiHandlers = [
   // ---------------------------------------------------------------------------
   // AUTHENTICATION
   // ---------------------------------------------------------------------------
@@ -130,41 +130,6 @@ export const handlers = [
     return HttpResponse.json(
       { detail: "Учетные данные не предоставлены." },
       { status: 401 },
-    );
-  }),
-
-  // ---------------------------------------------------------------------------
-  // FILES
-  // ---------------------------------------------------------------------------
-
-  // Get files list endpoint
-  http.get("/api/files/", () => {
-    return HttpResponse.json({
-      count: 0,
-      next: null,
-      previous: null,
-      results: [],
-    });
-  }),
-
-  // Upload file endpoint
-  http.post("/api/files/upload/", async ({ request }) => {
-    const formData = await request.formData();
-    const file = formData.get("file") as File;
-
-    if (!file) {
-      return HttpResponse.json({ error: "No file provided" }, { status: 400 });
-    }
-
-    return HttpResponse.json(
-      {
-        id: crypto.randomUUID(),
-        original_name: file.name,
-        size: file.size,
-        uploaded_at: new Date().toISOString(),
-        comment: (formData.get("comment") as string) || "",
-      },
-      { status: 201 },
     );
   }),
 ];

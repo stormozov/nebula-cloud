@@ -356,17 +356,20 @@ def multiple_files(create_file, user_account) -> list[File]:
         user_account: Regular user fixture.
 
     Returns:
-        list[File]: List of 5 file instances owned by user.
+        list[File]: List of 5 file instances owned by user with public links.
     """
-    return [
-        create_file(
+    files = []
+    for i in range(5):
+        file_obj = create_file(
             owner=user_account,
             original_name=f"file_{i}.txt",
             size=100 * (i + 1),
             comment=f"Test file #{i}",
         )
-        for i in range(5)
-    ]
+        file_obj.generate_public_link(force=True)
+        file_obj.save(update_fields=["public_link"])
+        files.append(file_obj)
+    return files
 
 
 @pytest.fixture
@@ -393,6 +396,11 @@ def another_user_file(create_file, another_user_account) -> File:
 # FIXTURES: HELPERS
 # ==================================================================================================
 
+
+@pytest.fixture(params=range(5), ids=lambda i: f"file_index_{i}")
+def file_index(request):
+    """Parametrized fixture providing indices 0-4 for multiple_files testing."""
+    return request.param
 
 @pytest.fixture
 def create_file(db, user_account):

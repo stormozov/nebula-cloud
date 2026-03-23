@@ -1,7 +1,12 @@
 /**
  * Button variants.
  */
-export type ButtonVariant = "primary" | "secondary" | "danger" | "ghost";
+export type ButtonVariant =
+  | "primary"
+  | "secondary"
+  | "danger"
+  | "ghost"
+  | "outline";
 
 /**
  * Button sizes.

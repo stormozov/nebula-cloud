@@ -9,6 +9,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "@tests": path.resolve(__dirname, "./tests"),
     },
   },
   test: {
@@ -22,6 +23,12 @@ export default defineConfig({
 
     // Excluded folders
     exclude: ["**/node_modules/**", "**/dist/**", "**/e2e/**", "**/*.config.*"],
+
+    reporters: ["default", "json"],
+    outputFile: {
+      json: "./reports/test-results.json",
+      junit: "./reports/junit.xml",
+    },
 
     // Test Coverage Settings
     coverage: {

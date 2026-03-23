@@ -7,10 +7,14 @@ let accessTokenMock: string | null = "mock_access_token";
 let refreshTokenMock: string | null = "mock_refresh_token";
 
 // Mock the dependencies
-vi.mock("@/shared/utils", () => ({
-  getAccessTokenFromPersist: vi.fn(() => accessTokenMock),
-  getRefreshTokenFromPersist: vi.fn(() => refreshTokenMock),
-}));
+vi.mock("@/shared/utils", async (importOriginal) => {
+  const actual = (await importOriginal()) as typeof import("@/shared/utils");
+  return {
+    ...actual,
+    getAccessTokenFromPersist: vi.fn(() => accessTokenMock),
+    getRefreshTokenFromPersist: vi.fn(() => refreshTokenMock),
+  };
+});
 
 const { userApi } = await import("./userApi");
 

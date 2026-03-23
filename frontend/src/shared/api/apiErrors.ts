@@ -1,3 +1,5 @@
+import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+
 import type { IParsedApiErrors } from "@/shared/types/api-errors";
 
 /**
@@ -110,3 +112,12 @@ export const hasFieldErrors = (
 export const hasAnyErrors = (parsedErrors: IParsedApiErrors): boolean => {
   return hasFieldErrors(parsedErrors.fieldErrors) || !!parsedErrors.submitError;
 };
+
+/**
+ * Checks if error is 401 (unauthorized).
+ */
+export const isError401 = (err: FetchBaseQueryError): boolean => {
+  return (
+    err && typeof err === "object" && "status" in err && err.status === 401
+  );
+}

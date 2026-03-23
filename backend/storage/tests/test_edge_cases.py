@@ -33,9 +33,11 @@ User = get_user_model()
 # ==================================================================================================
 
 
+@pytest.mark.django_db(transaction=True)
 class TestFileSizeEdgeCases:
     """
     Test suite for file size boundary conditions.
+
 
     These tests verify that the application correctly handles:
     - Empty files (0 bytes)
@@ -192,9 +194,11 @@ class TestFileSizeEdgeCases:
 # ==================================================================================================
 
 
+@pytest.mark.django_db(transaction=True)
 class TestFilenameEdgeCases:
     """
     Test suite for filename boundary conditions.
+
 
     These tests verify that the application correctly handles:
     - Unicode characters in filenames
@@ -452,9 +456,11 @@ class TestFilenameEdgeCases:
 # ==================================================================================================
 
 
+@pytest.mark.django_db(transaction=True)
 class TestConcurrentOperations:
     """
     Test suite for concurrent and race condition scenarios.
+
 
     These tests verify that the application handles:
     - Multiple uploads with same filename

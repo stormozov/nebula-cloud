@@ -249,6 +249,10 @@ ALLOWED_FILE_EXTENSIONS = [
 # Storage settings
 STORAGE_BASE_PATH = os.getenv("STORAGE_BASE_PATH", "storage")
 
+# Frontend public URL base (for public file sharing links)
+FRONTEND_PUBLIC_BASE_URL = env("FRONTEND_PUBLIC_BASE_URL", default="http://localhost:5173")
+
+
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

@@ -10,7 +10,7 @@ from rest_framework import serializers
 
 from core.utils import format_size
 from storage.models import File
-from storage.utils import validate_file_size, validate_filename
+from storage.utils import get_public_frontend_url, validate_file_size, validate_filename
 
 
 class FileSerializer(serializers.ModelSerializer):
@@ -60,16 +60,11 @@ class FileSerializer(serializers.ModelSerializer):
         return bool(obj.public_link)
 
     def get_public_link_url(self, obj: File) -> str | None:
-        """Return full public URL if link exists."""
-
-        if not obj.public_link:
-            return None
-
-        request = self.context.get("request")
+        """Return frontend public URL if link exists."""
         return (
-            request.build_absolute_uri(f"/api/storage/public/{obj.public_link}/")
-            if request
-            else f"/api/storage/public/{obj.public_link}/"
+            get_public_frontend_url(obj.public_link)
+            if obj.public_link
+            else None
         )
 
     def get_download_url(self, obj: File) -> str:

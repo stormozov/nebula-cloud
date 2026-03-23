@@ -1,4 +1,6 @@
 import { setupServer } from "msw/node";
-import { handlers } from "./handlers";
 
-export const server = setupServer(...handlers);
+import { fileApiHandlers } from "./fileApiHandlers";
+import { userApiHandlers } from "./userApiHandlers";
+
+export const server = setupServer(...userApiHandlers, ...fileApiHandlers);
