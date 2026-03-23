@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { formatFileSize, parseFileSize } from "../file-format";
+import { formatFileSize, parseFileSize, truncateWithMiddleEllipsis } from "../file-format";
 
 describe("file-format", () => {
   beforeEach(() => {
@@ -26,7 +26,7 @@ describe("file-format", () => {
        */
       it.each([
         { bytes: 0, expected: "0 Б", desc: "zero bytes" },
-      ])("should format $desc: $bytes bytes → $expected", ({
+      ])("should format $desc: $bytes bytes -> $expected", ({
         bytes,
         expected,
       }) => {
@@ -42,7 +42,7 @@ describe("file-format", () => {
         { bytes: 500, decimals: 0, expected: "500 Б" },
         { bytes: 500, decimals: 2, expected: "500.00 Б" },
         { bytes: 1023, decimals: 2, expected: "1023.00 Б" },
-      ])("should format bytes: $bytes bytes, $decimals decimals → $expected", ({
+      ])("should format bytes: $bytes bytes, $decimals decimals -> $expected", ({
         bytes,
         decimals,
         expected,
@@ -59,7 +59,7 @@ describe("file-format", () => {
         { bytes: 1024, expected: "1.00 КБ" },
         { bytes: 1536, expected: "1.50 КБ" },
         { bytes: 1_048_575, expected: "1024.00 КБ" },
-      ])("should format kilobytes: $bytes bytes → $expected", ({
+      ])("should format kilobytes: $bytes bytes -> $expected", ({
         bytes,
         expected,
       }) => {
@@ -75,7 +75,7 @@ describe("file-format", () => {
         { bytes: 1_048_576, expected: "1.00 МБ" },
         { bytes: 1_572_864, expected: "1.50 МБ" },
         { bytes: 1_073_741_823, expected: "1024.00 МБ" },
-      ])("should format megabytes: $bytes bytes → $expected", ({
+      ])("should format megabytes: $bytes bytes -> $expected", ({
         bytes,
         expected,
       }) => {
@@ -91,7 +91,7 @@ describe("file-format", () => {
         { bytes: 1_073_741_824, expected: "1.00 ГБ" },
         { bytes: 1_610_612_736, expected: "1.50 ГБ" },
         { bytes: 1_099_511_627_775, expected: "1024.00 ГБ" },
-      ])("should format gigabytes: $bytes bytes → $expected", ({
+      ])("should format gigabytes: $bytes bytes -> $expected", ({
         bytes,
         expected,
       }) => {
@@ -106,7 +106,7 @@ describe("file-format", () => {
       it.each([
         { bytes: 1_099_511_627_776, expected: "1.00 ТБ" },
         { bytes: 1_649_267_441_664, expected: "1.50 ТБ" },
-      ])("should format terabytes: $bytes bytes → $expected", ({
+      ])("should format terabytes: $bytes bytes -> $expected", ({
         bytes,
         expected,
       }) => {
@@ -123,7 +123,7 @@ describe("file-format", () => {
         { bytes: 1024, decimals: 1, expected: "1.0 КБ" },
         { bytes: 1024, decimals: 3, expected: "1.000 КБ" },
         { bytes: 1536, decimals: 4, expected: "1.5000 КБ" },
-      ])("should respect decimal places: $bytes bytes, $decimals decimals → $expected", ({
+      ])("should respect decimal places: $bytes bytes, $decimals decimals -> $expected", ({
         bytes,
         decimals,
         expected,
@@ -152,7 +152,7 @@ describe("file-format", () => {
           desc: "MB/GB boundary",
         },
         { bytes: 1_073_741_824, expected: "1.00 ГБ", desc: "GB start" },
-      ])("should handle $desc: $bytes bytes → $expected", ({
+      ])("should handle $desc: $bytes bytes -> $expected", ({
         bytes,
         expected,
       }) => {
@@ -168,7 +168,7 @@ describe("file-format", () => {
         { bytes: -1024, expected: "-1.00 КБ" },
         { bytes: -500, decimals: 0, expected: "-500 Б" },
         { bytes: -1_048_576, expected: "-1.00 МБ" },
-      ])("should preserve sign for negative: $bytes → $expected", ({
+      ])("should preserve sign for negative: $bytes -> $expected", ({
         bytes,
         decimals = 2,
         expected,
@@ -184,6 +184,22 @@ describe("file-format", () => {
       it("should cap at terabytes for very large values", () => {
         const largeValue = 1024 ** 5; // Petabyte
         expect(formatFileSize(largeValue)).toContain("ТБ");
+      });
+
+      /**
+       * @description Float precision preservation
+       * @scenario Values causing JS float edge cases
+       * @expected Formats correctly with toFixed
+       */
+      it.each([
+        { bytes: Number.MAX_SAFE_INTEGER, desc: "max safe int" },
+        { bytes: 1024 * 0.999, expected: "1022.98 Б", desc: "sub-unit float" },
+      ])("float precision: $desc", ({ bytes, expected }) => {
+        if (expected) {
+          expect(formatFileSize(bytes)).toBe(expected);
+        } else {
+          expect(formatFileSize(bytes)).toContain("ТБ");
+        }
       });
     });
   });
@@ -209,7 +225,7 @@ describe("file-format", () => {
         { input: "500 Б", expected: 500 },
         { input: "0 Б", expected: 0 },
         { input: "1023 Б", expected: 1023 },
-      ])("should parse bytes: '$input' → $expected", ({ input, expected }) => {
+      ])("should parse bytes: '$input' -> $expected", ({ input, expected }) => {
         expect(parseFileSize(input)).toBe(expected);
       });
 
@@ -222,7 +238,7 @@ describe("file-format", () => {
         { input: "1.00 КБ", expected: 1024 },
         { input: "1.50 КБ", expected: 1536 },
         { input: "2 КБ", expected: 2048 },
-      ])("should parse kilobytes: '$input' → $expected", ({
+      ])("should parse kilobytes: '$input' -> $expected", ({
         input,
         expected,
       }) => {
@@ -238,7 +254,7 @@ describe("file-format", () => {
         { input: "1.00 МБ", expected: 1_048_576 },
         { input: "1.50 МБ", expected: 1_572_864 },
         { input: "2 МБ", expected: 2_097_152 },
-      ])("should parse megabytes: '$input' → $expected", ({
+      ])("should parse megabytes: '$input' -> $expected", ({
         input,
         expected,
       }) => {
@@ -254,7 +270,7 @@ describe("file-format", () => {
         { input: "1.00 ГБ", expected: 1_073_741_824 },
         { input: "1.50 ГБ", expected: 1_610_612_736 },
         { input: "2 ГБ", expected: 2_147_483_648 },
-      ])("should parse gigabytes: '$input' → $expected", ({
+      ])("should parse gigabytes: '$input' -> $expected", ({
         input,
         expected,
       }) => {
@@ -269,7 +285,7 @@ describe("file-format", () => {
       it.each([
         { input: "1.00 ТБ", expected: 1_099_511_627_776 },
         { input: "1.50 ТБ", expected: 1_649_267_441_664 },
-      ])("should parse terabytes: '$input' → $expected", ({
+      ])("should parse terabytes: '$input' -> $expected", ({
         input,
         expected,
       }) => {
@@ -287,7 +303,7 @@ describe("file-format", () => {
         { input: "1.00 мб", expected: 1_048_576 },
         { input: "1.00 Гб", expected: 1_073_741_824 },
         { input: "1.00 тб", expected: 1_099_511_627_776 },
-      ])("should handle case insensitivity: '$input' → $expected", ({
+      ])("should handle case insensitivity: '$input' -> $expected", ({
         input,
         expected,
       }) => {
@@ -303,7 +319,7 @@ describe("file-format", () => {
         { input: "0.5 КБ", expected: 512 },
         { input: "0.25 МБ", expected: 262_144 },
         { input: "1.75 ГБ", expected: 1_879_048_192 },
-      ])("should handle decimal values: '$input' → $expected", ({
+      ])("should handle decimal values: '$input' -> $expected", ({
         input,
         expected,
       }) => {
@@ -319,7 +335,7 @@ describe("file-format", () => {
         { input: "1 КБ", expected: 1024 },
         { input: "10 МБ", expected: 10_485_760 },
         { input: "5 ГБ", expected: 5_368_709_120 },
-      ])("should handle integer values: '$input' → $expected", ({
+      ])("should handle integer values: '$input' -> $expected", ({
         input,
         expected,
       }) => {
@@ -338,7 +354,7 @@ describe("file-format", () => {
           expected: 1024,
           desc: "multiple trailing spaces",
         },
-      ])("should handle $desc: '$input' → $expected", ({ input, expected }) => {
+      ])("should handle $desc: '$input' -> $expected", ({ input, expected }) => {
         expect(parseFileSize(input)).toBe(expected);
       });
     });
@@ -384,7 +400,9 @@ describe("file-format", () => {
        */
       it.each([
         { input: " 1.00 КБ", expected: 0, desc: "leading space" },
-      ])("should return 0 for $desc: '$input' → $expected", ({
+        { input: "1KB", expected: 0, desc: "Latin K" },
+{ input: "1КБ", expected: 1024, desc: "no space parses" },
+      ])("should return 0 for $desc: '$input' -> $expected", ({
         input,
         expected,
       }) => {
@@ -405,7 +423,7 @@ describe("file-format", () => {
         { input: "0.001 КБ", expected: 1 },
         { input: "0.0005 КБ", expected: 1 },
         { input: "0.0001 КБ", expected: 0 },
-      ])("should round small decimal values: '$input' → $expected", ({
+      ])("should round small decimal values: '$input' -> $expected", ({
         input,
         expected,
       }) => {
@@ -420,6 +438,111 @@ describe("file-format", () => {
       it("should handle large terabyte values", () => {
         const expected = Math.round(999.99 * 1024 ** 4);
         expect(parseFileSize("999.99 ТБ")).toBe(expected);
+      });
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // TRUNCATE WITH MIDDLE ELLIPSIS
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Tests for truncateWithMiddleEllipsis function
+   */
+  describe("truncateWithMiddleEllipsis", () => {
+    /**
+     * No truncation needed - input is short enough
+     */
+    describe("no truncation needed", () => {
+      /**
+       * @description Input shorter than or equal to maxLength
+       * @scenario Various short inputs with defaults
+       * @expected Returns original string unchanged
+       */
+      it.each([
+        { input: "", expected: "", desc: "empty string" },
+        { input: "short", expected: "short", desc: "single word" },
+        { input: "a".repeat(35), expected: "a".repeat(35), desc: "exactly maxLength" },
+        { input: "hello world test string", expected: "hello world test string", desc: "< maxLength multi-word" },
+      ])("should return unchanged for $desc: '$input'", ({ input, expected }) => {
+        expect(truncateWithMiddleEllipsis(input)).toBe(expected);
+      });
+    });
+
+    /**
+     * Word-based truncation logic
+     */
+    describe("word-based truncation", () => {
+      /**
+       * @description Default params: prefix 4 words, suffix 1 word
+       * @scenario Long strings where word split fits
+       * @expected Prefix words + ... + suffix word
+       */
+      it.each([
+        {
+          input: "this is a very long sentence with many words to test truncation logic properly",
+          expected: "this is a very ... properly",
+          desc: "long sentence defaults"
+        },
+        {
+          input: "word1 word2 word3 word4 word5 word6 word7 word8 word9",
+          expected: "word1 word2 word3 word4 ... word9",
+          desc: "more words"
+        },
+      ])("should truncate defaults: $desc", ({ input, expected }) => {
+        expect(truncateWithMiddleEllipsis(input)).toBe(expected);
+      });
+    });
+
+    /**
+     * Fallback character slicing
+     */
+    describe("fallback char slicing", () => {
+      /**
+       * @description Extreme small maxLength triggers even split
+       * @scenario maxLength too small for ellipsis + suffix
+       * @expected Even char split around ...
+       */
+      it("should even-split chars for tiny maxLength", () => {
+        const result = truncateWithMiddleEllipsis("abcdefghijklmnopqrstuvwxyz", 10);
+        expect(result.length).toBe(9);
+        expect(result).toBe("abc...xyz");
+      });
+    });
+
+    /**
+     * Edge cases and custom maxLength
+     */
+    describe("edge cases", () => {
+      /**
+       * @description Custom small maxLength
+       * @scenario Short limit with defaults
+       * @expected Correct truncation
+       */
+      it.each([
+        {
+          input: "this is a longer test string",
+          maxLength: 15,
+          expected: "this ... string"
+        },
+        {
+          input: "abc def ghi",
+          maxLength: 5,
+          expected: "a...i"
+        },
+      ])("custom maxLength=$maxLength: '$input' -> '$expected'", ({ input, maxLength, expected }) => {
+        expect(truncateWithMiddleEllipsis(input, maxLength)).toBe(expected);
+      });
+
+      /**
+       * @description Single word input longer than maxLength
+       * @scenario No spaces to split
+       * @expected Falls back to char slicing
+       */
+      it("should handle single long word", () => {
+        const longWord = "supercalifragilisticexpialidocious";
+        const result = truncateWithMiddleEllipsis(longWord, 15);
+        expect(result).toBe("superc...ocious");
       });
     });
   });

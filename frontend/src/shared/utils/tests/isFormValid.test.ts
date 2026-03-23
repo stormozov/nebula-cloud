@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import type { IValidationResult } from "@/shared/types/validation";
-import { isFormValid } from "./isFormValid";
+
+import { isFormValid } from "../isFormValid";
 
 /** Helper to create expected valid result */
 const valid = (): IValidationResult => ({ isValid: true });
