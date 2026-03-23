@@ -7,7 +7,11 @@ export interface IUser {
   email: string;
   firstName: string;
   lastName: string;
+  fullName: string;
   isStaff: boolean;
+  storagePath: string;
+  dateJoined: string;
+  lastLogin?: string | null;
 }
 
 /**
@@ -62,3 +66,49 @@ export interface IAuthState {
  * Type alias for the authentication state.
  */
 export type UserState = IAuthState;
+
+/**
+ * User storage stats.
+ */
+export interface IStorageStats {
+  fileCount: number;
+  totalSize: number;
+  totalSizeFormatted: string;
+}
+
+// =============================================================================
+// TYPES FOR ADMIN API
+// =============================================================================
+
+/**
+ * Response structure for user list requests.
+ */
+export interface IUserListResponse {
+  id: number;
+  username: string;
+  email: string;
+  isStaff: boolean;
+  isActive: boolean;
+}
+
+/**
+ * Response structure for user details requests.
+ */
+export type UserDetailsResponse = IUser
+
+/**
+ * Response structure for storage stats requests.
+ */
+export interface IStorageStatsResponse {
+  user: {
+    id: number;
+    username: string;
+    email: string;
+  };
+  storage: {
+    path: string;
+    file_count: number;
+    total_size: number;
+    total_size_formatted: string;
+  };
+}

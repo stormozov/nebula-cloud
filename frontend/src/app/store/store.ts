@@ -19,6 +19,7 @@ import type {
 } from "@/entities/file-upload";
 import fileUploadReducer from "@/entities/file-upload/model/slice";
 import { userApi } from "@/entities/user";
+import { adminApi } from "@/entities/user/api/adminApi";
 import userReducer from "@/entities/user/model/slice";
 
 import { resetApiMiddleware } from "../middlewares/resetApiMiddleware";
@@ -136,6 +137,7 @@ const rootReducer = combineReducers({
   fileUpload: persistedUploadReducer,
   [userApi.reducerPath]: userApi.reducer,
   [fileApi.reducerPath]: fileApi.reducer,
+  [adminApi.reducerPath]: adminApi.reducer,
 });
 
 export const store = configureStore({
@@ -162,7 +164,8 @@ export const store = configureStore({
     })
       .concat(resetApiMiddleware)
       .concat(userApi.middleware)
-      .concat(fileApi.middleware),
+      .concat(fileApi.middleware)
+      .concat(adminApi.middleware),
 });
 
 // =============================================================================

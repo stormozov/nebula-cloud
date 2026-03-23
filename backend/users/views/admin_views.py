@@ -438,7 +438,7 @@ class AdminUserViewSet(viewsets.ModelViewSet):
 
         stats = {
             "user": {
-                "user_id": user.id,
+                "id": user.id,
                 "username": user.username,
                 "email": user.email,
             },

@@ -26,10 +26,6 @@ from users.models import UserAccount
 class AdminUserListSerializer(serializers.ModelSerializer):
     """Serializer for listing users in admin panel."""
 
-    full_name = serializers.SerializerMethodField()
-    is_admin = serializers.BooleanField(source="is_staff", read_only=True)
-    storage_stats = serializers.SerializerMethodField()
-
     class Meta:
         """Meta class for AdminUserListSerializer."""
 
@@ -38,48 +34,21 @@ class AdminUserListSerializer(serializers.ModelSerializer):
             "id",
             "username",
             "email",
-            "first_name",
-            "last_name",
-            "full_name",
-            "is_admin",
             "is_active",
-            "date_joined",
-            "last_login",
-            "storage_stats",
+            "is_staff",
         ]
         read_only_fields = [
             "id",
             "username",
             "email",
-            "date_joined",
-            "last_login",
         ]
-
-    def get_full_name(self, obj) -> str:
-        """Get user's full name."""
-        return obj.get_full_name()
-
-    def get_storage_stats(self, obj) -> dict:
-        """Get user's storage statistics."""
-
-        user_files = File.objects.filter(owner=obj)  # pylint: disable=no-member
-        total_size = user_files.aggregate(total=models.Sum("size"))["total"] or 0
-        file_count = user_files.count()
-
-        return {
-            "file_count": file_count,
-            "total_size": total_size,
-            "total_size_formatted": format_size(total_size),
-        }
 
 
 class AdminUserDetailSerializer(serializers.ModelSerializer):
     """Serializer for detailed user information in admin panel."""
 
     full_name = serializers.SerializerMethodField()
-    is_admin = serializers.BooleanField(source="is_staff", read_only=True)
     storage_path = serializers.CharField(read_only=True)
-    storage_stats = serializers.SerializerMethodField()
 
     class Meta:
         """Meta class for AdminUserDetailSerializer."""
@@ -92,12 +61,11 @@ class AdminUserDetailSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "full_name",
-            "is_admin",
+            "is_staff",
             "is_active",
             "date_joined",
             "last_login",
             "storage_path",
-            "storage_stats",
         ]
         read_only_fields = [
             "id",
@@ -111,19 +79,6 @@ class AdminUserDetailSerializer(serializers.ModelSerializer):
     def get_full_name(self, obj) -> str:
         """Get user's full name."""
         return obj.get_full_name()
-
-    def get_storage_stats(self, obj) -> dict:
-        """Get user's storage statistics."""
-
-        user_files = File.objects.filter(owner=obj)  # pylint: disable=no-member
-        total_size = user_files.aggregate(total=models.Sum("size"))["total"] or 0
-        file_count = user_files.count()
-
-        return {
-            "file_count": file_count,
-            "total_size": total_size,
-            "total_size_formatted": format_size(total_size),
-        }
 
 
 class AdminUserUpdateSerializer(serializers.ModelSerializer):

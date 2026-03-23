@@ -62,7 +62,7 @@ class TestAdminUserList:
         assert len(response.data) >= expected_min_count
         assert all("username" in user for user in response.data)
         assert all("email" in user for user in response.data)
-        assert all("is_admin" in user for user in response.data)
+        assert all("is_staff" in user for user in response.data)
 
     def test_regular_user_cannot_list_users(self, authenticated_client, admin_list_url):
         """
@@ -132,7 +132,7 @@ class TestAdminUserList:
 
         # Find regular user
         if user_account.email in users_by_email:
-            assert users_by_email[user_account.email]["is_admin"] is False
+            assert users_by_email[user_account.email]["is_staff"] is False
 
 
 # ==================================================================================================
@@ -833,7 +833,7 @@ class TestAdminStorageStats:
 
         # Assert
         assert response.status_code == status.HTTP_200_OK
-        assert response.data["user"]["user_id"] == target_user_account.id
+        assert response.data["user"]["id"] == target_user_account.id
         assert response.data["user"]["username"] == target_user_account.username
         assert response.data["user"]["email"] == target_user_account.email
 

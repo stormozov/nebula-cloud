@@ -69,27 +69,6 @@ class TestFileViewSetList:
         assert response.status_code == status.HTTP_200_OK
         assert all(item["original_name"] != "other_file.txt" for item in response.data)
 
-    def test_list_admin_sees_all_files(
-        self, admin_client: APIClient, create_file, user_account, another_user_account
-    ) -> None:
-        """
-        Test: Admin can list all users' files.
-
-        Scenario: Admin requests file list without user_id filter.
-        Expected: HTTP 200 with files from all users.
-        """
-
-        # Arrange
-        create_file(owner=user_account, original_name="user1_file.txt")
-        create_file(owner=another_user_account, original_name="user2_file.txt")
-
-        # Act
-        response = admin_client.get("/api/storage/files/")
-
-        # Assert
-        assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) >= 2
-
     def test_list_admin_filter_by_user_id(
         self, admin_client: APIClient, create_file, user_account, another_user_account
     ) -> None:

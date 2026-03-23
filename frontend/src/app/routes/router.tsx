@@ -47,6 +47,18 @@ export const routesConfig = createBrowserRouter([
         ),
       },
 
+      // Protected route: Admin dashboard (admin only)
+      {
+        path: "/admin/dashboard",
+        element: (
+          <AuthGuard accessLevel="admin">
+            {lazyWithSuspense(
+              () => import("@/pages/PageAdmin/ui/AdminDashboardPage"),
+            )}
+          </AuthGuard>
+        ),
+      },
+
       // Public route: Public file metadata preview
       {
         path: "/public/:token/",
