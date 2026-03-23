@@ -1,0 +1,43 @@
+// =============================================================================
+// FILE UPLOAD BUTTON STYLES
+// =============================================================================
+
+.file-upload-button {
+  position: relative;
+  display: inline-block;
+
+  // Hidden file input (visually hidden but accessible)
+  &__input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+
+    padding: 0;
+    margin: -1px;
+
+    border: 0;
+
+    overflow: hidden;
+    white-space: nowrap;
+    clip: rect(0, 0, 0, 0);
+
+    // Still focusable for keyboard accessibility
+    &:focus {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+    }
+  }
+
+  // Button inherits styles from Button component
+  &__btn {
+    cursor: pointer;
+  }
+
+  // Disabled state
+  &:has(&__input:disabled) {
+    .file-upload-button__btn {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "path": "/"
+  },
+  {
+    "path": "/auth"
+  },
+  {
+    "path": "/public/:token"
+  },
+  {
+    "path": "*"
+  }
+]

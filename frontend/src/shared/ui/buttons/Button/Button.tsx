@@ -41,8 +41,7 @@ export const Button = ({
     [`button--${size}`]: size,
     "button--loading": loading,
     "button--full-width": fullWidth,
-    className,
-  });
+  }, className);
 
   return (
     <button

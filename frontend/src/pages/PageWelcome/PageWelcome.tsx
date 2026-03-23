@@ -11,7 +11,11 @@ export default function PageWelcome() {
     <PageLayout className="page-welcome">
       <PageLayout.Header>
         <PageLayout.Container>
-          <PageLayout.Wrapper className="page__header-wrapper">
+          <PageLayout.Wrapper
+            align="center"
+            justify="space-between"
+            className="page__header-wrapper"
+          >
             <Logo />
             <AuthActions />
           </PageLayout.Wrapper>

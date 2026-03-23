@@ -1,0 +1,10 @@
+{
+  "max_size": 100,
+  "max_files_per_batch": 5,
+  "status_labels": {
+    "pending": "Ожидание",
+    "uploading": "Загрузка...",
+    "success": "Готово",
+    "error": "Ошибка"
+  }
+}

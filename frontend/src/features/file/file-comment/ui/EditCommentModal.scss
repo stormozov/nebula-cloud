@@ -1,0 +1,33 @@
+// =============================================================================
+// Edit comment modal styles
+// =============================================================================
+
+.edit-comment-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  &__symbol-count {
+    margin: 0;
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    line-height: 1.4;
+
+    small {
+      opacity: 0.8;
+    }
+  }
+
+  &__current {
+    margin: 0;
+    font-size: 13px;
+    color: var(--color-text-tertiary);
+    font-style: italic;
+
+    strong {
+      color: var(--color-text-secondary);
+      font-style: normal;
+      word-break: break-word;
+    }
+  }
+}

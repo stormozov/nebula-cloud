@@ -4,7 +4,7 @@ import {
   getAccessTokenFromPersist,
   getPersistedAuthState,
   getRefreshTokenFromPersist,
-} from "./getPersistedAuthState";
+} from "../getPersistedAuthState";
 
 describe("getPersistedAuthState", () => {
   describe("No persisted auth state in localStorage", () => {

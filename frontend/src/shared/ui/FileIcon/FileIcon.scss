@@ -1,0 +1,49 @@
+.file-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  // background-color: $color-bg-secondary;
+  font-size: 14px;
+  user-select: none;
+
+  &__symbol {
+    line-height: 1;
+  }
+
+  // File type colors
+  // &--image {
+  //   background-color: $color-file-image;
+  //   color: $color-text-inverse;
+  // }
+
+  // &--video {
+  //   background-color: $color-file-video;
+  //   color: $color-text-inverse;
+  // }
+
+  // &--audio {
+  //   background-color: $color-file-audio;
+  //   color: $color-text-inverse;
+  // }
+
+  // &--document {
+  //   background-color: $color-file-document;
+  //   color: $color-text-inverse;
+  // }
+
+  // &--archive {
+  //   background-color: $color-file-archive;
+  //   color: $color-text-inverse;
+  // }
+
+  // &--code {
+  //   background-color: $color-primary;
+  //   color: $color-text-inverse;
+  // }
+
+  // &--unknown {
+  //   background-color: $color-file-other;
+  //   color: $color-text-inverse;
+  // }
+}

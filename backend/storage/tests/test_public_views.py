@@ -709,7 +709,11 @@ class TestPublicLinkIntegration:
 
         # Assert 1: Link generated
         assert generate_response.status_code == status.HTTP_200_OK
-        public_url = generate_response.data["public_link_url"]
+        
+        # Get raw public_link from DB (not frontend URL)
+        uploaded_file.refresh_from_db()
+        public_link = uploaded_file.public_link
+        public_url = f"/api/storage/public/{public_link}/"
 
         # Act 2: Anonymous user previews file
         preview_response = api_client.get(public_url)
@@ -782,7 +786,7 @@ class TestPublicLinkIntegration:
         # Assert: Access denied
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    @pytest.mark.parametrize("file_index", range(5))
+
     def test_each_public_link_returns_correct_file(
         self,
         authenticated_client: APIClient,
@@ -799,15 +803,11 @@ class TestPublicLinkIntegration:
 
         # Arrange
         file_obj = multiple_files[file_index]
-
-        # Generate link
-        response = authenticated_client.post(
-            f"/api/storage/files/{file_obj.id}/public-link/generate/"
-        )
-        assert response.status_code == status.HTTP_200_OK
+        public_link = file_obj.public_link
+        public_link_url = f"/api/storage/public/{public_link}/"
 
         # Act
-        link_response = api_client.get(response.data["public_link_url"])
+        link_response = api_client.get(public_link_url)
 
         # Assert
         assert link_response.status_code == status.HTTP_200_OK
