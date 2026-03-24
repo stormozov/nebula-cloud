@@ -5,6 +5,7 @@ import type { IUserListResponse } from "@/entities/user";
  */
 export interface IUserListItemProps {
   user: IUserListResponse;
+  onSelectUser: (userId: number) => void;
 }
 
 /**
@@ -22,9 +23,9 @@ export interface IUserListItemProps {
  *    isActive: true 
  * }} />
  */
-export function UserListItem({ user }: IUserListItemProps) {
+export function UserListItem({ user, onSelectUser }: IUserListItemProps) {
   return (
-    <tr>
+    <tr onClick={() => onSelectUser(user.id)}>
       <td>{user.id}</td>
       <td>{user.username}</td>
       <td>{user.email}</td>

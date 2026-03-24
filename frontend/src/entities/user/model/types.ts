@@ -8,6 +8,7 @@ export interface IUser {
   firstName: string;
   lastName: string;
   fullName: string;
+  isActive: boolean;
   isStaff: boolean;
   storagePath: string;
   dateJoined: string;
@@ -107,8 +108,8 @@ export interface IStorageStatsResponse {
   };
   storage: {
     path: string;
-    file_count: number;
-    total_size: number;
-    total_size_formatted: string;
+    fileCount: number;
+    totalSize: number;
+    totalSizeFormatted: string;
   };
 }

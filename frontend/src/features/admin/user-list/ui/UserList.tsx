@@ -3,10 +3,14 @@ import { UserListItem } from "./UserListItem";
 
 const USER_LIST_HEADER = ["ID", "Логин", "Email", "Админ", "Активен"];
 
+interface IUserListProps {
+  onSelectUser: (userId: number) => void;
+}
+
 /**
  * Represents a list of users.
  */
-export const UserList = () => {
+export const UserList = ({ onSelectUser }: IUserListProps) => {
   const { data: users, isLoading, error } = useGetUsersQuery();
 
   if (isLoading) return <div>Загрузка...</div>;
@@ -24,7 +28,7 @@ export const UserList = () => {
       </thead>
       <tbody>
         {users?.map((user) => (
-          <UserListItem key={user.id} user={user} />
+          <UserListItem key={user.id} user={user} onSelectUser={onSelectUser} />
         ))}
       </tbody>
     </table>
