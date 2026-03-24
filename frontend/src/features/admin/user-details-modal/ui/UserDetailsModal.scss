@@ -61,7 +61,6 @@
     align-items: center;
     gap: 10px;
     margin: 0;
-
   }
 
   &__header-icon {
@@ -70,6 +69,7 @@
 
   &__content {
     flex: 1 1 auto;
+    padding-right: 10px;
     margin-top: 20px;
     min-height: 0;
     overflow-y: auto;
@@ -113,5 +113,22 @@
   &__info-title {
     color: var(--color-text-tertiary);
     cursor: default;
+  }
+
+  // ----------------------------------------------------------------------------
+  // Actions section
+  // ---------------------------------------------------------------------------
+
+  &__actions {
+    width: 100%;
+  }
+
+  &__actions-area {
+    &.active {
+      padding: 16px;
+      margin-top: 24px;
+      border: 1px solid var(--color-border-primary);
+      border-radius: 10px;
+    }
   }
 }

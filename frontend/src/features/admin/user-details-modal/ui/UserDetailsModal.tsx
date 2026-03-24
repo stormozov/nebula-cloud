@@ -1,9 +1,15 @@
+import { useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { FaUser } from "react-icons/fa6";
 
 import { useGetStorageStatsQuery, useGetUserQuery } from "@/entities/user";
 import { Button, Heading, PageWrapper } from "@/shared/ui";
 
+import type {
+  IUserDetailsModalActionsProps,
+  UserDetailsModalActionsType,
+} from "../lib/types";
+import { UserDetailsModalActions } from "./UserDetailsModalActions";
 import { UserDetailsModalInfo } from "./UserDetailsModalInfo";
 
 import "./UserDetailsModal.scss";
@@ -25,13 +31,30 @@ interface IUserDetailsModalProps {
  * <UserDetailsModal userId="123" onClose={() => setShowModal(false)} />
  */
 export function UserDetailsModal({ userId, onClose }: IUserDetailsModalProps) {
+  const [action, setAction] = useState<UserDetailsModalActionsType>("none");
+
   const { data: user, isLoading } = useGetUserQuery(userId, { skip: !userId });
   const { data: storageStats } = useGetStorageStatsQuery(userId, {
     skip: !userId,
   });
 
+  const handleInlineFormClose = () => setAction("none");
+
+  const handleEditFormActionSuccess = () => {
+    setAction("none");
+    console.log("Success edit form");
+  };
+
   if (isLoading) return <div>Загрузка...</div>;
   if (!user) return <div>Пользователь не найден</div>;
+
+  const actionsProps: IUserDetailsModalActionsProps = {
+    user,
+    action,
+    setAction,
+    onClose: handleInlineFormClose,
+    editFormSuccess: handleEditFormActionSuccess,
+  };
 
   return (
     <div className="user-details-modal">
@@ -54,11 +77,10 @@ export function UserDetailsModal({ userId, onClose }: IUserDetailsModalProps) {
             </PageWrapper>
           </header>
 
-          <div className="user-details-modal__content">
-            <PageWrapper className="user-details-modal__info-wrapper">
-              <UserDetailsModalInfo user={user} storageStats={storageStats} />
-            </PageWrapper>
-          </div>
+          <PageWrapper className="user-details-modal__content">
+            <UserDetailsModalInfo user={user} storageStats={storageStats} />
+            <UserDetailsModalActions actionProps={actionsProps} />
+          </PageWrapper>
         </div>
       </aside>
     </div>
