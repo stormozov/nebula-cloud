@@ -50,6 +50,11 @@ export function UserDetailsModal({ userId, onClose }: IUserDetailsModalProps) {
     console.log(message);
   };
 
+  const handleToggleActiveSuccess = () => {
+    setAction("none");
+    console.log("Success toggle active");
+  };
+
   if (isLoading) return <div>Загрузка...</div>;
   if (!user) return <div>Пользователь не найден</div>;
 
@@ -60,6 +65,7 @@ export function UserDetailsModal({ userId, onClose }: IUserDetailsModalProps) {
     onClose: handleInlineFormClose,
     editFormSuccess: handleEditFormActionSuccess,
     resetPasswordFormSuccess: handleResetPasswordFormActionSuccess,
+    toggleActiveSuccess: handleToggleActiveSuccess,
   };
 
   return (

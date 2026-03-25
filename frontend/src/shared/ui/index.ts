@@ -1,4 +1,5 @@
 export * from "./buttons";
+export * from "./Divider";
 export * from "./FileIcon";
 export * from "./form";
 export * from "./Heading";

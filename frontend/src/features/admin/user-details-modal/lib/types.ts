@@ -53,4 +53,9 @@ export interface IUserDetailsModalActionsProps {
    * Callback function to handle successful password reset.
    */
   resetPasswordFormSuccess: (message: string) => void;
+
+  /**
+   * Callback function to handle successful toggle of user activity.
+   */
+  toggleActiveSuccess: () => void;
 }

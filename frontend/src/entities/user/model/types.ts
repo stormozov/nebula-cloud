@@ -95,7 +95,7 @@ export interface IUserListResponse {
 /**
  * Response structure for user details requests.
  */
-export type UserDetailsResponse = IUser
+export type UserDetailsResponse = IUser;
 
 /**
  * Response structure for storage stats requests.
