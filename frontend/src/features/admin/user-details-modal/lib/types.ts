@@ -69,4 +69,9 @@ export interface IUserDetailsModalActionsProps {
    * Callback function to handle successful toggle of user admin status.
    */
   toggleAdminSuccess: () => void;
+
+  /**
+   * Callback function to handle successful deletion of the user.
+   */
+  deleteUserSuccess: (message: string) => void;
 }

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { FaUser } from "react-icons/fa6";
 
+import { useAppSelector } from "@/app/store/hooks";
 import {
   selectUser,
   useGetStorageStatsQuery,
@@ -16,7 +17,6 @@ import type {
 import { UserDetailsModalActions } from "./UserDetailsModalActions";
 import { UserDetailsModalInfo } from "./UserDetailsModalInfo";
 
-import { useAppSelector } from "@/app/store/hooks";
 import "./UserDetailsModal.scss";
 
 /**
@@ -67,6 +67,11 @@ export function UserDetailsModal({ userId, onClose }: IUserDetailsModalProps) {
     console.log("Success toggle admin");
   };
 
+  const handleDeleteUserSuccess = (message: string) => {
+    onClose();
+    console.log("Success delete user", message);
+  };
+
   if (isLoading) return <div>Загрузка...</div>;
   if (!user) return <div>Пользователь не найден</div>;
 
@@ -82,6 +87,7 @@ export function UserDetailsModal({ userId, onClose }: IUserDetailsModalProps) {
     resetPasswordFormSuccess: handleResetPasswordFormActionSuccess,
     toggleActiveSuccess: handleToggleActiveSuccess,
     toggleAdminSuccess: handleToggleAdminSuccess,
+    deleteUserSuccess: handleDeleteUserSuccess,
   };
 
   return (

@@ -9,6 +9,7 @@ import { ToggleAdminButton } from "@/features/admin/toggle-admin-button";
 import { Button, Divider, Heading, PageWrapper } from "@/shared/ui";
 
 import type { IUserDetailsModalActionsProps } from "../lib/types";
+import { DeleteUserButton } from "../../delete-user-button";
 
 /**
  * Props interface for the UserDetailsModalActions component.
@@ -34,6 +35,7 @@ export function UserDetailsModalActions({
     resetPasswordFormSuccess,
     toggleActiveSuccess,
     toggleAdminSuccess,
+    deleteUserSuccess,
   } = actionProps;
 
   const isEditAction = action === "edit";
@@ -84,6 +86,13 @@ export function UserDetailsModalActions({
             fullWidth
             disabled={isCurrentUser}
             onSuccess={toggleAdminSuccess}
+          />
+
+          <DeleteUserButton
+            userId={user.id}
+            fullWidth
+            disabled={isCurrentUser}
+            onSuccess={deleteUserSuccess}
           />
         </PageWrapper>
       </PageWrapper>

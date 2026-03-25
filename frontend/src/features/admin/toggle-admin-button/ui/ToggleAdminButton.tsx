@@ -1,4 +1,5 @@
 import { BsFillPersonFill } from "react-icons/bs";
+import { FaLock } from "react-icons/fa";
 import { RiAdminFill } from "react-icons/ri";
 
 import { useToggleAdminMutation } from "@/entities/user";
@@ -32,7 +33,7 @@ export function ToggleAdminButton({
   disabled = false,
   onSuccess,
 }: ToggleAdminButtonProps) {
-  const [toggleAdmin] = useToggleAdminMutation();
+  const [toggleAdmin, { isLoading }] = useToggleAdminMutation();
 
   const handleToggle = async () => {
     try {
@@ -48,17 +49,18 @@ export function ToggleAdminButton({
       variant="danger"
       title={disabled ? "Вы не можете изменить роль администратора" : ""}
       fullWidth={fullWidth}
+      loading={isLoading}
       disabled={disabled}
       onClick={handleToggle}
     >
       {isStaff ? (
         <>
-          <BsFillPersonFill />
+          {disabled ? <FaLock /> : <BsFillPersonFill />}
           Снять роль администратора
         </>
       ) : (
         <>
-          <RiAdminFill />
+          {disabled ? <FaLock /> : <RiAdminFill />}
           Назначить роль администратора
         </>
       )}

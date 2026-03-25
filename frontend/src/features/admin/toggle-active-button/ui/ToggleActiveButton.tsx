@@ -1,4 +1,5 @@
 import { BsFillLightbulbFill, BsLightbulbOffFill } from "react-icons/bs";
+import { FaLock } from "react-icons/fa";
 
 import { useUpdateUserMutation } from "@/entities/user";
 import { Button } from "@/shared/ui";
@@ -26,9 +27,13 @@ interface ToggleActiveButtonProps {
  */
 
 export function ToggleActiveButton({
-  userId, isActive, fullWidth = false, disabled = false, onSuccess,
+  userId,
+  isActive,
+  fullWidth = false,
+  disabled = false,
+  onSuccess,
 }: ToggleActiveButtonProps) {
-  const [updateUser] = useUpdateUserMutation();
+  const [updateUser, { isLoading }] = useUpdateUserMutation();
 
   const handleToggle = async () => {
     try {
@@ -44,17 +49,18 @@ export function ToggleActiveButton({
       variant={isActive ? "danger" : "primary"}
       title={disabled ? "Вы не можете деактивировать пользователя" : ""}
       fullWidth={fullWidth}
+      loading={isLoading}
       disabled={disabled}
       onClick={handleToggle}
     >
       {isActive ? (
         <>
-          <BsLightbulbOffFill />
+          {disabled ? <FaLock /> : <BsLightbulbOffFill />}
           Деактивировать
         </>
       ) : (
         <>
-          <BsFillLightbulbFill />
+          {disabled ? <FaLock /> : <BsFillLightbulbFill />}
           Активировать
         </>
       )}
