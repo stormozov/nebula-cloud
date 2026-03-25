@@ -3,7 +3,7 @@ import { FaLock } from "react-icons/fa";
 import { RiAdminFill } from "react-icons/ri";
 
 import { useToggleAdminMutation } from "@/entities/user";
-import { Button } from "@/shared/ui";
+import { Button, type ModalConfirmDialogRequest } from "@/shared/ui";
 
 /**
  * Props interface for the ToggleAdminButton component.
@@ -13,6 +13,7 @@ export interface ToggleAdminButtonProps {
   isStaff: boolean;
   fullWidth?: boolean;
   disabled?: boolean;
+  requestConfirm: ModalConfirmDialogRequest;
   onSuccess?: () => void;
 }
 
@@ -23,6 +24,7 @@ export interface ToggleAdminButtonProps {
  * <ToggleAdminButton
  *   userId={123}
  *   isStaff={false}
+ *   requestConfirm={requestConfirm}
  *   onSuccess={() => console.log("Admin status updated")}
  * />
  */
@@ -31,17 +33,24 @@ export function ToggleAdminButton({
   isStaff,
   fullWidth = false,
   disabled = false,
+  requestConfirm,
   onSuccess,
 }: ToggleAdminButtonProps) {
   const [toggleAdmin, { isLoading }] = useToggleAdminMutation();
 
   const handleToggle = async () => {
-    try {
-      await toggleAdmin({ id: userId, is_staff: !isStaff }).unwrap();
-      onSuccess?.();
-    } catch (err) {
-      console.error("Failed to toggle admin status:", err);
-    }
+    requestConfirm(
+      "Изменение роли админа",
+      "Вы действительно хотите изменить роль администратора?",
+      async () => {
+        try {
+          await toggleAdmin({ id: userId, is_staff: !isStaff }).unwrap();
+          onSuccess?.();
+        } catch (err) {
+          console.error("Failed to toggle admin status:", err);
+        }
+      },
+    );
   };
 
   return (

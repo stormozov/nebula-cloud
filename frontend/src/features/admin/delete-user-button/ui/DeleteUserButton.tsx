@@ -1,7 +1,7 @@
 import { FaLock, FaUserTimes } from "react-icons/fa";
 
 import { useDeleteUserMutation } from "@/entities/user";
-import { Button } from "@/shared/ui";
+import { Button, type ModalConfirmDialogRequest } from "@/shared/ui";
 
 /**
  * Props interface for the DeleteUserButton component.
@@ -10,6 +10,7 @@ export interface IDeleteUserButtonProps {
   userId: number;
   fullWidth?: boolean;
   disabled?: boolean;
+  requestConfirm: ModalConfirmDialogRequest;
   onSuccess?: (message: string) => void;
 }
 
@@ -19,25 +20,33 @@ export interface IDeleteUserButtonProps {
  * @example
  * <DeleteUserButton
  *   userId={123}
- *   onSuccess={(msg) => alert(msg)}
  *   disabled={!canDelete}
+ *   requestConfirm={requestConfirm}
+ *   onSuccess={(msg) => alert(msg)}
  * />
  */
 export function DeleteUserButton({
   userId,
-  onSuccess,
   fullWidth = false,
   disabled = false,
+  requestConfirm,
+  onSuccess,
 }: IDeleteUserButtonProps) {
   const [deleteUser, { isLoading }] = useDeleteUserMutation();
 
   const handleDelete = async () => {
-    try {
-      const response = await deleteUser(userId).unwrap();
-      onSuccess?.(response.detail);
-    } catch (err) {
-      console.error("Failed to delete user:", err);
-    }
+    requestConfirm(
+      "Удаление пользователя",
+      `Вы действительно хотите удалить пользователя (ID: ${userId})?`,
+      async () => {
+        try {
+          const response = await deleteUser(userId).unwrap();
+          onSuccess?.(response.detail);
+        } catch (err) {
+          console.error("Failed to delete user:", err);
+        }
+      },
+    );
   };
 
   return (

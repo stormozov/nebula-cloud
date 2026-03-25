@@ -8,7 +8,12 @@ import {
   useGetStorageStatsQuery,
   useGetUserQuery,
 } from "@/entities/user";
-import { Button, Heading, PageWrapper } from "@/shared/ui";
+import {
+  Button,
+  Heading,
+  type ModalConfirmDialogRequest,
+  PageWrapper,
+} from "@/shared/ui";
 
 import type {
   IUserDetailsModalActionsProps,
@@ -24,6 +29,7 @@ import "./UserDetailsModal.scss";
  */
 interface IUserDetailsModalProps {
   userId: number;
+  requestConfirm: ModalConfirmDialogRequest;
   onClose: () => void;
 }
 
@@ -35,7 +41,11 @@ interface IUserDetailsModalProps {
  * @example
  * <UserDetailsModal userId="123" onClose={() => setShowModal(false)} />
  */
-export function UserDetailsModal({ userId, onClose }: IUserDetailsModalProps) {
+export function UserDetailsModal({
+  userId,
+  requestConfirm,
+  onClose,
+}: IUserDetailsModalProps) {
   const [action, setAction] = useState<UserDetailsModalActionsType>("none");
 
   const currentUser = useAppSelector(selectUser);
@@ -82,6 +92,7 @@ export function UserDetailsModal({ userId, onClose }: IUserDetailsModalProps) {
     action,
     isCurrentUser,
     setAction,
+    requestConfirm,
     onClose: handleInlineFormClose,
     editFormSuccess: handleEditFormActionSuccess,
     resetPasswordFormSuccess: handleResetPasswordFormActionSuccess,

@@ -8,8 +8,8 @@ import { ToggleActiveButton } from "@/features/admin/toggle-active-button";
 import { ToggleAdminButton } from "@/features/admin/toggle-admin-button";
 import { Button, Divider, Heading, PageWrapper } from "@/shared/ui";
 
-import type { IUserDetailsModalActionsProps } from "../lib/types";
 import { DeleteUserButton } from "../../delete-user-button";
+import type { IUserDetailsModalActionsProps } from "../lib/types";
 
 /**
  * Props interface for the UserDetailsModalActions component.
@@ -30,6 +30,7 @@ export function UserDetailsModalActions({
     action,
     isCurrentUser,
     setAction,
+    requestConfirm,
     onClose,
     editFormSuccess,
     resetPasswordFormSuccess,
@@ -77,6 +78,7 @@ export function UserDetailsModalActions({
             isActive={user.isActive}
             fullWidth
             disabled={isCurrentUser}
+            requestConfirm={requestConfirm}
             onSuccess={toggleActiveSuccess}
           />
 
@@ -85,6 +87,7 @@ export function UserDetailsModalActions({
             isStaff={user.isStaff}
             fullWidth
             disabled={isCurrentUser}
+            requestConfirm={requestConfirm}
             onSuccess={toggleAdminSuccess}
           />
 
@@ -92,6 +95,7 @@ export function UserDetailsModalActions({
             userId={user.id}
             fullWidth
             disabled={isCurrentUser}
+            requestConfirm={requestConfirm}
             onSuccess={deleteUserSuccess}
           />
         </PageWrapper>

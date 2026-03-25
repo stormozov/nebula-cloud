@@ -1,4 +1,5 @@
 import type { UserDetailsResponse } from "@/entities/user";
+import type { ModalConfirmDialogRequest } from "@/shared/ui";
 
 /**
  * Union type that defines the possible actions available
@@ -44,6 +45,11 @@ export interface IUserDetailsModalActionsProps {
    * @param action - The new action state to set
    */
   setAction: (action: UserDetailsModalActionsType) => void;
+
+  /**
+   * Callback function to request a confirmation from the user.
+   */
+  requestConfirm: ModalConfirmDialogRequest;
 
   /**
    * Callback function to close the entire user details modal.

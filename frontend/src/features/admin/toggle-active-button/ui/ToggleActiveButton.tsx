@@ -2,7 +2,7 @@ import { BsFillLightbulbFill, BsLightbulbOffFill } from "react-icons/bs";
 import { FaLock } from "react-icons/fa";
 
 import { useUpdateUserMutation } from "@/entities/user";
-import { Button } from "@/shared/ui";
+import { Button, type ModalConfirmDialogRequest } from "@/shared/ui";
 
 /**
  * Props interface for the ToggleActiveButton component.
@@ -12,6 +12,7 @@ interface ToggleActiveButtonProps {
   isActive: boolean;
   fullWidth?: boolean;
   disabled?: boolean;
+  requestConfirm: ModalConfirmDialogRequest;
   onSuccess?: () => void;
 }
 
@@ -22,6 +23,7 @@ interface ToggleActiveButtonProps {
  * <ToggleActiveButton
  *   userId={123}
  *   isActive={true}
+ *   requestConfirm={requestConfirm}
  *   onSuccess={() => console.log("Status updated")}
  * />
  */
@@ -31,17 +33,27 @@ export function ToggleActiveButton({
   isActive,
   fullWidth = false,
   disabled = false,
+  requestConfirm,
   onSuccess,
 }: ToggleActiveButtonProps) {
   const [updateUser, { isLoading }] = useUpdateUserMutation();
 
   const handleToggle = async () => {
-    try {
-      await updateUser({ id: userId, data: { is_active: !isActive } }).unwrap();
-      onSuccess?.();
-    } catch (err) {
-      console.error("Failed to toggle active status:", err);
-    }
+    requestConfirm(
+      "Изменение статуса учетной записи",
+      "Вы действительно хотите изменить активность пользователя?",
+      async () => {
+        try {
+          await updateUser({
+            id: userId,
+            data: { is_active: !isActive },
+          }).unwrap();
+          onSuccess?.();
+        } catch (err) {
+          console.error("Failed to toggle active status:", err);
+        }
+      },
+    );
   };
 
   return (

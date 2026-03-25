@@ -30,7 +30,6 @@ export function Modal({
   closeOnButton = true,
   onClose,
 }: IModalProps) {
-
   const modalRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
 
