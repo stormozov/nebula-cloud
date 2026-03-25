@@ -52,7 +52,7 @@ export function Heading({
   level = 1,
   variant = "primary",
   align = "left",
-  size = "md",
+  size,
   className = "",
   ...props
 }: HeadingProps) {
@@ -62,7 +62,9 @@ export function Heading({
     "heading",
     `heading--${variant}`,
     `heading--${align}`,
-    `heading--${size}`,
+    {
+      "heading--size": size === "sm",
+    },
     className,
   );
 

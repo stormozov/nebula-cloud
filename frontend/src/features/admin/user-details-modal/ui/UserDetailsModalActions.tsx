@@ -1,8 +1,10 @@
 import classNames from "classnames";
 import { MdEdit } from "react-icons/md";
+import { PiPasswordBold } from "react-icons/pi";
 
 import { EditUserForm } from "@/features/admin/edit-user-form";
-import { Button, PageWrapper } from "@/shared/ui";
+import { ResetPasswordForm } from "@/features/admin/reset-password-form";
+import { Button, Heading, PageWrapper } from "@/shared/ui";
 
 import type { IUserDetailsModalActionsProps } from "../lib/types";
 
@@ -20,19 +22,47 @@ export interface IUserDetailsModalActionsComponentProps {
 export function UserDetailsModalActions({
   actionProps,
 }: IUserDetailsModalActionsComponentProps) {
-  const { user, action, setAction, onClose, editFormSuccess } = actionProps;
+  const {
+    user,
+    action,
+    setAction,
+    onClose,
+    editFormSuccess,
+    resetPasswordFormSuccess,
+  } = actionProps;
+
+  const isEditAction = action === "edit";
+  const isResetPasswordAction = action === "reset-password";
 
   return (
-    <div className="user-details-modal__actions">
-      <PageWrapper className="user-details-modal__actions-buttons">
-        <Button
-          variant={action === "edit" ? "primary" : "secondary"}
-          fullWidth
-          onClick={() => setAction("edit")}
-        >
-          <MdEdit />
-          Редактировать
-        </Button>
+    <PageWrapper className="user-details-modal__actions">
+      <PageWrapper
+        direction="column"
+        className="user-details-modal__actions-buttons"
+      >
+        <Heading level={4} className="user-details-modal__actions-title">
+          Действия с аккаунтом
+        </Heading>
+
+        <PageWrapper direction="column" gap={"0.625rem"} fullWidth>
+          <Button
+            variant={isEditAction ? "primary" : "secondary"}
+            fullWidth
+            onClick={() => setAction("edit")}
+          >
+            <MdEdit />
+            Редактировать
+          </Button>
+
+          <Button
+            variant={isResetPasswordAction ? "primary" : "secondary"}
+            fullWidth
+            onClick={() => setAction("reset-password")}
+          >
+            <PiPasswordBold />
+            Сбросить пароль
+          </Button>
+        </PageWrapper>
       </PageWrapper>
 
       <div
@@ -40,14 +70,21 @@ export function UserDetailsModalActions({
           active: action !== "none",
         })}
       >
-        {action === "edit" && (
+        {isEditAction && (
           <EditUserForm
             user={user}
             onSuccess={editFormSuccess}
             onCancel={onClose}
           />
         )}
+        {isResetPasswordAction && (
+          <ResetPasswordForm
+            userId={user.id}
+            onSuccess={resetPasswordFormSuccess}
+            onCancel={onClose}
+          />
+        )}
       </div>
-    </div>
+    </PageWrapper>
   );
 }

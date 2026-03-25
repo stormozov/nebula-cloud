@@ -3,6 +3,7 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithAuthErrorHandling } from "@/shared/api";
 
 import type {
+  IAdminApiResponse,
   IStorageStatsResponse,
   IUser,
   IUserListResponse,
@@ -59,7 +60,7 @@ export const adminApi = createApi({
     /**
      * Deletes a user by ID.
      */
-    deleteUser: builder.mutation<void, number>({
+    deleteUser: builder.mutation<IAdminApiResponse, number>({
       query: (id) => ({
         url: `/admin/users/${id}/`,
         method: "DELETE",
@@ -70,7 +71,10 @@ export const adminApi = createApi({
     /**
      * Resets a user's password.
      */
-    resetPassword: builder.mutation<void, { id: number; newPassword: string }>({
+    resetPassword: builder.mutation<
+      IAdminApiResponse,
+      { id: number; newPassword: string }
+    >({
       query: ({ id, newPassword }) => ({
         url: `/admin/users/${id}/password/`,
         method: "POST",

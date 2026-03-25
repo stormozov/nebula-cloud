@@ -114,28 +114,16 @@ class AdminPasswordResetSerializer(serializers.Serializer):
         style={"input_type": "password"},
         help_text="Новый пароль пользователя",
     )
-    new_password_confirm = serializers.CharField(
-        write_only=True,
-        required=True,
-        style={"input_type": "password"},
-        help_text="Подтверждение нового пароля",
-    )
 
-    def validate(self, attrs) -> dict:
+    def validate(self, attrs):
         """Validate password reset data."""
 
         new_password = attrs.get("new_password")
-        new_password_confirm = attrs.get("new_password_confirm")
 
-        # Check password confirmation
-        if new_password != new_password_confirm:
-            raise serializers.ValidationError({"new_password_confirm": "Пароли не совпадают."})
-
-        # Validate new password with Django validators
         try:
             validate_password(new_password)
         except DjangoValidationError as e:
-            raise serializers.ValidationError({"new_password": list(e.messages)}) from e
+            raise serializers.ValidationError({"new_password": list(e.messages)})
 
         return attrs
 

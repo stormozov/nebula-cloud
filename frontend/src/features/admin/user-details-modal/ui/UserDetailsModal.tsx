@@ -45,6 +45,11 @@ export function UserDetailsModal({ userId, onClose }: IUserDetailsModalProps) {
     console.log("Success edit form");
   };
 
+  const handleResetPasswordFormActionSuccess = (message: string) => {
+    setAction("none");
+    console.log(message);
+  };
+
   if (isLoading) return <div>Загрузка...</div>;
   if (!user) return <div>Пользователь не найден</div>;
 
@@ -54,6 +59,7 @@ export function UserDetailsModal({ userId, onClose }: IUserDetailsModalProps) {
     setAction,
     onClose: handleInlineFormClose,
     editFormSuccess: handleEditFormActionSuccess,
+    resetPasswordFormSuccess: handleResetPasswordFormActionSuccess,
   };
 
   return (

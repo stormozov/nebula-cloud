@@ -8,7 +8,7 @@ import type { UserDetailsResponse } from "@/entities/user";
  * This type is used to control which action buttons or functionality should be
  * displayed in the user details modal.
  */
-export type UserDetailsModalActionsType = "edit" | "none";
+export type UserDetailsModalActionsType = "edit" | "reset-password" | "none";
 
 /**
  * Interface defining the props required for the user actions functionality.
@@ -48,4 +48,9 @@ export interface IUserDetailsModalActionsProps {
    * Callback function to handle successful form submission.
    */
   editFormSuccess: () => void;
+
+  /**
+   * Callback function to handle successful password reset.
+   */
+  resetPasswordFormSuccess: (message: string) => void;
 }

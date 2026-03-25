@@ -113,3 +113,10 @@ export interface IStorageStatsResponse {
     totalSizeFormatted: string;
   };
 }
+
+/**
+ * Response structure for admin api responses.
+ */
+export interface IAdminApiResponse {
+  detail: string;
+}

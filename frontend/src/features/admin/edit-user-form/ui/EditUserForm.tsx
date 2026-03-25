@@ -1,5 +1,5 @@
 import type { UserDetailsResponse } from "@/entities/user";
-import { Button, ControlledInput, PageWrapper } from "@/shared/ui";
+import { Button, ControlledInput, Heading, PageWrapper } from "@/shared/ui";
 
 import { useEditUserForm } from "../lib/useEditUserForm";
 
@@ -35,6 +35,8 @@ export function EditUserForm({
 
   return (
     <form onSubmit={handleSubmit} className="edit-user-form">
+      <Heading level={4}>Основная информация</Heading>
+
       <ControlledInput
         value={formValues.email}
         label="Email"
