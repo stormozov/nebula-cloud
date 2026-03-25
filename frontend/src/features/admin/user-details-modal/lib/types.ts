@@ -31,6 +31,12 @@ export interface IUserDetailsModalActionsProps {
   action: UserDetailsModalActionsType;
 
   /**
+   * Boolean indicating whether the current user is the same as the user being
+   * displayed in the modal.
+   */
+  isCurrentUser: boolean;
+
+  /**
    * Function to update the current action state of the modal.
    *
    * Used to switch between different modes (e.g., "edit" or "none").
@@ -58,4 +64,9 @@ export interface IUserDetailsModalActionsProps {
    * Callback function to handle successful toggle of user activity.
    */
   toggleActiveSuccess: () => void;
+
+  /**
+   * Callback function to handle successful toggle of user admin status.
+   */
+  toggleAdminSuccess: () => void;
 }

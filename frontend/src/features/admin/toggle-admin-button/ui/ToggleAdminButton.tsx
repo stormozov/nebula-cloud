@@ -1,0 +1,67 @@
+import { BsFillPersonFill } from "react-icons/bs";
+import { RiAdminFill } from "react-icons/ri";
+
+import { useToggleAdminMutation } from "@/entities/user";
+import { Button } from "@/shared/ui";
+
+/**
+ * Props interface for the ToggleAdminButton component.
+ */
+export interface ToggleAdminButtonProps {
+  userId: number;
+  isStaff: boolean;
+  fullWidth?: boolean;
+  disabled?: boolean;
+  onSuccess?: () => void;
+}
+
+/**
+ * A button component that allows toggling a user's administrator (staff) role.
+ *
+ * @example
+ * <ToggleAdminButton
+ *   userId={123}
+ *   isStaff={false}
+ *   onSuccess={() => console.log("Admin status updated")}
+ * />
+ */
+export function ToggleAdminButton({
+  userId,
+  isStaff,
+  fullWidth = false,
+  disabled = false,
+  onSuccess,
+}: ToggleAdminButtonProps) {
+  const [toggleAdmin] = useToggleAdminMutation();
+
+  const handleToggle = async () => {
+    try {
+      await toggleAdmin({ id: userId, is_staff: !isStaff }).unwrap();
+      onSuccess?.();
+    } catch (err) {
+      console.error("Failed to toggle admin status:", err);
+    }
+  };
+
+  return (
+    <Button
+      variant="danger"
+      title={disabled ? "Вы не можете изменить роль администратора" : ""}
+      fullWidth={fullWidth}
+      disabled={disabled}
+      onClick={handleToggle}
+    >
+      {isStaff ? (
+        <>
+          <BsFillPersonFill />
+          Снять роль администратора
+        </>
+      ) : (
+        <>
+          <RiAdminFill />
+          Назначить роль администратора
+        </>
+      )}
+    </Button>
+  );
+}

@@ -2,7 +2,11 @@ import { useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { FaUser } from "react-icons/fa6";
 
-import { useGetStorageStatsQuery, useGetUserQuery } from "@/entities/user";
+import {
+  selectUser,
+  useGetStorageStatsQuery,
+  useGetUserQuery,
+} from "@/entities/user";
 import { Button, Heading, PageWrapper } from "@/shared/ui";
 
 import type {
@@ -12,6 +16,7 @@ import type {
 import { UserDetailsModalActions } from "./UserDetailsModalActions";
 import { UserDetailsModalInfo } from "./UserDetailsModalInfo";
 
+import { useAppSelector } from "@/app/store/hooks";
 import "./UserDetailsModal.scss";
 
 /**
@@ -32,6 +37,8 @@ interface IUserDetailsModalProps {
  */
 export function UserDetailsModal({ userId, onClose }: IUserDetailsModalProps) {
   const [action, setAction] = useState<UserDetailsModalActionsType>("none");
+
+  const currentUser = useAppSelector(selectUser);
 
   const { data: user, isLoading } = useGetUserQuery(userId, { skip: !userId });
   const { data: storageStats } = useGetStorageStatsQuery(userId, {
@@ -55,17 +62,26 @@ export function UserDetailsModal({ userId, onClose }: IUserDetailsModalProps) {
     console.log("Success toggle active");
   };
 
+  const handleToggleAdminSuccess = () => {
+    setAction("none");
+    console.log("Success toggle admin");
+  };
+
   if (isLoading) return <div>Загрузка...</div>;
   if (!user) return <div>Пользователь не найден</div>;
+
+  const isCurrentUser = currentUser?.id === user.id;
 
   const actionsProps: IUserDetailsModalActionsProps = {
     user,
     action,
+    isCurrentUser,
     setAction,
     onClose: handleInlineFormClose,
     editFormSuccess: handleEditFormActionSuccess,
     resetPasswordFormSuccess: handleResetPasswordFormActionSuccess,
     toggleActiveSuccess: handleToggleActiveSuccess,
+    toggleAdminSuccess: handleToggleAdminSuccess,
   };
 
   return (
@@ -82,6 +98,7 @@ export function UserDetailsModal({ userId, onClose }: IUserDetailsModalProps) {
               <Heading level={3} className="user-details-modal__header-title">
                 <FaUser className="user-details-modal__header-icon" />
                 Детали пользователя {user?.username || user?.fullName}
+                {isCurrentUser ? <span>Вы</span> : ""}
               </Heading>
               <Button variant="secondary" onClick={onClose}>
                 <AiOutlineClose />

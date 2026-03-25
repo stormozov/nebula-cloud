@@ -139,7 +139,7 @@ class AdminPasswordResetSerializer(serializers.Serializer):
 class AdminToggleAdminSerializer(serializers.Serializer):
     """Serializer for toggling admin status."""
 
-    is_admin = serializers.BooleanField(
+    is_staff = serializers.BooleanField(
         required=True,
         help_text="Статус администратора",
     )

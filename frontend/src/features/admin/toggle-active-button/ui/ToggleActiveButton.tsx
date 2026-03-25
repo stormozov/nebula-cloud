@@ -10,6 +10,7 @@ interface ToggleActiveButtonProps {
   userId: number;
   isActive: boolean;
   fullWidth?: boolean;
+  disabled?: boolean;
   onSuccess?: () => void;
 }
 
@@ -24,12 +25,9 @@ interface ToggleActiveButtonProps {
  * />
  */
 
-export const ToggleActiveButton = ({
-  userId,
-  isActive,
-  fullWidth = false,
-  onSuccess,
-}: ToggleActiveButtonProps) => {
+export function ToggleActiveButton({
+  userId, isActive, fullWidth = false, disabled = false, onSuccess,
+}: ToggleActiveButtonProps) {
   const [updateUser] = useUpdateUserMutation();
 
   const handleToggle = async () => {
@@ -44,7 +42,9 @@ export const ToggleActiveButton = ({
   return (
     <Button
       variant={isActive ? "danger" : "primary"}
+      title={disabled ? "Вы не можете деактивировать пользователя" : ""}
       fullWidth={fullWidth}
+      disabled={disabled}
       onClick={handleToggle}
     >
       {isActive ? (
@@ -60,4 +60,4 @@ export const ToggleActiveButton = ({
       )}
     </Button>
   );
-};
+}

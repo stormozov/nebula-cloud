@@ -87,12 +87,12 @@ export const adminApi = createApi({
      */
     toggleAdmin: builder.mutation<
       { is_staff: boolean },
-      { id: number; isAdmin: boolean }
+      { id: number; is_staff: boolean }
     >({
-      query: ({ id, isAdmin }) => ({
+      query: ({ id, is_staff }) => ({
         url: `/admin/users/${id}/toggle-admin/`,
         method: "POST",
-        body: { is_staff: isAdmin },
+        body: { is_staff },
       }),
       invalidatesTags: (_, __, { id }) => [{ type: "User", id }],
     }),

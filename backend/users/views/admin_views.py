@@ -384,7 +384,7 @@ class AdminUserViewSet(viewsets.ModelViewSet):
             )
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        new_is_admin = serializer.validated_data["is_admin"]
+        new_is_admin = serializer.validated_data["is_staff"]
         toggle_admin_status(target_user, new_is_admin)
 
         auth_logger.info(
@@ -396,7 +396,7 @@ class AdminUserViewSet(viewsets.ModelViewSet):
         )
 
         return Response(
-            {"detail": "Статус администратора успешно изменён.", "is_admin": target_user.is_staff},
+            {"detail": "Статус администратора успешно изменён.", "is_staff": target_user.is_staff},
             status=status.HTTP_200_OK,
         )
 

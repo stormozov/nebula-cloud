@@ -61,6 +61,17 @@
     align-items: center;
     gap: 10px;
     margin: 0;
+
+    span {
+      padding: 5px 10px;
+      margin-bottom: 10px;
+
+      background-color: var(--color-info-light);
+      border-radius: 6px;
+
+      font-size: 0.75rem;
+      color: var(--color-info);
+    }
   }
 
   &__header-icon {

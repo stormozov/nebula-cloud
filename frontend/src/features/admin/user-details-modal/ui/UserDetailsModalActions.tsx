@@ -5,6 +5,7 @@ import { PiPasswordBold } from "react-icons/pi";
 import { EditUserForm } from "@/features/admin/edit-user-form";
 import { ResetPasswordForm } from "@/features/admin/reset-password-form";
 import { ToggleActiveButton } from "@/features/admin/toggle-active-button";
+import { ToggleAdminButton } from "@/features/admin/toggle-admin-button";
 import { Button, Divider, Heading, PageWrapper } from "@/shared/ui";
 
 import type { IUserDetailsModalActionsProps } from "../lib/types";
@@ -26,11 +27,13 @@ export function UserDetailsModalActions({
   const {
     user,
     action,
+    isCurrentUser,
     setAction,
     onClose,
     editFormSuccess,
     resetPasswordFormSuccess,
     toggleActiveSuccess,
+    toggleAdminSuccess,
   } = actionProps;
 
   const isEditAction = action === "edit";
@@ -71,7 +74,16 @@ export function UserDetailsModalActions({
             userId={user.id}
             isActive={user.isActive}
             fullWidth
+            disabled={isCurrentUser}
             onSuccess={toggleActiveSuccess}
+          />
+
+          <ToggleAdminButton
+            userId={user.id}
+            isStaff={user.isStaff}
+            fullWidth
+            disabled={isCurrentUser}
+            onSuccess={toggleAdminSuccess}
           />
         </PageWrapper>
       </PageWrapper>
