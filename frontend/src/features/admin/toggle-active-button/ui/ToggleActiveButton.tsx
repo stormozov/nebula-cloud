@@ -46,7 +46,7 @@ export function ToggleActiveButton({
         try {
           await updateUser({
             id: userId,
-            data: { is_active: !isActive },
+            data: { isActive: !isActive },
           }).unwrap();
           onSuccess?.();
         } catch (err) {

@@ -1,6 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 
 import { baseQueryWithAuthErrorHandling } from "@/shared/api";
+import { camelToSnake } from "@/shared/utils";
 
 import type {
   IAdminApiResponse,
@@ -52,7 +53,7 @@ export const adminApi = createApi({
       query: ({ id, data }) => ({
         url: `/admin/users/${id}/`,
         method: "PATCH",
-        body: data,
+        body: camelToSnake(data),
       }),
       invalidatesTags: (_, __, { id }) => [{ type: "User", id }],
     }),
@@ -78,7 +79,7 @@ export const adminApi = createApi({
       query: ({ id, newPassword }) => ({
         url: `/admin/users/${id}/password/`,
         method: "POST",
-        body: { new_password: newPassword },
+        body: camelToSnake({ newPassword }),
       }),
     }),
 
@@ -86,13 +87,13 @@ export const adminApi = createApi({
      * Toggles a user's admin status.
      */
     toggleAdmin: builder.mutation<
-      { is_staff: boolean },
-      { id: number; is_staff: boolean }
+      { isStaff: boolean },
+      { id: number; isStaff: boolean }
     >({
-      query: ({ id, is_staff }) => ({
+      query: ({ id, isStaff }) => ({
         url: `/admin/users/${id}/toggle-admin/`,
         method: "POST",
-        body: { is_staff },
+        body: camelToSnake({ isStaff }),
       }),
       invalidatesTags: (_, __, { id }) => [{ type: "User", id }],
     }),

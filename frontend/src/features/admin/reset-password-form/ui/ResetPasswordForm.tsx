@@ -49,7 +49,7 @@ export function ResetPasswordForm({
           type="password"
           value={newPassword}
           onChange={setNewPassword}
-          error={errors.new_password}
+          error={errors.newPassword}
           required
         />
         <ControlledInput
@@ -57,7 +57,7 @@ export function ResetPasswordForm({
           type="password"
           value={confirmPassword}
           onChange={setConfirmPassword}
-          error={errors.new_password_confirm}
+          error={errors.newPasswordConfirm}
           required
         />
       </PageWrapper>

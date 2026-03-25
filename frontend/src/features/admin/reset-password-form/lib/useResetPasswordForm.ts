@@ -3,16 +3,11 @@ import { useState } from "react";
 
 import { useResetPasswordMutation } from "@/entities/user";
 
-import type { IResetPasswordFormProps } from "./types";
-
-/**
- * Interface representing the state of validation errors in the reset password
- * form.
- */
-export interface ErrorsStateType {
-  new_password?: string;
-  new_password_confirm?: string;
-}
+import type {
+  IErrorsState,
+  IResetPasswordFormProps,
+  IUseResetPasswordFormReturns,
+} from "./types";
 
 /**
  * Custom React Hook for handling the logic of a password reset form.
@@ -24,10 +19,10 @@ export interface ErrorsStateType {
 export const useResetPasswordForm = ({
   userId,
   onSuccess,
-}: IResetPasswordFormProps) => {
+}: IResetPasswordFormProps): IUseResetPasswordFormReturns => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [errors, setErrors] = useState<ErrorsStateType>({});
+  const [errors, setErrors] = useState<IErrorsState>({});
 
   const [resetPassword, { isLoading }] = useResetPasswordMutation();
 
@@ -36,26 +31,24 @@ export const useResetPasswordForm = ({
     setErrors({});
 
     if (newPassword !== confirmPassword) {
-      setErrors({ new_password_confirm: "Пароли не совпадают" });
+      setErrors({ newPasswordConfirm: "Пароли не совпадают" });
       return;
     }
 
     try {
-      const result = await resetPassword({
-        id: userId,
-        newPassword: newPassword,
-      }).unwrap();
-      onSuccess?.(result.detail);
+      const newData = { id: userId, newPassword: newPassword };
+      const response = await resetPassword(newData).unwrap();
+      onSuccess?.(response.detail);
     } catch (err) {
       const error = err as FetchBaseQueryError;
       if (error.data && typeof error.data === "object") {
         const serverErrors = error.data as Record<string, string[]>;
         setErrors({
-          new_password: serverErrors.newPassword?.[0],
-          new_password_confirm: serverErrors.confirmPassword?.[0],
+          newPassword: serverErrors.newPassword?.[0],
+          newPasswordConfirm: serverErrors.confirmPassword?.[0],
         });
       } else {
-        setErrors({ new_password: "Не удалось сбросить пароль" });
+        setErrors({ newPassword: "Не удалось сбросить пароль" });
       }
     }
   };

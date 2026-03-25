@@ -44,7 +44,7 @@ export function ToggleAdminButton({
       "Вы действительно хотите изменить роль администратора?",
       async () => {
         try {
-          await toggleAdmin({ id: userId, is_staff: !isStaff }).unwrap();
+          await toggleAdmin({ id: userId, isStaff: !isStaff }).unwrap();
           onSuccess?.();
         } catch (err) {
           console.error("Failed to toggle admin status:", err);
