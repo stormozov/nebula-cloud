@@ -96,18 +96,33 @@ class UserLoginSerializer(serializers.Serializer):
     )
 
     def validate(self, attrs):
-        """Validate user credentials."""
+        """
+        Validate user credentials.
+
+        Steps:
+        1. Find a user by username
+        2. Check password
+        3. Check if user is active
+        """
 
         username = attrs.get("username")
         password = attrs.get("password")
 
-        user = authenticate(username=username, password=password)
+        # 1. Find a user by username
+        try:
+            user = UserAccount.objects.get(username=username)
+        except UserAccount.DoesNotExist:
+            raise serializers.ValidationError({"detail": "Неверный логин или пароль."}) from None
 
-        if not user:
+        # 2. Check password
+        if not user.check_password(password):
             raise serializers.ValidationError({"detail": "Неверный логин или пароль."})
 
+        # 3. Check if user is active
         if not user.is_active:
-            raise serializers.ValidationError({"detail": "Пользователь неактивен."})
+            raise serializers.ValidationError(
+                {"detail": "Пользователь неактивен. Обратитесь к администратору."}
+            )
 
         attrs["user"] = user
         return attrs
