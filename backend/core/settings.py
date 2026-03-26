@@ -287,6 +287,14 @@ if not DEBUG and not IS_TESTING:
 # ==================================================================================================
 
 if IS_TESTING:
+    # Use SQLite in-memory database for tests
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": ":memory:",
+        }
+    }
+
     # Fast password hashing (speeds up test execution)
     PASSWORD_HASHERS = [
         "django.contrib.auth.hashers.MD5PasswordHasher",

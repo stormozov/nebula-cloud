@@ -11,10 +11,15 @@ from django.core.files.storage import default_storage
 
 
 @pytest.fixture(scope="session")
-def django_db_setup():
+def django_db_setup(django_db_setup, django_db_blocker):
     """
-    Ensure test database is created and cleaned up properly.
+    Ensure test database is created with migrations applied.
+    Uses pytest-django defaults with migrations for custom UserAccount model.
     """
+    with django_db_blocker.unblock():
+        from django.core.management import call_command
+
+        call_command("migrate", verbosity=0)
 
 
 @pytest.fixture(autouse=True)
