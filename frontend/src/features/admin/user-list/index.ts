@@ -1,2 +1,2 @@
 // UI
-export * from "./ui/UserList";
+export * from "./ui/UserList/UserList";

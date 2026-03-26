@@ -1,5 +1,5 @@
 import type { IStorageStatsResponse, IUser } from "@/entities/user";
-import { Heading, PageWrapper } from "@/shared/ui";
+import { Heading, PageWrapper, StatusBadge } from "@/shared/ui";
 import { formatDate, truncateWithMiddleEllipsis } from "@/shared/utils";
 
 import "./UserDetailsModal.scss";
@@ -36,8 +36,17 @@ export function UserDetailsModalInfo({
   const additionalInfo = [
     { title: "Регистрация", value: formatDate(user.dateJoined) },
     { title: "Посл. вход", value: formatDate(user.lastLogin) },
-    { title: "Активен", value: user.isActive ? "Да" : "Нет" },
-    { title: "Администратор", value: user.isStaff ? "Да" : "Нет" },
+    { title: "Активен", value: <StatusBadge isActive={user.isActive} /> },
+    {
+      title: "Администратор",
+      value: (
+        <StatusBadge
+          isActive={user.isStaff}
+          activeText="Да"
+          inactiveText="Нет"
+        />
+      ),
+    },
   ];
 
   const storageInfo = [
@@ -66,7 +75,7 @@ export function UserDetailsModalInfo({
             className="user-details-modal__info-path"
             title={info.originalValue}
           >
-            <p>{info.title}:</p>
+            <p className="user-details-modal__info-title">{info.title}:</p>
             <span>{info.value}</span>
           </div>
         ))}
@@ -83,7 +92,7 @@ export function UserDetailsModalInfo({
         </Heading>
         {additionalInfo.map((info) => (
           <div key={info.title} className="user-details-modal__info-path">
-            <p>{info.title}:</p>
+            <p className="user-details-modal__info-title">{info.title}:</p>
             <span>{info.value}</span>
           </div>
         ))}
@@ -100,7 +109,7 @@ export function UserDetailsModalInfo({
         </Heading>
         {storageInfo.map((info) => (
           <div key={info.title} className="user-details-modal__info-path">
-            <p>{info.title}:</p>
+            <p className="user-details-modal__info-title">{info.title}:</p>
             <span>{info.value}</span>
           </div>
         ))}

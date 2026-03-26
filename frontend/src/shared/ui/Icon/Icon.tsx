@@ -8,7 +8,7 @@ import { ICONS } from "./iconsRegistry";
 
 export type IconName = keyof typeof ICONS;
 
-type IconColor =
+export type IconColor =
   | "currentColor"
   | "text-primary"
   | "text-secondary"
