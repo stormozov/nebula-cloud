@@ -1,7 +1,5 @@
-import { FaLock, FaUserTimes } from "react-icons/fa";
-
 import { useDeleteUserMutation } from "@/entities/user";
-import { Button, type ModalConfirmDialogRequest } from "@/shared/ui";
+import { Button, Icon, type ModalConfirmDialogRequest } from "@/shared/ui";
 
 /**
  * Props interface for the DeleteUserButton component.
@@ -57,7 +55,7 @@ export function DeleteUserButton({
       disabled={disabled}
       onClick={handleDelete}
     >
-      {disabled ? <FaLock /> : <FaUserTimes />}
+      {disabled ? <Icon name="lock" /> : <Icon name="deleteUser" />}
       Удалить
     </Button>
   );

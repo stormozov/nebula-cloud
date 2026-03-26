@@ -1,9 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { AiOutlineClose } from "react-icons/ai";
-import { FaSave } from "react-icons/fa";
 
 import type { IFile } from "@/entities/file";
-import { Button, ControlledInput } from "@/shared/ui";
+import { Button, ControlledInput, Icon } from "@/shared/ui";
 import { Modal } from "@/shared/ui/Modal";
 
 import "./RenameFileModal.scss";
@@ -113,7 +111,7 @@ export function RenameFileModal({
             onClick={handleClose}
             disabled={isSubmitting}
           >
-            <AiOutlineClose />
+            <Icon name="close" />
             Отмена
           </Button>
           <Button
@@ -121,7 +119,7 @@ export function RenameFileModal({
             onClick={handleSubmit}
             loading={isSubmitting}
           >
-            <FaSave />
+            <Icon name="save" />
             Сохранить
           </Button>
         </>

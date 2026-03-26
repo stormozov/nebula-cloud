@@ -1,6 +1,6 @@
 import type { JSX } from "react";
 
-import { Button, ControlledInput, Form } from "@/shared/ui";
+import { Button, ControlledInput, Form, Icon } from "@/shared/ui";
 
 import type { IUseLoginFormProps } from "../lib/types";
 import { useLoginForm } from "../lib/useLoginForm";
@@ -72,6 +72,7 @@ export function LoginForm({
         fullWidth
         className="login-form__submit-btn"
       >
+        <Icon name="login" />
         Войти
       </Button>
     </Form>

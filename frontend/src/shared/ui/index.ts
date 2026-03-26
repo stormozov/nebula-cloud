@@ -3,6 +3,7 @@ export * from "./Divider";
 export * from "./FileIcon";
 export * from "./form";
 export * from "./Heading";
+export * from "./Icon";
 export * from "./inputs";
 export * from "./Logo/Logo";
 export * from "./layouts";

@@ -1,8 +1,5 @@
-import { BsFillLightbulbFill, BsLightbulbOffFill } from "react-icons/bs";
-import { FaLock } from "react-icons/fa";
-
 import { useUpdateUserMutation } from "@/entities/user";
-import { Button, type ModalConfirmDialogRequest } from "@/shared/ui";
+import { Button, Icon, type ModalConfirmDialogRequest } from "@/shared/ui";
 
 /**
  * Props interface for the ToggleActiveButton component.
@@ -67,12 +64,12 @@ export function ToggleActiveButton({
     >
       {isActive ? (
         <>
-          {disabled ? <FaLock /> : <BsLightbulbOffFill />}
+          {disabled ? <Icon name="lock" /> : <Icon name="lightbulbOff" />}
           Деактивировать
         </>
       ) : (
         <>
-          {disabled ? <FaLock /> : <BsFillLightbulbFill />}
+          {disabled ? <Icon name="lock" /> : <Icon name="lightbulbOn" />}
           Активировать
         </>
       )}

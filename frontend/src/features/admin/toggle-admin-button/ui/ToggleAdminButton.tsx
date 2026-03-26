@@ -1,9 +1,5 @@
-import { BsFillPersonFill } from "react-icons/bs";
-import { FaLock } from "react-icons/fa";
-import { RiAdminFill } from "react-icons/ri";
-
 import { useToggleAdminMutation } from "@/entities/user";
-import { Button, type ModalConfirmDialogRequest } from "@/shared/ui";
+import { Button, Icon, type ModalConfirmDialogRequest } from "@/shared/ui";
 
 /**
  * Props interface for the ToggleAdminButton component.
@@ -64,12 +60,12 @@ export function ToggleAdminButton({
     >
       {isStaff ? (
         <>
-          {disabled ? <FaLock /> : <BsFillPersonFill />}
+          {disabled ? <Icon name="lock" /> : <Icon name="person" />}
           Снять роль администратора
         </>
       ) : (
         <>
-          {disabled ? <FaLock /> : <RiAdminFill />}
+          {disabled ? <Icon name="lock" /> : <Icon name="adminStatus" />}
           Назначить роль администратора
         </>
       )}

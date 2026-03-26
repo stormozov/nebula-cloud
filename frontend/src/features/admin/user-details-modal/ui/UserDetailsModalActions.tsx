@@ -1,12 +1,10 @@
 import classNames from "classnames";
-import { MdEdit } from "react-icons/md";
-import { PiPasswordBold } from "react-icons/pi";
 
 import { EditUserForm } from "@/features/admin/edit-user-form";
 import { ResetPasswordForm } from "@/features/admin/reset-password-form";
 import { ToggleActiveButton } from "@/features/admin/toggle-active-button";
 import { ToggleAdminButton } from "@/features/admin/toggle-admin-button";
-import { Button, Divider, Heading, PageWrapper } from "@/shared/ui";
+import { Button, Divider, Heading, Icon, PageWrapper } from "@/shared/ui";
 
 import { DeleteUserButton } from "../../delete-user-button";
 import type { IUserDetailsModalActionsProps } from "../lib/types";
@@ -58,7 +56,7 @@ export function UserDetailsModalActions({
             fullWidth
             onClick={() => setAction("edit")}
           >
-            <MdEdit />
+            <Icon name="edit" />
             Редактировать
           </Button>
 
@@ -67,7 +65,7 @@ export function UserDetailsModalActions({
             fullWidth
             onClick={() => setAction("reset-password")}
           >
-            <PiPasswordBold />
+            <Icon name="password" />
             Сбросить пароль
           </Button>
 

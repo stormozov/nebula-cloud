@@ -5,6 +5,7 @@ import { FaCheck } from "react-icons/fa6";
 import { Button } from "../buttons";
 import { PageWrapper } from "../layouts";
 import { Modal } from "../Modal";
+import { Icon } from "../Icon";
 
 import "./ModalConfirm.scss";
 
@@ -91,7 +92,7 @@ export function ModalConfirm({
       {children && <div className="modal-confirm__content">{children}</div>}
       <PageWrapper className="modal-confirm__actions" justify="center">
         <Button variant="secondary" onClick={handleCancel} disabled={isLoading}>
-          <AiOutlineClose />
+          <Icon name="close" />
           Отменить
         </Button>
         <Button variant="primary" onClick={handleConfirm} disabled={isLoading}>
@@ -99,7 +100,7 @@ export function ModalConfirm({
             "Загрузка..."
           ) : (
             <>
-              <FaCheck />
+              <Icon name="check" />
               Подтвердить
             </>
           )}

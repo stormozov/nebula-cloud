@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { AiOutlineClose } from "react-icons/ai";
-import { FaUser } from "react-icons/fa6";
 
 import { useAppSelector } from "@/app/store/hooks";
 import {
@@ -11,6 +9,7 @@ import {
 import {
   Button,
   Heading,
+  Icon,
   type ModalConfirmDialogRequest,
   PageWrapper,
 } from "@/shared/ui";
@@ -113,12 +112,15 @@ export function UserDetailsModal({
               justify="space-between"
             >
               <Heading level={3} className="user-details-modal__header-title">
-                <FaUser className="user-details-modal__header-icon" />
+                <Icon
+                  name="person"
+                  color="primary"
+                />
                 Детали пользователя {user?.username || user?.fullName}
                 {isCurrentUser ? <span>Вы</span> : ""}
               </Heading>
               <Button variant="secondary" onClick={onClose}>
-                <AiOutlineClose />
+                <Icon name="close" />
               </Button>
             </PageWrapper>
           </header>

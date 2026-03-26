@@ -2,7 +2,7 @@ import { useNavigate } from "react-router";
 
 import { useLogoutMutation } from "@/entities/user";
 import type { IButtonProps } from "@/shared/ui";
-import { Button } from "@/shared/ui";
+import { Button, Icon } from "@/shared/ui";
 
 import "./LogoutButton.scss";
 
@@ -22,7 +22,6 @@ export function LogoutButton({
   size = "medium",
   fullWidth = false,
   className,
-  children = "Выход",
   ...restProps
 }: IButtonProps) {
   const navigate = useNavigate();
@@ -48,7 +47,8 @@ export function LogoutButton({
       onClick={handleClick}
       {...restProps}
     >
-      {children}
+      <Icon name="logout" />
+      Выход
     </Button>
   );
 }

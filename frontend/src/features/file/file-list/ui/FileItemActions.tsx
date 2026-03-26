@@ -1,7 +1,8 @@
 import classNames from "classnames";
 
 import fileListConfig from "@/shared/configs/file-list.json";
-import { Button } from "@/shared/ui";
+import { Button, Icon, type IconName } from "@/shared/ui";
+import { isImageFile } from "@/shared/utils";
 
 import type {
   ActionHandlers,
@@ -9,7 +10,6 @@ import type {
   IFileItemActionsProps,
 } from "../lib/types";
 
-import { isImageFile } from "@/shared/utils";
 import "./FileItemActions.scss";
 
 /** File action buttons configuration */
@@ -111,7 +111,7 @@ export function FileItemActions({
             onClick={handler}
             disabled={isDisabled}
           >
-            {action.icon}
+            <Icon name={action.icon as IconName} size={16} />
           </Button>
         );
       })}

@@ -1,8 +1,8 @@
 import classNames from "classnames";
 import { useCallback, useEffect, useRef } from "react";
-import { AiOutlineClose } from "react-icons/ai";
 
 import { Button } from "../buttons";
+import { Icon } from "../Icon";
 import type { IModalProps } from "./types";
 
 import "./Modal.scss";
@@ -134,7 +134,7 @@ export function Modal({
               onClick={handleCloseButtonClick}
               aria-label="Закрыть модальное окно"
             >
-              <AiOutlineClose />
+              <Icon name="close" />
             </Button>
           )}
         </header>

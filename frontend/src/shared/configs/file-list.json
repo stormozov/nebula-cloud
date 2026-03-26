@@ -2,37 +2,37 @@
   "actions": [
     {
       "id": "view",
-      "icon": "👁️",
+      "icon": "eye",
       "title": "Просмотр",
       "ariaLabel": "Просмотр файла"
     },
     {
       "id": "download",
-      "icon": "⬇️",
+      "icon": "download",
       "title": "Скачать",
       "ariaLabel": "Скачать файл"
     },
     {
       "id": "publicLink",
-      "icon": "🔗",
+      "icon": "share",
       "title": "Публичная ссылка",
       "ariaLabel": "Копировать публичную ссылку"
     },
     {
       "id": "rename",
-      "icon": "✏️",
+      "icon": "pencil",
       "title": "Переименовать",
       "ariaLabel": "Переименовать файл"
     },
     {
       "id": "editComment",
-      "icon": "💬",
+      "icon": "comment",
       "title": "Комментарий",
       "ariaLabel": "Изменить комментарий"
     },
     {
       "id": "delete",
-      "icon": "🗑️",
+      "icon": "trash",
       "title": "Удалить",
       "ariaLabel": "Удалить файл",
       "isDanger": true

@@ -31,10 +31,6 @@ export interface IButtonProps
    */
   loading?: boolean;
   /**
-   * Button children (text or icon).
-   */
-  children?: React.ReactNode;
-  /**
    * Additional CSS class name.
    */
   className?: string;

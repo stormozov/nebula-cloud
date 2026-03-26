@@ -1,4 +1,4 @@
-import { Button, ControlledInput, Heading, PageWrapper } from "@/shared/ui";
+import { Button, ControlledInput, Heading, PageWrapper, Icon } from "@/shared/ui";
 
 import type { IResetPasswordFormProps } from "../lib/types";
 import { useResetPasswordForm } from "../lib/useResetPasswordForm";
@@ -64,9 +64,11 @@ export function ResetPasswordForm({
 
       <PageWrapper className="edit-user-form__buttons" justify="end">
         <Button variant="secondary" onClick={onCancel}>
+          <Icon name="close" />
           Отмена
         </Button>
         <Button type="submit" loading={isLoading}>
+          <Icon name="save" />
           Сохранить
         </Button>
       </PageWrapper>

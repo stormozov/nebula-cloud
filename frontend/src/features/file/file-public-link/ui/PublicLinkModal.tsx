@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
-import { AiOutlineClose } from "react-icons/ai";
-import { BsInfoSquareFill } from "react-icons/bs";
-import { FaCheck, FaShareNodes, FaLinkSlash, FaCopy } from "react-icons/fa6";
 
 import type { IFile } from "@/entities/file";
-import { Button, ControlledInput } from "@/shared/ui";
+import { Button, ControlledInput, Icon } from "@/shared/ui";
 import { Modal } from "@/shared/ui/Modal";
 
 import "./PublicLinkModal.scss";
@@ -98,7 +95,7 @@ export function PublicLinkModal({
             onClick={handleClose}
             disabled={isGenerating || isDeleting}
           >
-            <AiOutlineClose />
+            <Icon name="close" />
             Закрыть
           </Button>
           {hasLink && (
@@ -107,7 +104,7 @@ export function PublicLinkModal({
               onClick={handleDeleteBtnClick}
               loading={isDeleting}
             >
-              <FaLinkSlash />
+              <Icon name="deleteLink" />
               Удалить ссылку
             </Button>
           )}
@@ -118,7 +115,7 @@ export function PublicLinkModal({
         {hasLink ? (
           <>
             <div className="public-link-modal__success">
-              <FaCheck />
+              <Icon name="check" />
               <p>Публичная ссылка активна</p>
             </div>
 
@@ -140,12 +137,12 @@ export function PublicLinkModal({
               >
                 {copySuccess ? (
                   <>
-                    <FaCheck />
+                    <Icon name="check" />
                     Скопировано!
                   </>
                 ) : (
                   <>
-                    <FaCopy />
+                    <Icon name="copy" />
                     Скопировать
                   </>
                 )}
@@ -159,7 +156,7 @@ export function PublicLinkModal({
         ) : (
           <>
             <div className="public-link-modal__info">
-              <BsInfoSquareFill size={20} />
+              <Icon name="infoSquare" size={20} />
               <p>Публичная ссылка ещё не создана</p>
             </div>
 
@@ -170,7 +167,7 @@ export function PublicLinkModal({
                 loading={isGenerating}
                 fullWidth
               >
-                <FaShareNodes />
+                <Icon name="share" />
                 Создать публичную ссылку
               </Button>
             </div>

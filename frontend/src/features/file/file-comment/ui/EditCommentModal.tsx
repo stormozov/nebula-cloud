@@ -1,9 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { AiOutlineClose } from "react-icons/ai";
-import { FaSave } from "react-icons/fa";
 
 import type { IFile } from "@/entities/file";
-import { Button, ControlledTextarea } from "@/shared/ui";
+import { Button, ControlledTextarea, Icon } from "@/shared/ui";
 import { Modal } from "@/shared/ui/Modal";
 
 import "./EditCommentModal.scss";
@@ -107,7 +105,7 @@ export function EditCommentModal({
             onClick={handleClose}
             disabled={isSubmitting}
           >
-            <AiOutlineClose />
+            <Icon name="close" />
             Отмена
           </Button>
           <Button
@@ -115,7 +113,7 @@ export function EditCommentModal({
             onClick={handleSubmit}
             loading={isSubmitting}
           >
-            <FaSave />
+            <Icon name="save" />
             Сохранить
           </Button>
         </>
