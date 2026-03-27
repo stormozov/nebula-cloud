@@ -27,8 +27,24 @@ export interface IUserListItemProps {
  * }} />
  */
 export function UserListItem({ user, onSelectUser }: IUserListItemProps) {
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTableRowElement>) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onSelectUser(user.id);
+    }
+  };
+
   return (
-    <tr className="users-list__body-row" onClick={() => onSelectUser(user.id)}>
+    // biome-ignore lint/a11y/useSemanticElements: <It`s need for accessibility>
+    <tr
+      className="users-list__body-row"
+      role="button"
+      title={`Открыть информацию о пользователе ${user.username}`}
+      aria-label={`Открыть информацию о пользователе ${user.username}`}
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+      onClick={() => onSelectUser(user.id)}
+    >
       <td className="users-list__body-cell">{user.id}</td>
       <td className="users-list__body-cell">{user.username}</td>
       <td className="users-list__body-cell">{user.email}</td>

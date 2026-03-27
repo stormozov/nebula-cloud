@@ -14,6 +14,13 @@
     &:hover {
       background-color: var(--color-bg-secondary);
     }
+
+    &:focus-visible {
+      background-color: var(--color-bg-secondary);
+      outline: 2px solid var(--color-border-focus);
+      outline-offset: -2px;
+      color: var(--color-text-link-hover);
+    }
   }
 
   &__body-cell {
