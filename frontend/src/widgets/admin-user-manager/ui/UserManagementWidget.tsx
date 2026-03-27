@@ -1,21 +1,37 @@
 import { useState } from "react";
 
+import { useGetUsersQuery } from "@/entities/user";
 import { UserDetailsModal, UserList } from "@/features/admin";
 import { ModalConfirm, useModalConfirm } from "@/shared/ui";
 
 export function UserManagementWidget() {
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
+  const {
+    data: users,
+    isLoading: usersLoading,
+    error: usersError,
+  } = useGetUsersQuery();
+
   const { dialog, requestConfirm, handleConfirm, handleCancel } =
     useModalConfirm();
 
+  const allUserIds = users?.map((user) => user.id) ?? [];
+
   return (
     <>
-      <UserList onSelectUser={setSelectedUserId} />
+      <UserList
+        users={users}
+        isLoading={usersLoading}
+        error={usersError}
+        onSelectUser={setSelectedUserId}
+      />
 
       {selectedUserId && (
         <UserDetailsModal
           userId={selectedUserId}
+          allUserIds={allUserIds}
+          onNavigate={setSelectedUserId}
           requestConfirm={requestConfirm}
           onClose={() => setSelectedUserId(null)}
         />

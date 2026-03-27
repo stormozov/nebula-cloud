@@ -1,4 +1,5 @@
-import { useState } from "react";
+import classNames from "classnames";
+import { useCallback, useEffect, useState } from "react";
 
 import { useAppSelector } from "@/app/store/hooks";
 import {
@@ -6,6 +7,7 @@ import {
   useGetStorageStatsQuery,
   useGetUserQuery,
 } from "@/entities/user";
+import { UserNavigation } from "@/features/admin";
 import {
   Button,
   Heading,
@@ -21,7 +23,6 @@ import type {
 import { UserDetailsModalActions } from "./UserDetailsModalActions";
 import { UserDetailsModalInfo } from "./UserDetailsModalInfo";
 
-import classNames from "classnames";
 import "./UserDetailsModal.scss";
 
 /**
@@ -29,6 +30,8 @@ import "./UserDetailsModal.scss";
  */
 interface IUserDetailsModalProps {
   userId: number;
+  allUserIds: number[];
+  onNavigate: (userId: number) => void;
   requestConfirm: ModalConfirmDialogRequest;
   onClose: () => void;
 }
@@ -43,6 +46,8 @@ interface IUserDetailsModalProps {
  */
 export function UserDetailsModal({
   userId,
+  allUserIds,
+  onNavigate,
   requestConfirm,
   onClose,
 }: IUserDetailsModalProps) {
@@ -56,11 +61,11 @@ export function UserDetailsModal({
     skip: !userId,
   });
 
-  const handleCloseWithAnimation = () => {
+  const handleCloseWithAnimation = useCallback(() => {
     if (isClosing) return;
     setIsClosing(true);
     setTimeout(() => onClose(), 300);
-  };
+  }, [isClosing, onClose]);
 
   const handleInlineFormClose = () => setAction("none");
 
@@ -88,6 +93,18 @@ export function UserDetailsModal({
     handleCloseWithAnimation();
     console.log("Success delete user", message);
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        handleCloseWithAnimation();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleCloseWithAnimation]);
 
   if (isLoading) return <div>Загрузка...</div>;
   if (!user) return <div>Пользователь не найден</div>;
@@ -124,9 +141,21 @@ export function UserDetailsModal({
                 Детали пользователя {user?.username || user?.fullName}
                 {isCurrentUser ? <span>Вы</span> : ""}
               </Heading>
-              <Button variant="secondary" onClick={handleCloseWithAnimation}>
-                <Icon name="close" />
-              </Button>
+              <PageWrapper>
+                <UserNavigation
+                  currentUserId={user.id}
+                  allUserIds={allUserIds}
+                  onNavigate={onNavigate}
+                />
+                <Button
+                  variant="secondary"
+                  title="Закрыть окно (ESC)"
+                  aria-label="Закрыть окно"
+                  onClick={handleCloseWithAnimation}
+                >
+                  <Icon name="close" />
+                </Button>
+              </PageWrapper>
             </PageWrapper>
           </header>
 

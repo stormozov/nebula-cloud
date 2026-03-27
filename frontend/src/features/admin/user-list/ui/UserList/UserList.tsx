@@ -1,20 +1,30 @@
-import { useGetUsersQuery } from "@/entities/user";
+import type { IUserListResponse } from "@/entities/user";
+
 import { UserListItem } from "../UserListItem/UserListItem";
 
 import "./UserList.scss";
 
 const USER_LIST_HEADER = ["ID", "Логин", "Email", "Админ", "Активен"];
 
+/**
+ * Interface for the props of the UserList component.
+ */
 interface IUserListProps {
+  users: IUserListResponse[] | undefined;
+  isLoading: boolean;
+  error: string | null | unknown;
   onSelectUser: (userId: number) => void;
 }
 
 /**
  * Represents a list of users.
  */
-export const UserList = ({ onSelectUser }: IUserListProps) => {
-  const { data: users, isLoading, error } = useGetUsersQuery();
-
+export function UserList({
+  users,
+  isLoading,
+  error,
+  onSelectUser,
+}: IUserListProps) {
   if (isLoading) return <div className="user-list-loading">Загрузка...</div>;
   if (error) {
     return <div className="user-list-error">Ошибка загрузки пользователей</div>;
@@ -47,4 +57,4 @@ export const UserList = ({ onSelectUser }: IUserListProps) => {
       </table>
     </div>
   );
-};
+}

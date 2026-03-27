@@ -86,7 +86,7 @@ export const Icon = React.memo<IconProps>(function Icon({
       ? "currentColor"
       : (colorMap[color as keyof typeof colorMap] ?? color);
 
-  const resolvedSize = size === "currentSize" ? undefined : size;
+  const resolvedSize = size === "currentSize" ? "1em" : size;
 
   return (
     <IconComponent

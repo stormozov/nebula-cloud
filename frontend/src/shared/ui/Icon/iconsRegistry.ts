@@ -30,6 +30,9 @@ import { IoReloadSharp } from "react-icons/io5";
 import { MdEdit, MdLogin, MdLogout } from "react-icons/md";
 import { PiPasswordBold, PiWarningDiamondFill } from "react-icons/pi";
 import { RiAdminFill } from "react-icons/ri";
+import { IoIosArrowForward } from "react-icons/io";
+import { IoIosArrowBack } from "react-icons/io";
+import { MdOutlineDoNotDisturbAlt } from "react-icons/md";
 
 /**
  * A constant object that maps icon names to their corresponding React component
@@ -65,6 +68,7 @@ export const ICONS = {
   check: FaCheck,
   warning: PiWarningDiamondFill,
   infoSquare: BsInfoSquareFill,
+  doNotDisturb: MdOutlineDoNotDisturbAlt,
 
   // ========== User & Admin ==========
   person: FaUser,
@@ -80,6 +84,10 @@ export const ICONS = {
   folder: FaFolder,
   cloud: IoIosCloud,
   deleteLink: FaLinkSlash,
+
+  // ========== Arrows ==========
+  arrowRight: IoIosArrowForward,
+  arrowLeft: IoIosArrowBack,
 
   // ========== Theme / Mode ==========
   lightbulbOn: BsFillLightbulbFill,
