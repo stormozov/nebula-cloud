@@ -1,6 +1,6 @@
 import { LogoutButton } from "@/features/auth";
 import { useGlobalDragDrop } from "@/features/file/file-upload";
-import { Logo, PageLayout } from "@/shared/ui";
+import { Logo, Navigation, PageLayout } from "@/shared/ui";
 
 import "./PageClientDisk.scss";
 import { FileManager } from "@/widgets/file-manager";
@@ -17,6 +17,7 @@ export default function PageClientDisk() {
         <PageLayout.Container>
           <PageLayout.Wrapper align="center" justify="space-between">
             <Logo />
+            <Navigation />
             <LogoutButton variant="secondary" />
           </PageLayout.Wrapper>
         </PageLayout.Container>

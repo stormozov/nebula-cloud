@@ -77,6 +77,11 @@ export interface IStorageStats {
   totalSizeFormatted: string;
 }
 
+/**
+ * Union type representing the possible roles a user can have.
+ */
+export type UserRoles = "user" | "admin";
+
 // =============================================================================
 // TYPES FOR ADMIN API
 // =============================================================================

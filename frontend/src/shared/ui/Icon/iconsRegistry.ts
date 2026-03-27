@@ -1,4 +1,5 @@
 import { AiOutlineClose } from "react-icons/ai";
+import { BiSolidDashboard } from "react-icons/bi";
 import {
   BsFillLightbulbFill,
   BsInfoSquareFill,
@@ -21,7 +22,8 @@ import {
   FaLinkSlash,
   FaPencil,
   FaShareNodes,
-  FaTrashCan,FaUser 
+  FaTrashCan,
+  FaUser,
 } from "react-icons/fa6";
 import { IoIosCloud } from "react-icons/io";
 import { IoReloadSharp } from "react-icons/io5";
@@ -57,6 +59,7 @@ export const ICONS = {
   close: AiOutlineClose,
   eye: FaEye,
   comment: FaComment,
+  dashboard: BiSolidDashboard,
 
   // ========== Status & Feedback ==========
   check: FaCheck,

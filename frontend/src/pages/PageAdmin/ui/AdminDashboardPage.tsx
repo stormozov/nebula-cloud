@@ -1,5 +1,5 @@
 import { LogoutButton } from "@/features/auth";
-import { Heading, Logo, PageLayout } from "@/shared/ui";
+import { Heading, Logo, Navigation, PageLayout } from "@/shared/ui";
 import { UserManagementWidget } from "@/widgets/admin-user-manager";
 
 import "./AdminDashboardPage.scss";
@@ -14,6 +14,7 @@ export default function AdminDashboardPage() {
         <PageLayout.Container>
           <PageLayout.Wrapper align="center" justify="space-between">
             <Logo />
+            <Navigation />
             <LogoutButton variant="secondary" />
           </PageLayout.Wrapper>
         </PageLayout.Container>
