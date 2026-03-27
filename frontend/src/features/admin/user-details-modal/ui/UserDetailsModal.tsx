@@ -21,6 +21,7 @@ import type {
 import { UserDetailsModalActions } from "./UserDetailsModalActions";
 import { UserDetailsModalInfo } from "./UserDetailsModalInfo";
 
+import classNames from "classnames";
 import "./UserDetailsModal.scss";
 
 /**
@@ -46,6 +47,7 @@ export function UserDetailsModal({
   onClose,
 }: IUserDetailsModalProps) {
   const [action, setAction] = useState<UserDetailsModalActionsType>("none");
+  const [isClosing, setIsClosing] = useState(false);
 
   const currentUser = useAppSelector(selectUser);
 
@@ -53,6 +55,12 @@ export function UserDetailsModal({
   const { data: storageStats } = useGetStorageStatsQuery(userId, {
     skip: !userId,
   });
+
+  const handleCloseWithAnimation = () => {
+    if (isClosing) return;
+    setIsClosing(true);
+    setTimeout(() => onClose(), 300);
+  };
 
   const handleInlineFormClose = () => setAction("none");
 
@@ -77,7 +85,7 @@ export function UserDetailsModal({
   };
 
   const handleDeleteUserSuccess = (message: string) => {
-    onClose();
+    handleCloseWithAnimation();
     console.log("Success delete user", message);
   };
 
@@ -101,7 +109,7 @@ export function UserDetailsModal({
   };
 
   return (
-    <div className="user-details-modal">
+    <div className={classNames("user-details-modal", { closing: isClosing })}>
       <div className="user-details-modal__overlay" />
       <aside className="user-details-modal__content-wrapper">
         <div className="container">
@@ -112,14 +120,11 @@ export function UserDetailsModal({
               justify="space-between"
             >
               <Heading level={3} className="user-details-modal__header-title">
-                <Icon
-                  name="person"
-                  color="primary"
-                />
+                <Icon name="person" color="primary" />
                 Детали пользователя {user?.username || user?.fullName}
                 {isCurrentUser ? <span>Вы</span> : ""}
               </Heading>
-              <Button variant="secondary" onClick={onClose}>
+              <Button variant="secondary" onClick={handleCloseWithAnimation}>
                 <Icon name="close" />
               </Button>
             </PageWrapper>
