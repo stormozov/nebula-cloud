@@ -1,11 +1,9 @@
 import { useState } from "react";
-import { AiOutlineClose } from "react-icons/ai";
-import { FaCheck } from "react-icons/fa6";
 
 import { Button } from "../buttons";
+import { Icon } from "../Icon";
 import { PageWrapper } from "../layouts";
 import { Modal } from "../Modal";
-import { Icon } from "../Icon";
 
 import "./ModalConfirm.scss";
 
@@ -44,8 +42,8 @@ export interface ModalConfirmProps {
 export function ModalConfirm({
   isOpen,
   title = "Подтвердите действие",
-  closeOnOverlayClick = false,
-  closeOnEsc = false,
+  closeOnOverlayClick = true,
+  closeOnEsc = true,
   onConfirm,
   onCancel,
   onClose,

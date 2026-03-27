@@ -268,9 +268,7 @@ export function FileManager({
   return (
     <div className="file-manager">
       <div className="file-manager__toolbar">
-        <FileUploadButton variant="primary" size="medium">
-          Загрузить файл
-        </FileUploadButton>
+        <FileUploadButton>Загрузить файл</FileUploadButton>
       </div>
 
       {/* Dropzone - ONLY WHEN NO FILES */}

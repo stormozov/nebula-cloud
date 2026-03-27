@@ -34,6 +34,7 @@ interface IUserDetailsModalProps {
   onNavigate: (userId: number) => void;
   requestConfirm: ModalConfirmDialogRequest;
   onClose: () => void;
+  isConfirmOpen?: boolean;
 }
 
 /**
@@ -50,6 +51,7 @@ export function UserDetailsModal({
   onNavigate,
   requestConfirm,
   onClose,
+  isConfirmOpen = false,
 }: IUserDetailsModalProps) {
   const [action, setAction] = useState<UserDetailsModalActionsType>("none");
   const [isClosing, setIsClosing] = useState(false);
@@ -96,7 +98,7 @@ export function UserDetailsModal({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
+      if (e.key === "Escape" && !isConfirmOpen) {
         e.preventDefault();
         handleCloseWithAnimation();
       }
@@ -104,7 +106,7 @@ export function UserDetailsModal({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleCloseWithAnimation]);
+  }, [handleCloseWithAnimation, isConfirmOpen]);
 
   if (isLoading) return <div>Загрузка...</div>;
   if (!user) return <div>Пользователь не найден</div>;

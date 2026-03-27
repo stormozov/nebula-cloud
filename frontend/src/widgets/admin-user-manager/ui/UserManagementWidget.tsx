@@ -31,6 +31,7 @@ export function UserManagementWidget() {
         <UserDetailsModal
           userId={selectedUserId}
           allUserIds={allUserIds}
+          isConfirmOpen={dialog.isOpen}
           onNavigate={setSelectedUserId}
           requestConfirm={requestConfirm}
           onClose={() => setSelectedUserId(null)}
@@ -40,6 +41,8 @@ export function UserManagementWidget() {
       <ModalConfirm
         isOpen={dialog.isOpen}
         title={dialog.title}
+        closeOnOverlayClick={false}
+        closeOnEsc={false}
         onConfirm={handleConfirm}
         onCancel={handleCancel}
         onClose={handleCancel}
