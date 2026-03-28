@@ -1,5 +1,8 @@
 // LIB
 export * from "./lib/types";
+export * from "./lib/useBlockHover";
+export * from "./lib/useClipboardWithHandlers";
+export * from "./lib/useUserBlocksData";
 
 // UI
 export * from "./ui/UserDetailsModal";

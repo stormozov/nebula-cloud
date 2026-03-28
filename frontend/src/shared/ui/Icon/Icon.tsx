@@ -35,7 +35,7 @@ const colorMap: Record<Exclude<IconColor, "currentColor">, string> = {
 /**
  * Interface for Icon component props.
  */
-interface IconProps {
+export interface IIconProps {
   name: IconName;
   size?: number | string;
   color?: IconColor;
@@ -70,7 +70,7 @@ interface IconProps {
  * - The `size` prop passes `undefined` when "currentSize" is used, allowing
  * the icon to inherit text size.
  */
-export const Icon = React.memo<IconProps>(function Icon({
+export const Icon = React.memo<IIconProps>(function Icon({
   name,
   size = "currentSize",
   color = "currentColor",

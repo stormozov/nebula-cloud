@@ -1,6 +1,12 @@
+import classNames from "classnames";
+
 import type { IStorageStatsResponse, IUser } from "@/entities/user";
-import { Heading, PageWrapper, StatusBadge } from "@/shared/ui";
-import { formatDate, truncateWithMiddleEllipsis } from "@/shared/utils";
+import { Button, Heading, Icon, PageWrapper } from "@/shared/ui";
+
+import type { IUserDetailsInfoItem } from "../lib/types";
+import { useBlockHover } from "../lib/useBlockHover";
+import { useClipboardWithHandlers } from "../lib/useClipboardWithHandlers";
+import { useUserBlocksData } from "../lib/useUserBlocksData";
 
 import "./UserDetailsModal.scss";
 
@@ -13,107 +19,83 @@ interface IUserDetailsModalInfoProps {
 }
 
 /**
- * Component that displays detailed user information in a structured format.
+ * Modal component for displaying detailed user info in structured blocks.
  *
- * @example
- * <UserDetailsModalInfo user={userData} storageStats={storageData} />
+ * Renders user data grouped into sections. Each section is interactive
+ * — supports hover states and copying values via clipboard hooks.
  */
 export function UserDetailsModalInfo({
   user,
   storageStats,
 }: IUserDetailsModalInfoProps) {
-  const generalInfo = [
-    { title: "ID", value: user.id },
-    { title: "Логин", value: user.username },
-    {
-      title: "Email",
-      value: truncateWithMiddleEllipsis(user.email),
-      originalValue: user.email,
-    },
-    { title: "ФИО", value: user.fullName },
-  ];
+  const blocks = useUserBlocksData(user, storageStats);
+  const { handleRowClick, handleCopyBlock } = useClipboardWithHandlers();
+  const { isHovered, handleMouseEnter, handleMouseLeave } = useBlockHover();
 
-  const additionalInfo = [
-    { title: "Регистрация", value: formatDate(user.dateJoined) },
-    { title: "Посл. вход", value: formatDate(user.lastLogin) },
-    { title: "Активен", value: <StatusBadge isActive={user.isActive} /> },
-    {
-      title: "Администратор",
-      value: (
-        <StatusBadge
-          isActive={user.isStaff}
-          activeText="Да"
-          inactiveText="Нет"
-        />
-      ),
-    },
-  ];
+  // An auxiliary function for rendering a block
+  const renderSection = (title: string, items: IUserDetailsInfoItem[]) => {
+    const copyValues = items.map((item) => item.copyValue);
 
-  const storageInfo = [
-    { title: "Путь хранилища", value: storageStats?.storage.path },
-    { title: "Кол-во файлов", value: storageStats?.storage.fileCount },
-    { title: "Общий размер", value: storageStats?.storage.totalSizeFormatted },
-  ];
+    return (
+      // biome-ignore lint/a11y/useSemanticElements: <It`s need for accessibility>
+      <div
+        key={title}
+        role="region"
+        className="user-details-modal__info"
+        aria-label={`Блок информации о пользователе: ${title}`}
+        onMouseEnter={() => handleMouseEnter(title)}
+        onMouseLeave={handleMouseLeave}
+      >
+        <div
+          className={classNames("user-details-modal__info-header", {
+            hovered: isHovered(title),
+          })}
+        >
+          <Heading
+            level={4}
+            size="sm"
+            noMargin
+            className="user-details-modal__info-title"
+          >
+            {title}
+          </Heading>
+          <Button
+            variant="text"
+            className="user-details-modal__copy-block-button"
+            onClick={() => handleCopyBlock(title, copyValues)}
+            aria-label={`Скопировать все поля блока "${title}"`}
+          >
+            <Icon name="copy" />
+          </Button>
+        </div>
+        {items.map((info) => (
+          <button
+            key={info.title}
+            type="button"
+            className="user-details-modal__info-path w-full"
+            title={info.originalValue}
+            aria-label={`Скопировать ${info.title}`}
+            onClick={() => handleRowClick(info.copyValue, info.title)}
+          >
+            <p className="user-details-modal__info-label">{info.title}:</p>
+            <span className="user-details-modal__info-value">{info.value}</span>
+            <Icon
+              name="copy"
+              color="text-tertiary"
+              className="user-details-modal__copy-decor-icon"
+            />
+          </button>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <PageWrapper
       direction="column"
       className="user-details-modal__info-section"
     >
-      <div className="user-details-modal__info">
-        <Heading
-          level={4}
-          align="center"
-          size="sm"
-          className="user-details-modal__info-title"
-        >
-          Основная информация
-        </Heading>
-        {generalInfo.map((info) => (
-          <div
-            key={info.title}
-            className="user-details-modal__info-path"
-            title={info.originalValue}
-          >
-            <p className="user-details-modal__info-title">{info.title}:</p>
-            <span>{info.value}</span>
-          </div>
-        ))}
-      </div>
-
-      <div className="user-details-modal__info">
-        <Heading
-          level={4}
-          align="center"
-          size="sm"
-          className="user-details-modal__info-title"
-        >
-          Доп. информация
-        </Heading>
-        {additionalInfo.map((info) => (
-          <div key={info.title} className="user-details-modal__info-path">
-            <p className="user-details-modal__info-title">{info.title}:</p>
-            <span>{info.value}</span>
-          </div>
-        ))}
-      </div>
-
-      <div className="user-details-modal__info">
-        <Heading
-          level={4}
-          align="center"
-          size="sm"
-          className="user-details-modal__info-title"
-        >
-          Статистика диска
-        </Heading>
-        {storageInfo.map((info) => (
-          <div key={info.title} className="user-details-modal__info-path">
-            <p className="user-details-modal__info-title">{info.title}:</p>
-            <span>{info.value}</span>
-          </div>
-        ))}
-      </div>
+      {blocks.map(({ title, items }) => renderSection(title, items))}
     </PageWrapper>
   );
 }

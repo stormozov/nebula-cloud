@@ -1,5 +1,6 @@
 import type { UserDetailsResponse } from "@/entities/user";
 import type { ModalConfirmDialogRequest } from "@/shared/ui";
+import type { ReactNode } from "react";
 
 /**
  * Union type that defines the possible actions available
@@ -80,4 +81,21 @@ export interface IUserDetailsModalActionsProps {
    * Callback function to handle successful deletion of the user.
    */
   deleteUserSuccess: (message: string) => void;
+}
+
+/**
+ * Interface defining the structure of an information item in the modal.
+ */
+export interface IUserDetailsInfoItem {
+  /** The title of the information item */
+  title: string;
+
+  /** Additional information or content associated with the item */
+  value: ReactNode;
+
+  /** The value to be copied to the clipboard */
+  copyValue: string;
+
+  /** The value of the information item */
+  originalValue?: string;
 }

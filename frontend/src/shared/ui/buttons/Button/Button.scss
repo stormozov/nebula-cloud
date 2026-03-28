@@ -105,6 +105,17 @@
     }
   }
 
+  &--text {
+    padding: 0;
+    background-color: transparent;
+    border: none;
+    color: var(--color-text-primary);
+
+    &:hover:not(:disabled) {
+      color: var(--color-text-link);
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // Modifiers
   // ---------------------------------------------------------------------------

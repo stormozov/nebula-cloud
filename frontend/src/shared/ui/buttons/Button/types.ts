@@ -6,7 +6,8 @@ export type ButtonVariant =
   | "secondary"
   | "danger"
   | "ghost"
-  | "outline";
+  | "outline"
+  | "text";
 
 /**
  * Button sizes.
