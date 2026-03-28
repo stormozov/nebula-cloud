@@ -2,12 +2,12 @@ import { LogoutButton } from "@/features/auth";
 import { Heading, Logo, Navigation, PageLayout } from "@/shared/ui";
 import { UserManagementWidget } from "@/widgets/admin-user-manager";
 
-import "./AdminDashboardPage.scss";
+import "./PageAdminDashboard.scss";
 
 /**
- * Admin dashboard page component.
+ * The main dashboard page component for administrators.
  */
-export default function AdminDashboardPage() {
+export default function PageAdminDashboard() {
   return (
     <PageLayout className="page-admin-dashboard">
       <PageLayout.Header>

@@ -22,6 +22,7 @@ import {
   FileUploadDropzone,
 } from "@/features/file/file-upload";
 import { isError401 } from "@/shared/api";
+import { BackButton, Heading, Icon, PageWrapper } from "@/shared/ui";
 import { camelToSnake, isImageFile } from "@/shared/utils";
 
 import "./FileManager.scss";
@@ -49,7 +50,11 @@ export function FileManager({
   isAdmin = false,
   onFileSelect,
 }: IFileManagerProps) {
-  const { data: files = [], isLoading, error } = useGetFilesQuery();
+  const {
+    data: files = [],
+    isLoading,
+    error,
+  } = useGetFilesQuery(userId ? { userId } : undefined);
 
   // Mutations
   const [deleteFile, { isLoading: isDeleting }] = useDeleteFileMutation();
@@ -267,9 +272,30 @@ export function FileManager({
 
   return (
     <div className="file-manager">
-      <div className="file-manager__toolbar">
-        <FileUploadButton>Загрузить файл</FileUploadButton>
-      </div>
+      <header className="file-manager__header">
+        {!isAdmin ? (
+          <>
+            <Heading level={2} noMargin className="file-manager__header-title">
+              Ваш диск
+            </Heading>
+            <FileUploadButton>Загрузить файл</FileUploadButton>
+          </>
+        ) : (
+          <PageWrapper>
+            <BackButton />
+            <Heading level={2} noMargin className="file-manager__header-title">
+              Файлы пользователя{" "}
+              <sup
+                className="file-manager__header-title-badge"
+                title={`ID пользователя: ${userId}`}
+              >
+                <Icon name="person" />
+                {userId}
+              </sup>
+            </Heading>
+          </PageWrapper>
+        )}
+      </header>
 
       {/* Dropzone - ONLY WHEN NO FILES */}
       {!hasFiles && !isLoading && (

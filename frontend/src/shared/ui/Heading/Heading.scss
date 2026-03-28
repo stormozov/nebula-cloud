@@ -11,6 +11,10 @@
   font-family: var(--font-family-base, 'Inter', sans-serif);
   transition: color 0.2s ease-in-out;
 
+  &--no-margin {
+    margin: 0;
+  }
+
   // ---------------------------------------------------------------------------
   // Semantic dimensions (by header level)
   // ---------------------------------------------------------------------------

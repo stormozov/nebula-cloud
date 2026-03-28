@@ -100,8 +100,11 @@ export const fileApi = createApi({
      * to load the file list. Sets loading state before and after the request
      * using `setLoading`.
      */
-    getFiles: build.query<IFile[], void>({
-      query: () => "/storage/files/",
+    getFiles: build.query<IFile[], { userId?: number } | undefined>({
+      query: (params) => {
+        const queryParams = params?.userId ? `?user_id=${params.userId}` : "";
+        return `/storage/files/${queryParams}`;
+      },
       providesTags: ["File"],
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         dispatch(setLoading(true));

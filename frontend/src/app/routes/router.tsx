@@ -53,7 +53,22 @@ export const routesConfig = createBrowserRouter([
         element: (
           <AuthGuard accessLevel="admin">
             {lazyWithSuspense(
-              () => import("@/pages/PageAdmin/ui/AdminDashboardPage"),
+              () =>
+                import(
+                  "@/pages/PageAdmin/ui/PageAdminDashboard/PageAdminDashboard"
+                ),
+            )}
+          </AuthGuard>
+        ),
+      },
+
+      // Protected route: User disk (admin only)
+      {
+        path: "/admin/user/:userId/disk",
+        element: (
+          <AuthGuard accessLevel="admin">
+            {lazyWithSuspense(
+              () => import("@/pages/PageAdmin/ui/PageUserDisk/PageUserDisk"),
             )}
           </AuthGuard>
         ),

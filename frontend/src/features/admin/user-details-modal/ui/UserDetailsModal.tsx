@@ -141,7 +141,16 @@ export function UserDetailsModal({
               <Heading level={3} className="user-details-modal__header-title">
                 <Icon name="person" color="primary" />
                 Детали пользователя {user?.username || user?.fullName}
-                {isCurrentUser ? <span>Вы</span> : ""}
+                {isCurrentUser ? (
+                  <sup
+                    title="Текущий пользователь"
+                    className="user-details-modal__header-title-badge"
+                  >
+                    Вы
+                  </sup>
+                ) : (
+                  ""
+                )}
               </Heading>
               <PageWrapper>
                 <UserNavigation
@@ -151,6 +160,7 @@ export function UserDetailsModal({
                 />
                 <Button
                   variant="secondary"
+                  size="small"
                   title="Закрыть окно (ESC)"
                   aria-label="Закрыть окно"
                   onClick={handleCloseWithAnimation}

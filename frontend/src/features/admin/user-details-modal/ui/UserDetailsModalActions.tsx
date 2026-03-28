@@ -1,6 +1,7 @@
 import classNames from "classnames";
 
 import { EditUserForm } from "@/features/admin/edit-user-form";
+import { UserDiskButton } from "@/features/admin/navigate-to-user-disk";
 import { ResetPasswordForm } from "@/features/admin/reset-password-form";
 import { ToggleActiveButton } from "@/features/admin/toggle-active-button";
 import { ToggleAdminButton } from "@/features/admin/toggle-admin-button";
@@ -51,6 +52,12 @@ export function UserDetailsModalActions({
         </Heading>
 
         <PageWrapper direction="column" gap={"0.625rem"} fullWidth>
+          <UserDiskButton userId={user.id} isCurrentUser={isCurrentUser} />
+        </PageWrapper>
+
+        <Divider />
+
+        <PageWrapper direction="column" gap={"0.625rem"} fullWidth>
           <Button
             variant={isEditAction ? "primary" : "secondary"}
             fullWidth
@@ -68,9 +75,11 @@ export function UserDetailsModalActions({
             <Icon name="password" />
             Сбросить пароль
           </Button>
+        </PageWrapper>
 
-          <Divider gap="0.625rem" />
+        <Divider />
 
+        <PageWrapper direction="column" gap={"0.625rem"} fullWidth>
           <ToggleActiveButton
             userId={user.id}
             isActive={user.isActive}

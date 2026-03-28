@@ -23,6 +23,7 @@ export interface HeadingProps extends React.HTMLAttributes<HTMLHeadingElement> {
   variant?: HeadingVariant; // Color variants
   align?: HeadingAlign; // Alignment
   size?: HeadingSize; // Visual size
+  noMargin?: boolean; // Remove default margin
 }
 
 /**
@@ -53,6 +54,7 @@ export function Heading({
   variant = "primary",
   align = "left",
   size,
+  noMargin = false,
   className = "",
   ...props
 }: HeadingProps) {
@@ -64,6 +66,7 @@ export function Heading({
     `heading--${align}`,
     {
       "heading--size": size === "sm",
+      "heading--no-margin": noMargin,
     },
     className,
   );

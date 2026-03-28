@@ -40,6 +40,7 @@ export function UserNavigation({
     <div className="user-navigation">
       <Button
         variant="ghost"
+        size="small"
         title="Предыдущий пользователь (←)"
         aria-label="Предыдущий пользователь"
         disabled={!hasPrev}
@@ -50,6 +51,7 @@ export function UserNavigation({
       </Button>
       <Button
         variant="ghost"
+        size="small"
         title="Следующий пользователь (→)"
         aria-label="Следующий пользователь"
         disabled={!hasNext}
