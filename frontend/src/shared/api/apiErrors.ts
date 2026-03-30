@@ -1,6 +1,6 @@
 import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 
-import type { IParsedApiErrors } from "@/shared/types/api-errors";
+import type { IParsedApiErrors } from "@/shared/types/api";
 
 /**
  * Parses Django REST Framework validation errors.

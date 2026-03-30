@@ -16,12 +16,12 @@ export function UserManagementWidget() {
   const { dialog, requestConfirm, handleConfirm, handleCancel } =
     useModalConfirm();
 
-  const allUserIds = users?.map((user) => user.id) ?? [];
+  const allUserIds = users?.results.map((user) => user.id) ?? [];
 
   return (
     <>
       <UserList
-        users={users}
+        users={users?.results ?? []}
         isLoading={usersLoading}
         error={usersError}
         onSelectUser={setSelectedUserId}

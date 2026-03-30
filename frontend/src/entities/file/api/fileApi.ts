@@ -7,6 +7,7 @@ import {
   fetchWithAuth,
   getRefreshedToken,
 } from "@/shared/api";
+import type { PaginatedResponse } from "@/shared/types/api";
 import { downloadFile } from "@/shared/utils";
 
 import {
@@ -100,7 +101,10 @@ export const fileApi = createApi({
      * to load the file list. Sets loading state before and after the request
      * using `setLoading`.
      */
-    getFiles: build.query<IFile[], { userId?: number } | undefined>({
+    getFiles: build.query<
+      PaginatedResponse<IFile>,
+      { userId?: number } | undefined
+    >({
       query: (params) => {
         const queryParams = params?.userId ? `?user_id=${params.userId}` : "";
         return `/storage/files/${queryParams}`;
@@ -110,7 +114,7 @@ export const fileApi = createApi({
         dispatch(setLoading(true));
         try {
           const { data } = await queryFulfilled;
-          dispatch(setFileList(data));
+          dispatch(setFileList(data.results));
         } catch {
           dispatch(setError("Не удалось загрузить список файлов"));
         } finally {

@@ -121,15 +121,28 @@ class AdminUserViewSet(viewsets.ModelViewSet):
         """
 
         queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True, context={"request": request})
+        total_count = queryset.count()
 
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True, context={"request": request})
+            logger.info(
+                "Admin user list retrieved: count=%d (total=%d), admin=%s, IP=%s",
+                len(page),
+                total_count,
+                self._get_user_email_for_log(),
+                get_client_ip(request),
+            )
+            return self.get_paginated_response(serializer.data)
+
+        # if pagination is not configured (PAGE_SIZE = None), return all records
+        serializer = self.get_serializer(queryset, many=True, context={"request": request})
         logger.info(
             "Admin user list retrieved: count=%d, admin=%s, IP=%s",
-            queryset.count(),
+            total_count,
             self._get_user_email_for_log(),
             get_client_ip(request),
         )
-
         return Response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs) -> Response:

@@ -50,11 +50,10 @@ export function FileManager({
   isAdmin = false,
   onFileSelect,
 }: IFileManagerProps) {
-  const {
-    data: files = [],
-    isLoading,
-    error,
-  } = useGetFilesQuery(userId ? { userId } : undefined);
+  const { data, isLoading, error } = useGetFilesQuery(
+    userId ? { userId } : undefined,
+  );
+  const fileList = data?.results ?? [];
 
   // Mutations
   const [deleteFile, { isLoading: isDeleting }] = useDeleteFileMutation();
@@ -78,7 +77,7 @@ export function FileManager({
   );
   const [selectedFile, setSelectedFile] = useState<IFile | null>(null);
 
-  const hasFiles = files.length > 0;
+  const hasFiles = fileList.length > 0;
 
   /**
    * Extract error message from RTK Query error object.
@@ -313,7 +312,7 @@ export function FileManager({
       {hasFiles && (
         <div className="file-manager__list">
           <FileList
-            files={files}
+            files={fileList}
             isLoading={isLoading}
             error={getErrorMessage(error)}
             emptyMessage={

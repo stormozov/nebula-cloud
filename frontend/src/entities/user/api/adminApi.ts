@@ -1,6 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 
 import { baseQueryWithAuthErrorHandling } from "@/shared/api";
+import type { PaginatedResponse } from "@/shared/types/api";
 import { camelToSnake } from "@/shared/utils";
 
 import type {
@@ -22,12 +23,12 @@ export const adminApi = createApi({
     /**
      * Fetches a list of all users.
      */
-    getUsers: builder.query<IUserListResponse[], void>({
+    getUsers: builder.query<PaginatedResponse<IUserListResponse>, void>({
       query: () => "/admin/users/",
       providesTags: (result) => {
-        if (result) {
+        if (result?.results) {
           return [
-            ...result.map(({ id }) => ({ type: "User" as const, id })),
+            ...result.results.map(({ id }) => ({ type: "User" as const, id })),
             { type: "User" as const, id: "LIST" },
           ];
         }
@@ -113,7 +114,7 @@ export const adminApi = createApi({
         url: `/admin/users/${id}/export/`,
         method: "GET",
       }),
-    })
+    }),
   }),
 });
 
