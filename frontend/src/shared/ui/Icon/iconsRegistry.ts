@@ -33,6 +33,7 @@ import { RiAdminFill } from "react-icons/ri";
 import { IoIosArrowForward } from "react-icons/io";
 import { IoIosArrowBack } from "react-icons/io";
 import { MdOutlineDoNotDisturbAlt } from "react-icons/md";
+import { FaFileExport } from "react-icons/fa6";
 
 /**
  * A constant object that maps icon names to their corresponding React component
@@ -57,6 +58,7 @@ export const ICONS = {
   download: FaDownload,
   trash: FaTrashCan,
   pencil: FaPencil,
+  export: FaFileExport,
 
   // ========== Navigation & UI ==========
   close: AiOutlineClose,

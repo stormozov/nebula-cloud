@@ -1,13 +1,14 @@
 import classNames from "classnames";
 
+import { DeleteUserButton } from "@/features/admin/delete-user-button";
 import { EditUserForm } from "@/features/admin/edit-user-form";
+import { ExportUserJson } from "@/features/admin/export-user-json";
 import { UserDiskButton } from "@/features/admin/navigate-to-user-disk";
 import { ResetPasswordForm } from "@/features/admin/reset-password-form";
 import { ToggleActiveButton } from "@/features/admin/toggle-active-button";
 import { ToggleAdminButton } from "@/features/admin/toggle-admin-button";
 import { Button, Divider, Heading, Icon, PageWrapper } from "@/shared/ui";
 
-import { DeleteUserButton } from "../../delete-user-button";
 import type { IUserDetailsModalActionsProps } from "../lib/types";
 
 /**
@@ -76,6 +77,13 @@ export function UserDetailsModalActions({
             Сбросить пароль
           </Button>
         </PageWrapper>
+
+        <Divider />
+
+        <ExportUserJson
+          userId={user.id}
+          buttonProps={{ variant: "secondary", fullWidth: true }}
+        />
 
         <Divider />
 

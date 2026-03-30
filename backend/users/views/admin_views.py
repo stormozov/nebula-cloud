@@ -50,6 +50,7 @@ class AdminUserViewSet(viewsets.ModelViewSet):
         POST   /api/admin/users/{id}/password/ - Reset user password
         POST   /api/admin/users/{id}/toggle-admin/ - Toggle admin status
         GET    /api/admin/users/{id}/storage-stats/ - Get storage statistics
+        GET    /api/admin/users/{id}/export/ - Export user data
     """
 
     queryset = UserAccount.objects.all().order_by("username")
@@ -456,3 +457,24 @@ class AdminUserViewSet(viewsets.ModelViewSet):
         )
 
         return Response(stats, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["get"], url_path="export")
+    def export_user_data(self, request, pk=None):
+        """Export user data as JSON."""
+
+        user = self.get_object()
+
+        data = {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "full_name": user.get_full_name(),
+            "is_staff": user.is_staff,
+            "is_active": user.is_active,
+            "date_joined": user.date_joined,
+            "last_login": user.last_login,
+            "storage_path": user.storage_path,
+            "storage_stats": calculate_storage_stats(user),
+        }
+
+        return Response(data)

@@ -104,6 +104,16 @@ export const adminApi = createApi({
     getStorageStats: builder.query<IStorageStatsResponse, number>({
       query: (id) => `/admin/users/${id}/storage-stats/`,
     }),
+
+    /**
+     * Exports user data as a JSON file for a specific user.
+     */
+    exportUserData: builder.mutation<IAdminApiResponse, number>({
+      query: (id) => ({
+        url: `/admin/users/${id}/export/`,
+        method: "GET",
+      }),
+    })
   }),
 });
 
@@ -115,4 +125,5 @@ export const {
   useResetPasswordMutation,
   useToggleAdminMutation,
   useGetStorageStatsQuery,
+  useExportUserDataMutation,
 } = adminApi;
