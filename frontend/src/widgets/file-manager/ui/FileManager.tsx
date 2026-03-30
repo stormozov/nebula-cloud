@@ -1,6 +1,7 @@
 import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+import { useAppSelector } from "@/app/store/hooks";
 import type { IFile, IFileRename } from "@/entities/file";
 import {
   downloadFileFromApi,
@@ -9,8 +10,9 @@ import {
   useGeneratePublicLinkMutation,
   useGetFilesQuery,
   useRenameFileMutation,
-  useUpdateCommentMutation,
+  useUpdateCommentMutation
 } from "@/entities/file";
+import { selectIsQueueCompleted } from "@/entities/file-upload";
 import { EditCommentModal } from "@/features/file/file-comment";
 import { DeleteFileModal } from "@/features/file/file-delete";
 import { ImageViewerModal } from "@/features/file/file-image-preview";
@@ -22,7 +24,7 @@ import {
   FileUploadDropzone,
 } from "@/features/file/file-upload";
 import { isError401 } from "@/shared/api";
-import { BackButton, Heading, Icon, PageWrapper } from "@/shared/ui";
+import { BackButton, Button, Heading, Icon, PageWrapper } from "@/shared/ui";
 import { camelToSnake, isImageFile } from "@/shared/utils";
 
 import "./FileManager.scss";
@@ -50,10 +52,18 @@ export function FileManager({
   isAdmin = false,
   onFileSelect,
 }: IFileManagerProps) {
-  const { data, isLoading, error } = useGetFilesQuery(
-    userId ? { userId } : undefined,
+  const PAGE_SIZE = 20;
+
+  // States
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loadedFiles, setLoadedFiles] = useState<IFile[]>([]);
+
+  // Queries
+  const { data, isLoading, error, isFetching } = useGetFilesQuery(
+    userId
+      ? { userId, page: currentPage, pageSize: PAGE_SIZE }
+      : { page: currentPage, pageSize: PAGE_SIZE },
   );
-  const fileList = data?.results ?? [];
 
   // Mutations
   const [deleteFile, { isLoading: isDeleting }] = useDeleteFileMutation();
@@ -77,7 +87,8 @@ export function FileManager({
   );
   const [selectedFile, setSelectedFile] = useState<IFile | null>(null);
 
-  const hasFiles = fileList.length > 0;
+  // Listen for upload completion to reset pagination
+  const isUploadQueueCompleted = useAppSelector(selectIsQueueCompleted);
 
   /**
    * Extract error message from RTK Query error object.
@@ -145,10 +156,9 @@ export function FileManager({
     if (!selectedFile) return;
 
     try {
-      const newFileName = camelToSnake({ original_name: newName });
       await renameFile({
         id: selectedFile.id,
-        data: newFileName as IFileRename,
+        data: camelToSnake({ original_name: newName }) as IFileRename,
       }).unwrap();
       setRenameModalOpen(false);
       setSelectedFile(null);
@@ -215,9 +225,8 @@ export function FileManager({
     if (!selectedFile) return;
 
     try {
-      const updatedFile = await generatePublicLink(selectedFile.id).unwrap();
-      setSelectedFile(updatedFile);
-      // Don't close modal - user might want to copy the link
+      await generatePublicLink(selectedFile.id).unwrap();
+      setSelectedFile(selectedFile); // Trigger re-render with cache update
     } catch (err) {
       if (isError401(err as FetchBaseQueryError)) return;
       console.error("Failed to generate link:", err);
@@ -237,10 +246,7 @@ export function FileManager({
     if (!selectedFile) return;
 
     try {
-      const updatedFile = await deletePublicLink(selectedFile.id).unwrap();
-
-      setSelectedFile(updatedFile);
-
+      await deletePublicLink(selectedFile.id).unwrap();
       setLinkModalOpen(false);
       setSelectedFile(null);
     } catch (err) {
@@ -264,6 +270,41 @@ export function FileManager({
       return;
     }
   };
+
+  const loadMore = () => {
+    setCurrentPage((prev) => prev + 1);
+  };
+
+  // ---------------------------------------------------------------------------
+  // EFFECTS
+  // ---------------------------------------------------------------------------
+
+  // Reset pagination when uploads complete (new files at top of page 1)
+  useEffect(() => {
+    if (!isUploadQueueCompleted) return;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    setTimeout(() => {
+      setCurrentPage(1);
+      setLoadedFiles([]);
+    });
+  }, [isUploadQueueCompleted]);
+
+  // Load more files when scrolling to bottom
+  useEffect(() => {
+    if (!data) return;
+
+    if (currentPage === 1) {
+      setTimeout(() => setLoadedFiles(data.results));
+    } else {
+      setTimeout(() => {
+        setLoadedFiles((prev) => {
+          const existingIds = new Set(prev.map((f) => f.id));
+          const newFiles = data.results.filter((f) => !existingIds.has(f.id));
+          return [...prev, ...newFiles];
+        });
+      });
+    }
+  }, [data, currentPage]);
 
   // ---------------------------------------------------------------------------
   // RENDER
@@ -296,8 +337,8 @@ export function FileManager({
         )}
       </header>
 
-      {/* Dropzone - ONLY WHEN NO FILES */}
-      {!hasFiles && !isLoading && (
+      {/* Dropzone - ONLY WHEN NO FILES or initial load */}
+      {data && data.results.length === 0 && !error && (
         <div className="file-manager__dropzone">
           <FileUploadDropzone
             mode="local"
@@ -309,17 +350,13 @@ export function FileManager({
       )}
 
       {/* File list */}
-      {hasFiles && (
+      {loadedFiles.length > 0 && (
         <div className="file-manager__list">
           <FileList
-            files={fileList}
+            files={loadedFiles}
             isLoading={isLoading}
             error={getErrorMessage(error)}
-            emptyMessage={
-              hasFiles
-                ? "Файлы не найдены"
-                : "В хранилище нет файлов. Загрузите первый файл!"
-            }
+            emptyMessage="Файлы не найдены"
             onSelectFile={onFileSelect}
             onViewFile={handleView}
             onDownloadFile={handleDownload}
@@ -328,6 +365,18 @@ export function FileManager({
             onEditCommentFile={handleEditComment}
             onDeleteFile={handleDelete}
           />
+          {data?.next && (
+            <div className="file-manager__load-more">
+              <Button
+                loading={isFetching}
+                disabled={isFetching}
+                onClick={loadMore}
+              >
+                <Icon name="retry" />
+                Загрузить ещё
+              </Button>
+            </div>
+          )}
         </div>
       )}
 

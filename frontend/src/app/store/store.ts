@@ -12,7 +12,6 @@ import {
 } from "redux-persist";
 
 import { fileApi } from "@/entities/file";
-import fileReducer from "@/entities/file/model/slice";
 import type {
   IUploadFileSerialized,
   IUploadState,
@@ -133,7 +132,6 @@ const persistedUploadReducer = persistReducer(
 
 const rootReducer = combineReducers({
   user: persistedUserReducer,
-  file: fileReducer,
   fileUpload: persistedUploadReducer,
   [userApi.reducerPath]: userApi.reducer,
   [fileApi.reducerPath]: fileApi.reducer,

@@ -2,7 +2,6 @@ import { useEffect, useRef } from "react";
 
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import { fileApi, uploadFile as uploadFileToApi } from "@/entities/file";
-import { addFile } from "@/entities/file/model/slice";
 import {
   selectActiveUpload,
   updateProgress,
@@ -67,21 +66,6 @@ export const useFileUploadProcessor = (): void => {
             uploadId: activeUpload.id,
             status: "success",
             uploadedFileId: result.id,
-          }),
-        );
-
-        dispatch(
-          addFile({
-            id: result.id,
-            originalName: result.originalName,
-            comment: result.comment,
-            size: result.size,
-            sizeFormatted: result.sizeFormatted,
-            uploadedAt: result.uploadedAt,
-            lastDownloaded: result.lastDownloaded,
-            hasPublicLink: result.hasPublicLink,
-            publicLinkUrl: result.publicLinkUrl,
-            downloadUrl: result.downloadUrl,
           }),
         );
 
