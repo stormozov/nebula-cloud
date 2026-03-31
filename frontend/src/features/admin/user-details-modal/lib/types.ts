@@ -1,6 +1,6 @@
+import type { ReactNode } from "react";
 import type { UserDetailsResponse } from "@/entities/user";
 import type { ModalConfirmDialogRequest } from "@/shared/ui";
-import type { ReactNode } from "react";
 
 /**
  * Union type that defines the possible actions available
@@ -53,34 +53,14 @@ export interface IUserDetailsModalActionsProps {
   requestConfirm: ModalConfirmDialogRequest;
 
   /**
+   * Callback function to handle the success of an action.
+   */
+  onSuccess: (message?: string, close?: boolean) => void;
+
+  /**
    * Callback function to close the entire user details modal.
    */
   onClose: () => void;
-
-  /**
-   * Callback function to handle successful form submission.
-   */
-  editFormSuccess: () => void;
-
-  /**
-   * Callback function to handle successful password reset.
-   */
-  resetPasswordFormSuccess: (message: string) => void;
-
-  /**
-   * Callback function to handle successful toggle of user activity.
-   */
-  toggleActiveSuccess: () => void;
-
-  /**
-   * Callback function to handle successful toggle of user admin status.
-   */
-  toggleAdminSuccess: () => void;
-
-  /**
-   * Callback function to handle successful deletion of the user.
-   */
-  deleteUserSuccess: (message: string) => void;
 }
 
 /**
@@ -98,4 +78,26 @@ export interface IUserDetailsInfoItem {
 
   /** The value of the information item */
   originalValue?: string;
+}
+
+/**
+ * Props interface for the `UserDetailsModal` component.
+ */
+export interface IUserDetailsModalProps {
+  /** The ID of the user whose details are being displayed */
+  userId: number;
+  /** An array of user IDs */
+  allUserIds: number[];
+  /** Indicates if there are more users to load */
+  hasPaginationMore: boolean;
+  /** Callback to load more users */
+  onLoadMore: () => void;
+  /** Callback to navigate to a different user */
+  onNavigate: (userId: number) => void;
+  /** Request for a confirmation dialog */
+  requestConfirm: ModalConfirmDialogRequest;
+  /** Callback to close the modal */
+  onClose: () => void;
+  /** Indicates if the confirmation dialog is open */
+  isConfirmOpen?: boolean;
 }

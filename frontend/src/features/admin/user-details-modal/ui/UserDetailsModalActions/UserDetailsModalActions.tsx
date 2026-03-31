@@ -1,15 +1,14 @@
-import classNames from "classnames";
-
 import { DeleteUserButton } from "@/features/admin/delete-user-button";
-import { EditUserForm } from "@/features/admin/edit-user-form";
 import { ExportUserJson } from "@/features/admin/export-user-json";
 import { UserDiskButton } from "@/features/admin/navigate-to-user-disk";
-import { ResetPasswordForm } from "@/features/admin/reset-password-form";
 import { ToggleActiveButton } from "@/features/admin/toggle-active-button";
 import { ToggleAdminButton } from "@/features/admin/toggle-admin-button";
 import { Button, Divider, Heading, Icon, PageWrapper } from "@/shared/ui";
 
-import type { IUserDetailsModalActionsProps } from "../lib/types";
+import type { IUserDetailsModalActionsProps } from "../../lib/types";
+import { UserDetailsModalActionForms } from "./UserDetailsModalActionForms";
+
+import "./UserDetailsModalActions.scss";
 
 /**
  * Props interface for the UserDetailsModalActions component.
@@ -31,33 +30,30 @@ export function UserDetailsModalActions({
     isCurrentUser,
     setAction,
     requestConfirm,
+    onSuccess,
     onClose,
-    editFormSuccess,
-    resetPasswordFormSuccess,
-    toggleActiveSuccess,
-    toggleAdminSuccess,
-    deleteUserSuccess,
   } = actionProps;
 
   const isEditAction = action === "edit";
   const isResetPasswordAction = action === "reset-password";
+  const isFormVisible = action !== "none";
 
   return (
-    <PageWrapper className="user-details-modal__actions">
+    <PageWrapper className="user-details-modal-actions w-full">
       <PageWrapper
         direction="column"
-        className="user-details-modal__actions-buttons"
+        className="user-details-modal-actions__buttons"
       >
-        <Heading level={4} className="user-details-modal__actions-title">
+        <Heading level={4} className="user-details-modal-actions__title">
           Действия с аккаунтом
         </Heading>
 
-        <PageWrapper direction="column" gap={"0.625rem"} fullWidth>
-          <UserDiskButton userId={user.id} isCurrentUser={isCurrentUser} />
-        </PageWrapper>
+        {/* Section: Navigate to user disk */}
+        <UserDiskButton userId={user.id} isCurrentUser={isCurrentUser} />
 
         <Divider />
 
+        {/* Section: Main actions */}
         <PageWrapper direction="column" gap={"0.625rem"} fullWidth>
           <Button
             variant={isEditAction ? "primary" : "secondary"}
@@ -80,6 +76,7 @@ export function UserDetailsModalActions({
 
         <Divider />
 
+        {/* Section: Export */}
         <ExportUserJson
           userId={user.id}
           buttonProps={{ variant: "secondary", fullWidth: true }}
@@ -87,6 +84,7 @@ export function UserDetailsModalActions({
 
         <Divider />
 
+        {/* Section: Manage access and dangerous actions */}
         <PageWrapper direction="column" gap={"0.625rem"} fullWidth>
           <ToggleActiveButton
             userId={user.id}
@@ -94,7 +92,7 @@ export function UserDetailsModalActions({
             fullWidth
             disabled={isCurrentUser}
             requestConfirm={requestConfirm}
-            onSuccess={toggleActiveSuccess}
+            onSuccess={() => onSuccess("toggle-active")}
           />
 
           <ToggleAdminButton
@@ -103,7 +101,7 @@ export function UserDetailsModalActions({
             fullWidth
             disabled={isCurrentUser}
             requestConfirm={requestConfirm}
-            onSuccess={toggleAdminSuccess}
+            onSuccess={() => onSuccess("toggle-admin")}
           />
 
           <DeleteUserButton
@@ -111,31 +109,21 @@ export function UserDetailsModalActions({
             fullWidth
             disabled={isCurrentUser}
             requestConfirm={requestConfirm}
-            onSuccess={deleteUserSuccess}
+            onSuccess={() => onSuccess("delete", true)}
           />
         </PageWrapper>
       </PageWrapper>
 
-      <div
-        className={classNames("user-details-modal__actions-area", {
-          active: action !== "none",
-        })}
-      >
-        {isEditAction && (
-          <EditUserForm
+      {isFormVisible && (
+        <div className="user-details-modal-actions__area w-full">
+          <UserDetailsModalActionForms
+            action={action}
             user={user}
-            onSuccess={editFormSuccess}
-            onCancel={onClose}
+            onSuccess={onSuccess}
+            onClose={onClose}
           />
-        )}
-        {isResetPasswordAction && (
-          <ResetPasswordForm
-            userId={user.id}
-            onSuccess={resetPasswordFormSuccess}
-            onCancel={onClose}
-          />
-        )}
-      </div>
+        </div>
+      )}
     </PageWrapper>
   );
 }

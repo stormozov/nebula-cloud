@@ -1,14 +1,14 @@
 import classNames from "classnames";
 
 import type { IStorageStatsResponse, IUser } from "@/entities/user";
-import { Button, Heading, Icon, PageWrapper } from "@/shared/ui";
+import { Button, Heading, Icon } from "@/shared/ui";
 
-import type { IUserDetailsInfoItem } from "../lib/types";
-import { useBlockHover } from "../lib/useBlockHover";
-import { useClipboardWithHandlers } from "../lib/useClipboardWithHandlers";
-import { useUserBlocksData } from "../lib/useUserBlocksData";
+import type { IUserDetailsInfoItem } from "../../lib/types";
+import { useBlockHover } from "../../lib/useBlockHover";
+import { useClipboardWithHandlers } from "../../lib/useClipboardWithHandlers";
+import { useUserBlocksData } from "../../lib/useUserBlocksData";
 
-import "./UserDetailsModal.scss";
+import "./UserDetailsModalInfo.scss";
 
 /**
  * Props interface for the UserDetailsModalInfo component.
@@ -37,17 +37,15 @@ export function UserDetailsModalInfo({
     const copyValues = items.map((item) => item.copyValue);
 
     return (
-      // biome-ignore lint/a11y/useSemanticElements: <It`s need for accessibility>
-      <div
+      <section
         key={title}
-        role="region"
-        className="user-details-modal__info"
+        className="user-details-modal-info__section"
         aria-label={`Блок информации о пользователе: ${title}`}
         onMouseEnter={() => handleMouseEnter(title)}
         onMouseLeave={handleMouseLeave}
       >
-        <div
-          className={classNames("user-details-modal__info-header", {
+        <header
+          className={classNames("user-details-modal-info__header", {
             hovered: isHovered(title),
           })}
         >
@@ -55,47 +53,48 @@ export function UserDetailsModalInfo({
             level={4}
             size="sm"
             noMargin
-            className="user-details-modal__info-title"
+            className="user-details-modal-info__title"
           >
             {title}
           </Heading>
           <Button
             variant="text"
-            className="user-details-modal__copy-block-button"
+            className="user-details-modal-info__copy-block-btn"
             onClick={() => handleCopyBlock(title, copyValues)}
             aria-label={`Скопировать все поля блока "${title}"`}
           >
             <Icon name="copy" />
           </Button>
+        </header>
+        <div className="user-details-modal-info__items">
+          {items.map((info) => (
+            <button
+              key={info.title}
+              type="button"
+              className="user-details-modal-info__item w-full"
+              title={info.originalValue}
+              aria-label={`Скопировать ${info.title}`}
+              onClick={() => handleRowClick(info.copyValue, info.title)}
+            >
+              <p className="user-details-modal-info__label">{info.title}:</p>
+              <span className="user-details-modal-info__value">
+                {info.value}
+              </span>
+              <Icon
+                name="copy"
+                color="text-tertiary"
+                className="user-details-modal-info__copy-decor-icon"
+              />
+            </button>
+          ))}
         </div>
-        {items.map((info) => (
-          <button
-            key={info.title}
-            type="button"
-            className="user-details-modal__info-path w-full"
-            title={info.originalValue}
-            aria-label={`Скопировать ${info.title}`}
-            onClick={() => handleRowClick(info.copyValue, info.title)}
-          >
-            <p className="user-details-modal__info-label">{info.title}:</p>
-            <span className="user-details-modal__info-value">{info.value}</span>
-            <Icon
-              name="copy"
-              color="text-tertiary"
-              className="user-details-modal__copy-decor-icon"
-            />
-          </button>
-        ))}
-      </div>
+      </section>
     );
   };
 
   return (
-    <PageWrapper
-      direction="column"
-      className="user-details-modal__info-section"
-    >
+    <aside className="user-details-modal-info">
       {blocks.map(({ title, items }) => renderSection(title, items))}
-    </PageWrapper>
+    </aside>
   );
 }
