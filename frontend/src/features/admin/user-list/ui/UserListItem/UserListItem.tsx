@@ -49,12 +49,7 @@ export function UserListItem({ user, onSelectUser }: IUserListItemProps) {
       <td className="users-list__body-cell">{user.username}</td>
       <td className="users-list__body-cell">{user.email}</td>
       <td className="users-list__body-cell">
-        <StatusBadge
-          isActive={user.isStaff}
-          activeText="Да"
-          inactiveText="Нет"
-          centerX
-        />
+        <StatusBadge isActive={user.isStaff} centerX />
       </td>
       <td className="users-list__body-cell">
         <StatusBadge isActive={user.isActive} centerX />

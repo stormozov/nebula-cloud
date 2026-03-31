@@ -20,7 +20,7 @@ export default function PageAdminDashboard() {
         </PageLayout.Container>
       </PageLayout.Header>
       <PageLayout.Main className="page-admin-dashboard__main">
-        <PageLayout.Container className="h-full">
+        <PageLayout.Container>
           <PageLayout.Wrapper
             direction="column"
             align="center"

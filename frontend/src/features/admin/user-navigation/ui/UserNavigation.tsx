@@ -11,7 +11,9 @@ import "./UserNavigation.scss";
 export interface IUserNavigationProps {
   currentUserId: number;
   allUserIds: number[];
+  hasPaginationMore: boolean;
   onNavigate: (userId: number) => void;
+  onLoadMore: (shouldAutoNavigate: boolean) => void;
 }
 
 /**
@@ -21,12 +23,16 @@ export interface IUserNavigationProps {
 export function UserNavigation({
   currentUserId,
   allUserIds,
+  hasPaginationMore,
   onNavigate,
+  onLoadMore,
 }: IUserNavigationProps) {
   const { hasPrev, hasNext, handlePrev, handleNext } = useUserNavigation({
     currentUserId,
     allUserIds,
+    hasPaginationMore,
     onNavigate,
+    onLoadMore,
   });
 
   useKeyboardNavigation({

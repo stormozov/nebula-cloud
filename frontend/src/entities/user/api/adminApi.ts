@@ -23,8 +23,21 @@ export const adminApi = createApi({
     /**
      * Fetches a list of all users.
      */
-    getUsers: builder.query<PaginatedResponse<IUserListResponse>, void>({
-      query: () => "/admin/users/",
+    getUsers: builder.query<
+      PaginatedResponse<IUserListResponse>,
+      { page?: number; pageSize?: number } | undefined
+    >({
+      query: (params) => {
+        const queryParams = new URLSearchParams();
+
+        if (params?.page) queryParams.append("page", String(params.page));
+        if (params?.pageSize) {
+          queryParams.append("page_size", String(params.pageSize));
+        }
+
+        const queryString = queryParams.toString();
+        return `/admin/users/${queryString ? `?${queryString}` : ""}`;
+      },
       providesTags: (result) => {
         if (result?.results) {
           return [

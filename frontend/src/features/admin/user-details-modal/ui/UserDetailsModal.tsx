@@ -31,6 +31,8 @@ import "./UserDetailsModal.scss";
 interface IUserDetailsModalProps {
   userId: number;
   allUserIds: number[];
+  hasPaginationMore: boolean;
+  onLoadMore: () => void;
   onNavigate: (userId: number) => void;
   requestConfirm: ModalConfirmDialogRequest;
   onClose: () => void;
@@ -48,6 +50,8 @@ interface IUserDetailsModalProps {
 export function UserDetailsModal({
   userId,
   allUserIds,
+  hasPaginationMore,
+  onLoadMore,
   onNavigate,
   requestConfirm,
   onClose,
@@ -156,6 +160,8 @@ export function UserDetailsModal({
                 <UserNavigation
                   currentUserId={user.id}
                   allUserIds={allUserIds}
+                  hasPaginationMore={hasPaginationMore}
+                  onLoadMore={onLoadMore}
                   onNavigate={onNavigate}
                 />
                 <Button

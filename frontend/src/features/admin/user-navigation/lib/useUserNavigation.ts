@@ -6,7 +6,9 @@ import { useCallback, useMemo } from "react";
 export interface IUserNavigationProps {
   currentUserId: number;
   allUserIds: number[];
+  hasPaginationMore: boolean;
   onNavigate: (userId: number) => void;
+  onLoadMore: (shouldAutoNavigate: boolean) => void;
 }
 
 /**
@@ -16,20 +18,27 @@ export const useUserNavigation = ({
   currentUserId,
   allUserIds,
   onNavigate,
+  hasPaginationMore,
+  onLoadMore,
 }: IUserNavigationProps) => {
   const currentIndex = useMemo(() => {
     return allUserIds.indexOf(currentUserId);
   }, [currentUserId, allUserIds]);
   const hasPrev = currentIndex > 0;
-  const hasNext = currentIndex < allUserIds.length - 1;
+  const hasNext = currentIndex < allUserIds.length - 1 || hasPaginationMore;
 
   const handlePrev = useCallback(() => {
     if (hasPrev) onNavigate(allUserIds[currentIndex - 1]);
   }, [hasPrev, onNavigate, allUserIds, currentIndex]);
 
   const handleNext = useCallback(() => {
-    if (hasNext) onNavigate(allUserIds[currentIndex + 1]);
-  }, [hasNext, onNavigate, allUserIds, currentIndex]);
+    if (currentIndex < allUserIds.length - 1) {
+      onNavigate(allUserIds[currentIndex + 1]);
+    } else if (hasPaginationMore && onLoadMore) {
+      onLoadMore(true);
+      // Widget will auto-navigate to first new user post-load
+    }
+  }, [currentIndex, allUserIds, hasPaginationMore, onLoadMore, onNavigate]);
 
   return {
     hasPrev,

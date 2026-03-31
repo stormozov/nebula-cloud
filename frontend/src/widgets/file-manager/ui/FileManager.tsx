@@ -338,7 +338,7 @@ export function FileManager({
       </header>
 
       {/* Dropzone - ONLY WHEN NO FILES or initial load */}
-      {data && data.results.length === 0 && !error && (
+      {data && data.results.length === 0 && !error && !isAdmin && (
         <div className="file-manager__dropzone">
           <FileUploadDropzone
             mode="local"
@@ -346,6 +346,13 @@ export function FileManager({
             multiple={true}
             comment="Загружено через FileManager"
           />
+        </div>
+      )}
+
+      {/* Empty state */}
+      {data && data.results.length === 0 && !error && isAdmin && (
+        <div className="file-manager__empty-message">
+          <p>Нет загруженных файлов</p>
         </div>
       )}
 

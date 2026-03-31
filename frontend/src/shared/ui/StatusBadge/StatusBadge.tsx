@@ -31,8 +31,8 @@ import "./StatusBadge.scss";
  */
 export function StatusBadge({
   isActive,
-  activeText = "Активен",
-  inactiveText = "Неактивен",
+  activeText = "Да",
+  inactiveText = "Нет",
   variant = "success",
   centerX = false,
   iconOnly = false,
