@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 
 import { type IUserListResponse, useGetUsersQuery } from "@/entities/user";
-import { UserDetailsModal, UserList } from "@/features/admin";
+import {
+  UserDetailsModal,
+  UserList,
+  UserSearchInput,
+  useUserSearch,
+} from "@/features/admin";
 import { Button, Icon, ModalConfirm, useModalConfirm } from "@/shared/ui";
 
 import "./UserManagementWidget.scss";
@@ -13,6 +18,7 @@ export function UserManagementWidget() {
   const [pendingAutoNavigateAfterLoad, setPendingAutoNavigateAfterLoad] =
     useState(false);
 
+  const { searchTerm, setSearchTerm, debouncedSearchTerm } = useUserSearch();
   const {
     data: users,
     isLoading: usersLoading,
@@ -20,6 +26,7 @@ export function UserManagementWidget() {
   } = useGetUsersQuery({
     page: currentPage,
     pageSize: 20,
+    search: debouncedSearchTerm || undefined,
   });
 
   const { dialog, requestConfirm, handleConfirm, handleCancel } =
@@ -62,32 +69,33 @@ export function UserManagementWidget() {
   return (
     <div className="users-management w-full">
       <header className="users-management__header">
+        <UserSearchInput
+          value={searchTerm}
+          className="users-management__search"
+          onChange={setSearchTerm}
+        />
         <div className="users-management__count">
           Всего пользователей: {users?.count ?? 0}
         </div>
       </header>
 
-      {loadedUsers.length > 0 && (
-        <>
-          <UserList
-            users={loadedUsers}
-            isLoading={usersLoading}
-            error={usersError}
-            onSelectUser={setSelectedUserId}
-          />
-          {users?.next && (
-            <div className="users-management__load-more">
-              <Button
-                loading={usersLoading}
-                disabled={usersLoading}
-                onClick={() => handleLoadMore(false)}
-              >
-                <Icon name="retry" />
-                Загрузить еще
-              </Button>
-            </div>
-          )}
-        </>
+      <UserList
+        users={loadedUsers}
+        isLoading={usersLoading}
+        error={usersError}
+        onSelectUser={setSelectedUserId}
+      />
+      {users?.next && (
+        <div className="users-management__load-more">
+          <Button
+            loading={usersLoading}
+            disabled={usersLoading}
+            onClick={() => handleLoadMore(false)}
+          >
+            <Icon name="retry" />
+            Загрузить еще
+          </Button>
+        </div>
       )}
 
       {selectedUserId && (

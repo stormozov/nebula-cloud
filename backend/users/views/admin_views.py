@@ -4,6 +4,7 @@ This module provides a unified ViewSet for managing users with admin privileges.
 All actions require authentication and admin status.
 """
 
+from django.db.models import Q
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -75,6 +76,28 @@ class AdminUserViewSet(viewsets.ModelViewSet):
             return AdminUserUpdateSerializer
 
         return AdminUserDetailSerializer
+
+    def get_queryset(self):
+        """
+        Filter queryset based on search parameter.
+
+        Returns:
+            QuerySet: Filtered queryset.
+        """
+
+        queryset = super().get_queryset()
+        search = self.request.query_params.get("search")
+
+        if search:
+            if search.isdigit():
+                id_q = Q(id__startswith=search)
+            else:
+                id_q = Q()
+            queryset = queryset.filter(
+                id_q | Q(username__icontains=search) | Q(email__icontains=search)
+            )
+
+        return queryset
 
     def _get_user_email_for_log(self) -> str:
         """

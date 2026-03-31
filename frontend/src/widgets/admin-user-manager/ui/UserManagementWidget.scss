@@ -4,12 +4,20 @@
 
 .users-management {
   &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
     margin-bottom: 0.75rem;
   }
 
   &__count {
     font-size: 0.875rem;
     color: var(--color-text-secondary);
+  }
+
+  &__search {
+    flex: 1;
   }
 
   &__load-more {

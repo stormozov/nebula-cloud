@@ -6,3 +6,4 @@ export * from "./toggle-admin-button";
 export * from "./user-details-modal";
 export * from "./user-list";
 export * from "./user-navigation";
+export * from "./user-search";

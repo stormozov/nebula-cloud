@@ -25,12 +25,14 @@ export function UserList({
   error,
   onSelectUser,
 }: IUserListProps) {
-  if (isLoading) return <div className="user-list-loading">Загрузка...</div>;
+  if (isLoading) return <div className="users-list-loading">Загрузка...</div>;
   if (error) {
-    return <div className="user-list-error">Ошибка загрузки пользователей</div>;
+    return (
+      <div className="users-list-error">Ошибка загрузки пользователей</div>
+    );
   }
-  if (!users) {
-    return <div className="user-list-empty">Пользователи не найдены</div>;
+  if (users?.length === 0) {
+    return <div className="users-list-empty">Пользователи не найдены</div>;
   }
 
   return (
