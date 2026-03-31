@@ -23,17 +23,17 @@ interface INavItem {
  */
 const defaultItems: INavItem[] = [
   {
-    to: "/disk",
-    icon: "folder",
-    label: "Мой диск",
-    roles: ["user", "admin"],
-    withIcon: true,
-  },
-  {
     to: "/admin/dashboard",
     icon: "dashboard",
     label: "Админ-панель",
     roles: ["admin"],
+    withIcon: true,
+  },
+  {
+    to: "/disk",
+    icon: "folder",
+    label: "Мой диск",
+    roles: ["user", "admin"],
     withIcon: true,
   },
 ];

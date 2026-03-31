@@ -1,5 +1,4 @@
 import { useCallback, useState } from "react";
-import { useNavigate } from "react-router";
 
 import { useLoginMutation } from "@/entities/user";
 import { hasFieldErrors, parseDjangoApiErrors } from "@/shared/api";
@@ -43,7 +42,6 @@ export const useLoginForm = ({
   onSuccess,
   onError,
 }: IUseLoginFormProps): IUseLoginFormReturn => {
-  const navigate = useNavigate();
   const [login, { isLoading }] = useLoginMutation();
 
   const [formData, setFormData] =
@@ -117,10 +115,7 @@ export const useLoginForm = ({
       // Submit to API
       try {
         await login(formData).unwrap();
-
-        // Success flow
         onSuccess?.();
-        navigate("/disk", { replace: true });
       } catch (error: unknown) {
         let submitError: string | undefined;
 
@@ -162,11 +157,11 @@ export const useLoginForm = ({
         onError?.(submitError);
       }
     },
-    [formData, login, navigate, onSuccess, onError],
+    [formData, login, onSuccess, onError],
   );
 
   return {
-    // Form state
+    // States
     formData,
     errors,
     isSubmitting: isLoading,
