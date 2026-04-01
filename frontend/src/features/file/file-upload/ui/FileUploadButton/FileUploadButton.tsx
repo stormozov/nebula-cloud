@@ -32,7 +32,7 @@ import "./FileUploadButton.scss";
  * </FileUploadButton>
  */
 export function FileUploadButton({
-  children = "Загрузить файл",
+  children,
   variant = "primary",
   size = "medium",
   fullWidth = false,

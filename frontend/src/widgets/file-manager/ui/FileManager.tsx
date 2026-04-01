@@ -10,7 +10,7 @@ import {
   useGeneratePublicLinkMutation,
   useGetFilesQuery,
   useRenameFileMutation,
-  useUpdateCommentMutation
+  useUpdateCommentMutation,
 } from "@/entities/file";
 import { selectIsQueueCompleted } from "@/entities/file-upload";
 import { EditCommentModal } from "@/features/file/file-comment";
@@ -19,6 +19,7 @@ import { ImageViewerModal } from "@/features/file/file-image-preview";
 import { FileList } from "@/features/file/file-list";
 import { PublicLinkModal } from "@/features/file/file-public-link";
 import { RenameFileModal } from "@/features/file/file-rename";
+import { FileSearchInput, useFileSearch } from "@/features/file/file-search";
 import {
   FileUploadButton,
   FileUploadDropzone,
@@ -58,11 +59,22 @@ export function FileManager({
   const [currentPage, setCurrentPage] = useState(1);
   const [loadedFiles, setLoadedFiles] = useState<IFile[]>([]);
 
+  const { searchTerm, setSearchTerm, debouncedSearchTerm } = useFileSearch();
+
   // Queries
   const { data, isLoading, error, isFetching } = useGetFilesQuery(
     userId
-      ? { userId, page: currentPage, pageSize: PAGE_SIZE }
-      : { page: currentPage, pageSize: PAGE_SIZE },
+      ? {
+          userId,
+          page: currentPage,
+          pageSize: PAGE_SIZE,
+          search: debouncedSearchTerm || undefined,
+        }
+      : {
+          page: currentPage,
+          pageSize: PAGE_SIZE,
+          search: debouncedSearchTerm || undefined,
+        },
   );
 
   // Mutations
@@ -271,8 +283,17 @@ export function FileManager({
     }
   };
 
+  // -- Load more handlers -----------------------------------------------------
+
   const loadMore = () => {
     setCurrentPage((prev) => prev + 1);
+  };
+
+  // -- Search handlers --------------------------------------------------------
+
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1);
   };
 
   // ---------------------------------------------------------------------------
@@ -318,43 +339,77 @@ export function FileManager({
             <Heading level={2} noMargin className="file-manager__header-title">
               Ваш диск
             </Heading>
-            <FileUploadButton>Загрузить файл</FileUploadButton>
+            <PageWrapper>
+              <FileSearchInput
+                inputProps={{
+                  value: searchTerm,
+                  placeholder: "Поиск по названию и дате загрузки",
+                  onChange: handleSearchChange,
+                }}
+              />
+              <FileUploadButton>Загрузить файл</FileUploadButton>
+            </PageWrapper>
           </>
         ) : (
-          <PageWrapper>
-            <BackButton />
-            <Heading level={2} noMargin className="file-manager__header-title">
-              Файлы пользователя{" "}
-              <sup
-                className="file-manager__header-title-badge"
-                title={`ID пользователя: ${userId}`}
+          <>
+            <PageWrapper>
+              <BackButton />
+              <Heading
+                level={2}
+                noMargin
+                className="file-manager__header-title"
               >
-                <Icon name="person" />
-                {userId}
-              </sup>
-            </Heading>
-          </PageWrapper>
+                Файлы пользователя{" "}
+                <sup
+                  className="file-manager__header-title-badge"
+                  title={`ID пользователя: ${userId}`}
+                >
+                  <Icon name="person" />
+                  {userId}
+                </sup>
+              </Heading>
+            </PageWrapper>
+            <FileSearchInput
+              buttonProps={{
+                children: "Поиск",
+                size: "small",
+              }}
+              inputProps={{
+                value: searchTerm,
+                placeholder: "Поиск по названию и дате загрузки",
+                onChange: handleSearchChange,
+              }}
+            />
+          </>
         )}
       </header>
 
       {/* Dropzone - ONLY WHEN NO FILES or initial load */}
-      {data && data.results.length === 0 && !error && !isAdmin && (
-        <div className="file-manager__dropzone">
-          <FileUploadDropzone
-            mode="local"
-            clickable={true}
-            multiple={true}
-            comment="Загружено через FileManager"
-          />
-        </div>
-      )}
+      {!isAdmin &&
+        !debouncedSearchTerm &&
+        (!data || data.results.length === 0) &&
+        !error &&
+        !isLoading &&
+        !isFetching && (
+          <div className="file-manager__dropzone">
+            <FileUploadDropzone
+              mode="local"
+              clickable={true}
+              multiple={true}
+              comment="Загружено через FileManager"
+            />
+          </div>
+        )}
 
       {/* Empty state */}
-      {data && data.results.length === 0 && !error && isAdmin && (
-        <div className="file-manager__empty-message">
-          <p>Нет загруженных файлов</p>
-        </div>
-      )}
+      {!isLoading &&
+        !isFetching &&
+        (!data || data.results.length === 0) &&
+        !error && (
+          <div className="file-manager__empty-message">
+            <p>Нет загруженных файлов</p>
+          </div>
+        )}
 
       {/* File list */}
       {loadedFiles.length > 0 && (

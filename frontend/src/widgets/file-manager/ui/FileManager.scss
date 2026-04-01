@@ -45,4 +45,12 @@
     margin-top: 1.125rem;
     text-align: center;
   }
+
+  &__empty-message {
+    padding: 48px 24px;
+    font-size: 16px;
+    text-align: center;
+    color: var(--color-text-secondary);
+    cursor: default;
+  }
 }

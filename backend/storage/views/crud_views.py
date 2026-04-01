@@ -3,6 +3,9 @@ ViewSet for authenticated file operations (CRUD + management).
 All actions in this module require authentication and appropriate permissions.
 """
 
+from datetime import datetime
+
+from django.db.models import Q
 from django.http import FileResponse
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
@@ -78,6 +81,29 @@ class FileViewSet(viewsets.ModelViewSet):
                     user_email,
                     get_client_ip(self.request),
                 )
+
+            search = self.request.query_params.get("search")
+            if search:
+                if search.startswith("."):
+                    extension = search.lower()
+                    q_filter = Q(original_name__iendswith=extension)
+                else:
+                    parsed_date = None
+
+                    for fmt in ("%Y-%m-%d", "%d.%m.%Y"):
+                        try:
+                            parsed_date = datetime.strptime(search, fmt).date()
+                            break
+                        except ValueError:
+                            continue
+
+                    if parsed_date:
+                        q_filter = Q(uploaded_at__date=parsed_date)
+                    else:
+                        q_filter = Q(original_name__icontains=search)
+
+                queryset = queryset.filter(q_filter)
+
         else:
             queryset = File.objects.all()
 

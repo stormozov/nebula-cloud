@@ -20,7 +20,7 @@ export type ButtonSize = "small" | "medium" | "large";
 export interface IButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   /**
-   * Button variant (primary, secondary, danger, ghost).
+   * Button variant (primary, secondary, danger, ghost, outline, text).
    */
   variant?: ButtonVariant;
   /**

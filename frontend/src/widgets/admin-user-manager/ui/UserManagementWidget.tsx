@@ -19,6 +19,7 @@ export function UserManagementWidget() {
     useState(false);
 
   const { searchTerm, setSearchTerm, debouncedSearchTerm } = useUserSearch();
+
   const {
     data: users,
     isLoading: usersLoading,
@@ -39,6 +40,14 @@ export function UserManagementWidget() {
     setCurrentPage((prev) => prev + 1);
   };
 
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1);
+    setSelectedUserId(null);
+    setPendingAutoNavigateAfterLoad(false);
+  };
+
+  // Обработка полученных данных
   useEffect(() => {
     if (!users) return;
 
@@ -70,9 +79,16 @@ export function UserManagementWidget() {
     <div className="users-management w-full">
       <header className="users-management__header">
         <UserSearchInput
-          value={searchTerm}
-          className="users-management__search"
-          onChange={setSearchTerm}
+          buttonProps={{
+            children: "Поиск",
+            size: "small",
+          }}
+          inputProps={{
+            value: searchTerm,
+            className: "users-management__search",
+            placeholder: "Поиск по ID, логину или email",
+            onChange: handleSearchChange,
+          }}
         />
         <div className="users-management__count">
           Всего пользователей: {users?.count ?? 0}

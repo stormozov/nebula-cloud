@@ -18,22 +18,18 @@ import {
   FaCheck,
   FaComment,
   FaCopy,
-  FaDownload,
+  FaDownload,FaFileExport, 
   FaLinkSlash,
   FaPencil,
   FaShareNodes,
   FaTrashCan,
-  FaUser,
+  FaUser
 } from "react-icons/fa6";
-import { IoIosCloud } from "react-icons/io";
-import { IoReloadSharp } from "react-icons/io5";
-import { MdEdit, MdLogin, MdLogout } from "react-icons/md";
+import { IoIosArrowBack, IoIosArrowForward, IoIosCloud } from "react-icons/io";
+import { IoReloadSharp, IoSearch } from "react-icons/io5";
+import { MdEdit, MdLogin, MdLogout, MdOutlineDoNotDisturbAlt } from "react-icons/md";
 import { PiPasswordBold, PiWarningDiamondFill } from "react-icons/pi";
 import { RiAdminFill } from "react-icons/ri";
-import { IoIosArrowForward } from "react-icons/io";
-import { IoIosArrowBack } from "react-icons/io";
-import { MdOutlineDoNotDisturbAlt } from "react-icons/md";
-import { FaFileExport } from "react-icons/fa6";
 
 /**
  * A constant object that maps icon names to their corresponding React component
@@ -59,6 +55,7 @@ export const ICONS = {
   trash: FaTrashCan,
   pencil: FaPencil,
   export: FaFileExport,
+  search: IoSearch,
 
   // ========== Navigation & UI ==========
   close: AiOutlineClose,
