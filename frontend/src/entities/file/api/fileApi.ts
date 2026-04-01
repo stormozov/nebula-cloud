@@ -96,7 +96,7 @@ export const fileApi = createApi({
      */
     getFiles: build.query<
       PaginatedResponse<IFile>,
-      { userId?: number; page?: number; pageSize?: number, search?: string }
+      { userId?: number; page?: number; search?: string }
     >({
       query: (params) => {
         const queryParams = new URLSearchParams();
@@ -105,9 +105,6 @@ export const fileApi = createApi({
           queryParams.append("user_id", String(params.userId));
         }
         if (params?.page) queryParams.append("page", String(params.page));
-        if (params?.pageSize) {
-          queryParams.append("page_size", String(params.pageSize));
-        }
         if (params?.search) {
           queryParams.append("search", String(params.search));
         }

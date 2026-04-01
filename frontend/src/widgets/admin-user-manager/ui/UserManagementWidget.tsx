@@ -26,7 +26,6 @@ export function UserManagementWidget() {
     error: usersError,
   } = useGetUsersQuery({
     page: currentPage,
-    pageSize: 20,
     search: debouncedSearchTerm || undefined,
   });
 

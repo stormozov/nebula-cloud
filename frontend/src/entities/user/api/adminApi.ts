@@ -25,15 +25,12 @@ export const adminApi = createApi({
      */
     getUsers: builder.query<
       PaginatedResponse<IUserListResponse>,
-      { page?: number; pageSize?: number, search?: string } | undefined
+      { page?: number; search?: string } | undefined
     >({
       query: (params) => {
         const queryParams = new URLSearchParams();
 
         if (params?.page) queryParams.append("page", String(params.page));
-        if (params?.pageSize) {
-          queryParams.append("page_size", String(params.pageSize));
-        }
         if (params?.search) {
           queryParams.append("search", String(params.search));
         }

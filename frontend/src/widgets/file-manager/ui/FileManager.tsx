@@ -53,8 +53,6 @@ export function FileManager({
   isAdmin = false,
   onFileSelect,
 }: IFileManagerProps) {
-  const PAGE_SIZE = 20;
-
   // States
   const [currentPage, setCurrentPage] = useState(1);
   const [loadedFiles, setLoadedFiles] = useState<IFile[]>([]);
@@ -67,12 +65,10 @@ export function FileManager({
       ? {
           userId,
           page: currentPage,
-          pageSize: PAGE_SIZE,
           search: debouncedSearchTerm || undefined,
         }
       : {
           page: currentPage,
-          pageSize: PAGE_SIZE,
           search: debouncedSearchTerm || undefined,
         },
   );
