@@ -70,11 +70,11 @@ export function UserDetailsModal({ modalProps }: IUserDetailsModalProps) {
                 <Button
                   variant="secondary"
                   size="small"
+                  icon={{ name: "close" }}
                   title="Закрыть окно (ESC)"
                   aria-label="Закрыть окно"
                   onClick={handleCloseWithAnimation}
                 >
-                  <Icon name="close" />
                 </Button>
               </PageWrapper>
             </PageWrapper>

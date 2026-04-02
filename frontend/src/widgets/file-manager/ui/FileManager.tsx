@@ -427,11 +427,11 @@ export function FileManager({
           {data?.next && (
             <div className="file-manager__load-more">
               <Button
+                icon={{ name: "retry" }}
                 loading={isFetching}
                 disabled={isFetching}
                 onClick={loadMore}
               >
-                <Icon name="retry" />
                 Загрузить ещё
               </Button>
             </div>

@@ -3,7 +3,7 @@ import { useCallback, useRef } from "react";
 
 import { useAppDispatch } from "@/app/store/hooks";
 import { addFiles, generateUploadId } from "@/entities/file-upload";
-import { Button, Icon } from "@/shared/ui";
+import { Button } from "@/shared/ui";
 
 import { fileStorage } from "../../lib/fileStorage";
 import type { IFileUploadButtonProps } from "../../lib/types";
@@ -127,13 +127,13 @@ export function FileUploadButton({
         type="button"
         variant={variant}
         size={size}
-        fullWidth={fullWidth}
+        icon={{ name: "upload" }}
         className={classNames("file-upload-button__btn", className)}
-        onClick={handleClick}
+        fullWidth={fullWidth}
         disabled={disabled}
+        onClick={handleClick}
         {...restProps}
       >
-        <Icon name="upload" />
         {children}
       </Button>
     </div>

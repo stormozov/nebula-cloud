@@ -1,3 +1,5 @@
+import type { IconName } from "@/shared/ui/Icon";
+
 /**
  * Button variants.
  */
@@ -19,24 +21,21 @@ export type ButtonSize = "small" | "medium" | "large";
  */
 export interface IButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  /**
-   * Button variant (primary, secondary, danger, ghost, outline, text).
-   */
+  /** Button variant (primary, secondary, danger, ghost, outline, text). */
   variant?: ButtonVariant;
-  /**
-   * Button size (small, medium, large).
-   */
+  /** Button size (small, medium, large). */
   size?: ButtonSize;
-  /**
-   * Show loading spinner.
-   */
+  /** Button icon config */
+  icon?: {
+    /** Button icon name */
+    name: IconName;
+    /** Button icon position */
+    isRight?: boolean;
+  };
+  /** Show loading spinner. */
   loading?: boolean;
-  /**
-   * Additional CSS class name.
-   */
+  /** Additional CSS class name. */
   className?: string;
-  /**
-   * Full width button.
-   */
+  /** Full width button. */
   fullWidth?: boolean;
 }

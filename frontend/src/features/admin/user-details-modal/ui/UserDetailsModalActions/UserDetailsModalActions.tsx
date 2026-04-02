@@ -3,7 +3,7 @@ import { ExportUserJson } from "@/features/admin/export-user-json";
 import { UserDiskButton } from "@/features/admin/navigate-to-user-disk";
 import { ToggleActiveButton } from "@/features/admin/toggle-active-button";
 import { ToggleAdminButton } from "@/features/admin/toggle-admin-button";
-import { Button, Divider, Heading, Icon, PageWrapper } from "@/shared/ui";
+import { Button, Divider, Heading, PageWrapper } from "@/shared/ui";
 
 import type { IUserDetailsModalActionsProps } from "../../lib/types";
 import { UserDetailsModalActionForms } from "./UserDetailsModalActionForms";
@@ -57,19 +57,19 @@ export function UserDetailsModalActions({
         <PageWrapper direction="column" gap={"0.625rem"} fullWidth>
           <Button
             variant={isEditAction ? "primary" : "secondary"}
-            fullWidth
+            icon={{ name: "edit" }}
             onClick={() => setAction("edit")}
+            fullWidth
           >
-            <Icon name="edit" />
             Редактировать
           </Button>
 
           <Button
             variant={isResetPasswordAction ? "primary" : "secondary"}
-            fullWidth
+            icon={{ name: "password" }}
             onClick={() => setAction("reset-password")}
+            fullWidth
           >
-            <Icon name="password" />
             Сбросить пароль
           </Button>
         </PageWrapper>

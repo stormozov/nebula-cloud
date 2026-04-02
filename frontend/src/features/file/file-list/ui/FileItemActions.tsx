@@ -1,7 +1,7 @@
 import classNames from "classnames";
 
 import fileListConfig from "@/shared/configs/file-list.json";
-import { Button, Icon, type IconName } from "@/shared/ui";
+import { Button, type IconName } from "@/shared/ui";
 import { isImageFile } from "@/shared/utils";
 
 import type {
@@ -103,16 +103,15 @@ export function FileItemActions({
             key={action.id}
             variant="secondary"
             size="small"
+            icon={{ name: action.icon as IconName }}
             className={classNames("file-item-actions__btn", {
               "file-item-actions__btn--danger": action.isDanger,
             })}
             title={action.title}
             aria-label={action.ariaLabel}
-            onClick={handler}
             disabled={isDisabled}
-          >
-            <Icon name={action.icon as IconName} size={16} />
-          </Button>
+            onClick={handler}
+          />
         );
       })}
     </div>

@@ -94,8 +94,7 @@ export function ImageViewerModal({
           <div className="image-viewer-modal__error">
             <h3>Ошибка загрузки изображения</h3>
             <p>{error}</p>
-            <Button onClick={onClose}>
-              <Icon name="close" />
+            <Button icon={{ name: "close" }} onClick={onClose}>
               Закрыть
             </Button>
           </div>

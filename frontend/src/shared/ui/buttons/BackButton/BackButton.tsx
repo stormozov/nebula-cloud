@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router";
 
-import { Icon } from "../../Icon";
 import { Button } from "../Button";
 
 /**
@@ -13,10 +12,10 @@ export interface BackButtonProps {
 /**
  * A reusable back button component that navigates to the previous page
  * in history.
- * 
+ *
  * @example
  * <BackButton text="" /> // Without text, only icon
- * 
+ *
  * @example
  * <BackButton /> // With default text
  */
@@ -32,9 +31,9 @@ export function BackButton({ text = "Назад" }: BackButtonProps) {
       size="small"
       title="Вернуться назад"
       aria-label="Вернуться назад"
+      icon={{ name: "arrowLeft" }}
       onClick={handleClick}
     >
-      <Icon name="arrowLeft" />
       {text}
     </Button>
   );

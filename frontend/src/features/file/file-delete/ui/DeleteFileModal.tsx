@@ -33,7 +33,6 @@ export function DeleteFileModal({
 }: IDeleteFileModalProps) {
   const handleConfirm = async (): Promise<void> => {
     await onConfirm();
-    // Modal closes after successful deletion (handled by parent)
   };
 
   return (
@@ -46,12 +45,20 @@ export function DeleteFileModal({
       closeOnEsc={!isDeleting}
       footer={
         <>
-          <Button variant="secondary" onClick={onClose} disabled={isDeleting}>
-            <Icon name="close" />
+          <Button
+            variant="secondary"
+            icon={{ name: "close" }}
+            disabled={isDeleting}
+            onClick={onClose}
+          >
             Отмена
           </Button>
-          <Button variant="danger" onClick={handleConfirm} loading={isDeleting}>
-            <Icon name="trash" />
+          <Button
+            variant="danger"
+            icon={{ name: "trash" }}
+            onClick={handleConfirm}
+            loading={isDeleting}
+          >
             Удалить
           </Button>
         </>
@@ -59,7 +66,6 @@ export function DeleteFileModal({
     >
       <div className="delete-file-modal">
         <div className="delete-file-modal__icon">
-          {/* <PiWarningDiamondFill size="60" color="var(--color-warning)" /> */}
           <Icon name="warning" size="60" color="warning" />
         </div>
         <div className="delete-file-modal__message">

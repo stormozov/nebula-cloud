@@ -1,5 +1,5 @@
 import { useUpdateUserMutation } from "@/entities/user";
-import { Button, Icon, type ModalConfirmDialogRequest } from "@/shared/ui";
+import { Button, type ModalConfirmDialogRequest } from "@/shared/ui";
 
 /**
  * Props interface for the ToggleActiveButton component.
@@ -56,23 +56,16 @@ export function ToggleActiveButton({
   return (
     <Button
       variant={isActive ? "danger" : "primary"}
+      icon={{
+        name: isActive ? (disabled ? "lock" : "lightbulbOff") : "lightbulbOn",
+      }}
       title={disabled ? "Вы не можете деактивировать пользователя" : ""}
       fullWidth={fullWidth}
       loading={isLoading}
       disabled={disabled}
       onClick={handleToggle}
     >
-      {isActive ? (
-        <>
-          {disabled ? <Icon name="lock" /> : <Icon name="lightbulbOff" />}
-          Деактивировать
-        </>
-      ) : (
-        <>
-          {disabled ? <Icon name="lock" /> : <Icon name="lightbulbOn" />}
-          Активировать
-        </>
-      )}
+      {isActive ? "Деактивировать" : "Активировать"}
     </Button>
   );
 }

@@ -1,4 +1,4 @@
-import { Button, Icon } from "@/shared/ui";
+import { Button } from "@/shared/ui";
 
 import { useKeyboardNavigation } from "../lib/useKeyboardNavigation";
 import { useUserNavigation } from "../lib/useUserNavigation";
@@ -49,10 +49,10 @@ export function UserNavigation({
         size="small"
         title="Предыдущий пользователь (←)"
         aria-label="Предыдущий пользователь"
+        icon={{ name: hasPrev ? "arrowLeft" : "doNotDisturb" }}
         disabled={!hasPrev}
         onClick={handlePrev}
       >
-        <Icon name={hasPrev ? "arrowLeft" : "doNotDisturb"} />
         Пред.
       </Button>
       <Button
@@ -60,11 +60,11 @@ export function UserNavigation({
         size="small"
         title="Следующий пользователь (→)"
         aria-label="Следующий пользователь"
+        icon={{ name: hasNext ? "arrowRight" : "doNotDisturb", isRight: true }}
         disabled={!hasNext}
         onClick={handleNext}
       >
         След.
-        <Icon name={hasNext ? "arrowRight" : "doNotDisturb"} />
       </Button>
     </div>
   );

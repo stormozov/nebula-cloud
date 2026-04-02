@@ -4,7 +4,7 @@ import {
   UserList,
   UserSearchInput,
 } from "@/features/admin";
-import { Button, Icon, ModalConfirm } from "@/shared/ui";
+import { Button, ModalConfirm } from "@/shared/ui";
 
 import { useUserManager } from "../lib/useUserManager";
 
@@ -49,11 +49,11 @@ export function UserManagementWidget() {
       {usersList.hasMore && (
         <div className="users-management__load-more">
           <Button
+            icon={{ name: "retry" }}
             loading={pagination.isLoadMoreLoading}
             disabled={pagination.isLoadMoreLoading}
             onClick={() => pagination.loadMore(false)}
           >
-            <Icon name="retry" />
             Загрузить еще
           </Button>
         </div>

@@ -6,8 +6,7 @@ import {
   Button,
   ControlledInput,
   type IButtonProps,
-  type IControlledInputProps,
-  Icon,
+  type IControlledInputProps
 } from "@/shared/ui";
 
 import "./CollapsibleSearch.scss";
@@ -73,9 +72,9 @@ export const CollapsibleSearch = ({
         onClick={() => setIsOpen(true)}
         title="Поиск"
         aria-label="Поиск"
+        icon={{ name: "search" }}
         {...buttonProps}
       >
-        <Icon name="search" />
         {buttonProps.children}
       </Button>
       <ControlledInput

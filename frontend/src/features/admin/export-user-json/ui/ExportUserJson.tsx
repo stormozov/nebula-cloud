@@ -1,6 +1,7 @@
 import classNames from "classnames";
+
 import { useExportUserDataMutation } from "@/entities/user";
-import { Button, type IButtonProps, Icon } from "@/shared/ui";
+import { Button, type IButtonProps } from "@/shared/ui";
 import { downloadFile } from "@/shared/utils";
 
 /**
@@ -38,6 +39,7 @@ export function ExportUserJson({
     <Button
       aria-label={`Экспорт JSON данных пользователя ${userId}`}
       {...buttonProps}
+      icon={{ name: "export" }}
       className={classNames(
         "user-json-data-export-btn",
         buttonProps?.className,
@@ -46,7 +48,6 @@ export function ExportUserJson({
       disabled={isLoading}
       onClick={handleExportUserData}
     >
-      <Icon name="export" />
       Экспорт JSON
     </Button>
   );

@@ -2,7 +2,6 @@ import classNames from "classnames";
 import { useCallback, useEffect, useRef } from "react";
 
 import { Button } from "../buttons";
-import { Icon } from "../Icon";
 import type { IModalProps } from "./types";
 
 import "./Modal.scss";
@@ -97,8 +96,6 @@ export function Modal({
     };
   }, [isOpen, handleKeyDown, focusTarget]);
 
-
-
   // ---------------------------------------------------------------------------
   // RENDER
   // ---------------------------------------------------------------------------
@@ -133,9 +130,8 @@ export function Modal({
               className="modal__close-btn"
               onClick={handleCloseButtonClick}
               aria-label="Закрыть модальное окно"
-            >
-              <Icon name="close" />
-            </Button>
+              icon={{ name: "close" }}
+            />
           )}
         </header>
 

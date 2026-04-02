@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 
-import { Button, Icon } from "@/shared/ui";
+import { Button } from "@/shared/ui";
 
 import "./UserDiskButton.scss";
 
@@ -34,11 +34,11 @@ export function UserDiskButton({ userId, isCurrentUser }: UserDiskButtonProps) {
   return (
     <Button
       variant="secondary"
+      icon={{ name: "folder" }}
       className="user-disk-button"
-      fullWidth
       onClick={() => navigate(currentNavigatePath)}
+      fullWidth
     >
-      <Icon name="folder" />
       Перейти к диску
     </Button>
   );
