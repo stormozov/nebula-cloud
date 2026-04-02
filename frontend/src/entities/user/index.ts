@@ -1,4 +1,5 @@
 // API
+export * from "./api/adminApi";
 export * from "./api/userApi";
 
 // Selectors

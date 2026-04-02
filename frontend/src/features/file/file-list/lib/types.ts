@@ -22,7 +22,7 @@ export interface IFileAction {
   /**
    * SVG icon element to render inside the button.
    */
-  icon: React.ReactNode;
+  icon: string;
 
   /**
    * Indicates if the action is destructive (e.g., delete).

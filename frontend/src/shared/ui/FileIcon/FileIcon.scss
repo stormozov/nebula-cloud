@@ -1,49 +1,43 @@
+// =============================================================================
+// Styles module for FileIcon component
+// =============================================================================
+
 .file-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   border-radius: 4px;
-  // background-color: $color-bg-secondary;
-  font-size: 14px;
+
   user-select: none;
 
   &__symbol {
     line-height: 1;
   }
 
-  // File type colors
-  // &--image {
-  //   background-color: $color-file-image;
-  //   color: $color-text-inverse;
-  // }
+  // -------------------------- File type colors -------------------------------
+  &--image {
+    color: var(--color-file-image);
+  }
 
-  // &--video {
-  //   background-color: $color-file-video;
-  //   color: $color-text-inverse;
-  // }
+  &--video {
+    color: var(--color-file-video);
+  }
 
-  // &--audio {
-  //   background-color: $color-file-audio;
-  //   color: $color-text-inverse;
-  // }
+  &--audio {
+    color: var(--color-file-audio);
+  }
 
-  // &--document {
-  //   background-color: $color-file-document;
-  //   color: $color-text-inverse;
-  // }
+  &--document {
+    color: var(--color-file-document);
+  }
 
-  // &--archive {
-  //   background-color: $color-file-archive;
-  //   color: $color-text-inverse;
-  // }
+  &--archive {
+    color: var(--color-file-archive);
+  }
 
-  // &--code {
-  //   background-color: $color-primary;
-  //   color: $color-text-inverse;
-  // }
-
-  // &--unknown {
-  //   background-color: $color-file-other;
-  //   color: $color-text-inverse;
-  // }
+  &--code,
+  &--unknown {
+    color: var(--color-file-other);
+  }
 }

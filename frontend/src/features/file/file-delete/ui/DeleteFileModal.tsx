@@ -1,9 +1,5 @@
-import { AiOutlineClose } from "react-icons/ai";
-import { FaTrashCan } from "react-icons/fa6";
-import { PiWarningDiamondFill } from "react-icons/pi";
-
 import type { IFile } from "@/entities/file";
-import { Button, Modal } from "@/shared/ui";
+import { Button, Icon, Modal } from "@/shared/ui";
 
 import "./DeleteFileModal.scss";
 
@@ -35,9 +31,6 @@ export function DeleteFileModal({
   onConfirm,
   isDeleting = false,
 }: IDeleteFileModalProps) {
-  /**
-   * Handle confirm button click.
-   */
   const handleConfirm = async (): Promise<void> => {
     await onConfirm();
     // Modal closes after successful deletion (handled by parent)
@@ -54,11 +47,11 @@ export function DeleteFileModal({
       footer={
         <>
           <Button variant="secondary" onClick={onClose} disabled={isDeleting}>
-            <AiOutlineClose />
+            <Icon name="close" />
             Отмена
           </Button>
           <Button variant="danger" onClick={handleConfirm} loading={isDeleting}>
-            <FaTrashCan />
+            <Icon name="trash" />
             Удалить
           </Button>
         </>
@@ -66,7 +59,8 @@ export function DeleteFileModal({
     >
       <div className="delete-file-modal">
         <div className="delete-file-modal__icon">
-          <PiWarningDiamondFill size="60" color="var(--color-warning)" />
+          {/* <PiWarningDiamondFill size="60" color="var(--color-warning)" /> */}
+          <Icon name="warning" size="60" color="warning" />
         </div>
         <div className="delete-file-modal__message">
           <p>

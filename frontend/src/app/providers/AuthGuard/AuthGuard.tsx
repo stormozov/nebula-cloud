@@ -1,7 +1,7 @@
 import { type JSX, useEffect } from "react";
-import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 
+import { useAppSelector } from "@/app/store/hooks";
 import {
   selectIsAuthenticated,
   selectIsLoading,
@@ -40,9 +40,9 @@ export const AuthGuard = ({
 }: IAuthGuardProps): JSX.Element | null => {
   const navigate = useNavigate();
 
-  const isAuthenticated = useSelector(selectIsAuthenticated);
-  const isStaff = useSelector(selectIsStaff);
-  const isLoading = useSelector(selectIsLoading);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const isStaff = useAppSelector(selectIsStaff);
+  const isLoading = useAppSelector(selectIsLoading);
 
   useEffect(() => {
     // Skip redirect while loading auth state (initial app load)
@@ -51,8 +51,9 @@ export const AuthGuard = ({
     // Logic for guest-only routes (e.g., /auth, /welcome for non-auth)
     if (accessLevel === "guest") {
       if (isAuthenticated) {
-        // Authenticated users should not access guest routes
-        navigate(redirectPath ?? "/disk", { replace: true });
+        const redirectTo =
+          redirectPath ?? (isStaff ? "/admin/dashboard" : "/disk");
+        navigate(redirectTo, { replace: true });
       }
       return;
     }

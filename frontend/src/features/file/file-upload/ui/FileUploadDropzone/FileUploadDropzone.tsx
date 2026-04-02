@@ -9,6 +9,7 @@ import type { IFileUploadDropzoneProps } from "../../lib/types";
 import { validateFileBatch } from "../../lib/validateFile";
 import { FileUploadButton } from "../FileUploadButton/FileUploadButton";
 
+import { Icon } from "@/shared/ui";
 import "./FileUploadDropzone.scss";
 
 /**
@@ -193,12 +194,15 @@ export function FileUploadDropzone({
   /**
    * Handle key down event.
    */
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (clickable && !isGlobalMode && (e.key === "Enter" || e.key === " ")) {
-      e.preventDefault();
-      handleClick();
-    }
-  }, [clickable, isGlobalMode, handleClick]);
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (clickable && !isGlobalMode && (e.key === "Enter" || e.key === " ")) {
+        e.preventDefault();
+        handleClick();
+      }
+    },
+    [clickable, isGlobalMode, handleClick],
+  );
 
   /**
    * Reset drag state when component unmounts.
@@ -260,7 +264,11 @@ export function FileUploadDropzone({
       {children || (
         <div className="file-upload-dropzone__content">
           <div className="file-upload-dropzone__icon">
-            {isGlobalMode ? "📥" : "📁"}
+            <Icon
+              name="download"
+              size={isGlobalMode ? 80 : 48}
+              color="primary"
+            />
           </div>
 
           <div className="file-upload-dropzone__text">

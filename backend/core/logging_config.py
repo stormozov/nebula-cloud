@@ -20,7 +20,7 @@ def get_logging_config(base_dir: Path, debug: bool = False) -> dict:
     logs_dir = base_dir / "logs"
     logs_dir.mkdir(exist_ok=True)
 
-    max_bytes = 10 * 1024 * 1024  # 10 MB
+    max_bytes = 50 * 1024 * 1024  # 50 MB
 
     return {
         "version": 1,
@@ -53,6 +53,7 @@ def get_logging_config(base_dir: Path, debug: bool = False) -> dict:
                 "filename": logs_dir / "app.log",
                 "maxBytes": max_bytes,
                 "backupCount": 5,
+                "delay": True,
                 "formatter": "verbose",
                 "encoding": "utf-8",
             },
@@ -62,6 +63,7 @@ def get_logging_config(base_dir: Path, debug: bool = False) -> dict:
                 "filename": logs_dir / "errors.log",
                 "maxBytes": max_bytes,
                 "backupCount": 5,
+                "delay": True,
                 "formatter": "verbose",
                 "encoding": "utf-8",
             },
@@ -71,6 +73,7 @@ def get_logging_config(base_dir: Path, debug: bool = False) -> dict:
                 "filename": logs_dir / "security.log",
                 "maxBytes": max_bytes,
                 "backupCount": 5,
+                "delay": True,
                 "formatter": "verbose",
                 "encoding": "utf-8",
             },
@@ -80,6 +83,7 @@ def get_logging_config(base_dir: Path, debug: bool = False) -> dict:
                 "filename": logs_dir / "auth.log",
                 "maxBytes": max_bytes,
                 "backupCount": 5,
+                "delay": True,
                 "formatter": "verbose",
                 "encoding": "utf-8",
             },

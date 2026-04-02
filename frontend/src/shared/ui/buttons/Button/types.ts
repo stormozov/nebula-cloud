@@ -6,7 +6,8 @@ export type ButtonVariant =
   | "secondary"
   | "danger"
   | "ghost"
-  | "outline";
+  | "outline"
+  | "text";
 
 /**
  * Button sizes.
@@ -19,7 +20,7 @@ export type ButtonSize = "small" | "medium" | "large";
 export interface IButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   /**
-   * Button variant (primary, secondary, danger, ghost).
+   * Button variant (primary, secondary, danger, ghost, outline, text).
    */
   variant?: ButtonVariant;
   /**
@@ -30,10 +31,6 @@ export interface IButtonProps
    * Show loading spinner.
    */
   loading?: boolean;
-  /**
-   * Button children (text or icon).
-   */
-  children?: React.ReactNode;
   /**
    * Additional CSS class name.
    */

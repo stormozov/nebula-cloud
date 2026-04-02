@@ -47,6 +47,33 @@ export const routesConfig = createBrowserRouter([
         ),
       },
 
+      // Protected route: Admin dashboard (admin only)
+      {
+        path: "/admin/dashboard",
+        element: (
+          <AuthGuard accessLevel="admin">
+            {lazyWithSuspense(
+              () =>
+                import(
+                  "@/pages/PageAdmin/ui/PageAdminDashboard/PageAdminDashboard"
+                ),
+            )}
+          </AuthGuard>
+        ),
+      },
+
+      // Protected route: User disk (admin only)
+      {
+        path: "/admin/user/:userId/disk",
+        element: (
+          <AuthGuard accessLevel="admin">
+            {lazyWithSuspense(
+              () => import("@/pages/PageAdmin/ui/PageUserDisk/PageUserDisk"),
+            )}
+          </AuthGuard>
+        ),
+      },
+
       // Public route: Public file metadata preview
       {
         path: "/public/:token/",

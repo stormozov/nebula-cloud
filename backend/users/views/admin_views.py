@@ -4,6 +4,7 @@ This module provides a unified ViewSet for managing users with admin privileges.
 All actions require authentication and admin status.
 """
 
+from django.db.models import Q
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -50,6 +51,7 @@ class AdminUserViewSet(viewsets.ModelViewSet):
         POST   /api/admin/users/{id}/password/ - Reset user password
         POST   /api/admin/users/{id}/toggle-admin/ - Toggle admin status
         GET    /api/admin/users/{id}/storage-stats/ - Get storage statistics
+        GET    /api/admin/users/{id}/export/ - Export user data
     """
 
     queryset = UserAccount.objects.all().order_by("username")
@@ -74,6 +76,28 @@ class AdminUserViewSet(viewsets.ModelViewSet):
             return AdminUserUpdateSerializer
 
         return AdminUserDetailSerializer
+
+    def get_queryset(self):
+        """
+        Filter queryset based on search parameter.
+
+        Returns:
+            QuerySet: Filtered queryset.
+        """
+
+        queryset = super().get_queryset()
+        search = self.request.query_params.get("search")
+
+        if search:
+            if search.isdigit():
+                id_q = Q(id__startswith=search)
+            else:
+                id_q = Q()
+            queryset = queryset.filter(
+                id_q | Q(username__icontains=search) | Q(email__icontains=search)
+            )
+
+        return queryset
 
     def _get_user_email_for_log(self) -> str:
         """
@@ -120,15 +144,28 @@ class AdminUserViewSet(viewsets.ModelViewSet):
         """
 
         queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True, context={"request": request})
+        total_count = queryset.count()
 
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True, context={"request": request})
+            logger.info(
+                "Admin user list retrieved: count=%d (total=%d), admin=%s, IP=%s",
+                len(page),
+                total_count,
+                self._get_user_email_for_log(),
+                get_client_ip(request),
+            )
+            return self.get_paginated_response(serializer.data)
+
+        # if pagination is not configured (PAGE_SIZE = None), return all records
+        serializer = self.get_serializer(queryset, many=True, context={"request": request})
         logger.info(
             "Admin user list retrieved: count=%d, admin=%s, IP=%s",
-            queryset.count(),
+            total_count,
             self._get_user_email_for_log(),
             get_client_ip(request),
         )
-
         return Response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs) -> Response:
@@ -384,7 +421,7 @@ class AdminUserViewSet(viewsets.ModelViewSet):
             )
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        new_is_admin = serializer.validated_data["is_admin"]
+        new_is_admin = serializer.validated_data["is_staff"]
         toggle_admin_status(target_user, new_is_admin)
 
         auth_logger.info(
@@ -396,7 +433,7 @@ class AdminUserViewSet(viewsets.ModelViewSet):
         )
 
         return Response(
-            {"detail": "Статус администратора успешно изменён.", "is_admin": target_user.is_staff},
+            {"detail": "Статус администратора успешно изменён.", "is_staff": target_user.is_staff},
             status=status.HTTP_200_OK,
         )
 
@@ -438,7 +475,7 @@ class AdminUserViewSet(viewsets.ModelViewSet):
 
         stats = {
             "user": {
-                "user_id": user.id,
+                "id": user.id,
                 "username": user.username,
                 "email": user.email,
             },
@@ -456,3 +493,24 @@ class AdminUserViewSet(viewsets.ModelViewSet):
         )
 
         return Response(stats, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["get"], url_path="export")
+    def export_user_data(self, request, pk=None):
+        """Export user data as JSON."""
+
+        user = self.get_object()
+
+        data = {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "full_name": user.get_full_name(),
+            "is_staff": user.is_staff,
+            "is_active": user.is_active,
+            "date_joined": user.date_joined,
+            "last_login": user.last_login,
+            "storage_path": user.storage_path,
+            "storage_stats": calculate_storage_stats(user),
+        }
+
+        return Response(data)

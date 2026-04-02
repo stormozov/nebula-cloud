@@ -14,9 +14,9 @@ import {
   setPanelVisible,
 } from "@/entities/file-upload";
 import { FileUploadItem } from "@/features/file/file-upload";
+import { Button, Icon } from "@/shared/ui";
 
 import "./FileUploadPanel.scss";
-import { Button } from "@/shared/ui";
 
 /**
  * File upload panel widget.
@@ -93,9 +93,7 @@ export function FileUploadPanel() {
         <div className="file-upload-panel__title">
           {getPanelTitle()}
           {isQueueCompleted && (
-            <span className="file-upload-panel__badge file-upload-panel__badge--success">
-              ✓
-            </span>
+            <Icon name="check" color="success" />
           )}
         </div>
         <Button
@@ -135,11 +133,13 @@ export function FileUploadPanel() {
         <footer className="file-upload-panel__footer">
           <div className="file-upload-panel__stats">
             <span className="file-upload-panel__stat file-upload-panel__stat--success">
-              ✓ {completedCount}
+              <Icon name="check" color="success" />
+              {completedCount}
             </span>
             {failedCount > 0 && (
               <span className="file-upload-panel__stat file-upload-panel__stat--error">
-                ✗ {failedCount}
+                <Icon name="close" color="error" />
+                {failedCount}
               </span>
             )}
           </div>
@@ -150,6 +150,7 @@ export function FileUploadPanel() {
             className="file-upload-panel__clear-btn"
             onClick={handleClose}
           >
+            <Icon name="trash" />
             Очистить
           </Button>
         </footer>

@@ -3,6 +3,9 @@ ViewSet for authenticated file operations (CRUD + management).
 All actions in this module require authentication and appropriate permissions.
 """
 
+from datetime import datetime
+
+from django.db.models import Q
 from django.http import FileResponse
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
@@ -31,31 +34,25 @@ class FileViewSet(viewsets.ModelViewSet):
     """
 
     serializer_class = FileSerializer
-    # Добавляем IsAuthenticated для блокировки анонимных запросов до выполнения логики
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin]
 
     def get_queryset(self):
         """
         Return queryset filtered by owner for list action only.
 
-        For list: filter by owner to prevent ID enumeration attacks.
-        For detail actions (retrieve/update/destroy): return full queryset
-        and let permission class (IsOwnerOrAdmin) handle access control.
-        This ensures 403 (Forbidden) instead of 404 (Not Found) for
-        unauthorized access to existing files.
+        Admin users can access all files; regular users can only access
+        their own files.
         """
+
         user = self.request.user
 
-        # Для list-экшена фильтруем по владельцу
         if self.action == "list":
             if user.is_staff:
                 user_id = self.request.query_params.get("user_id")
+                user_email = getattr(user, "email", "anonymous")
                 if user_id:
                     try:
-                        queryset = File.objects.filter(
-                            owner_id=int(user_id)
-                        )  # pylint: disable=no-member
-                        user_email = getattr(user, "email", "anonymous")
+                        queryset = File.objects.filter(owner_id=int(user_id))
                         file_logger.info(
                             "Admin %s requested files for user_id=%s, IP=%s",
                             user_email,
@@ -63,33 +60,52 @@ class FileViewSet(viewsets.ModelViewSet):
                             get_client_ip(self.request),
                         )
                     except (ValueError, TypeError):
-                        user_email = getattr(user, "email", "anonymous")
                         file_logger.warning(
                             "Admin %s provided invalid user_id parameter, IP=%s",
                             user_email,
                             get_client_ip(self.request),
                         )
-                        queryset = File.objects.filter(owner=user)  # pylint: disable=no-member
+                        queryset = File.objects.filter(owner=user)
                 else:
-                    queryset = File.objects.all()  # pylint: disable=no-member
-                    user_email = getattr(user, "email", "anonymous")
+                    queryset = File.objects.filter(owner=user)
                     file_logger.info(
-                        "Admin %s requested all files, IP=%s",
+                        "Admin %s requested own files, IP=%s",
                         user_email,
                         get_client_ip(self.request),
                     )
             else:
-                queryset = File.objects.filter(owner=user)  # pylint: disable=no-member
+                queryset = File.objects.filter(owner=user)
                 user_email = getattr(user, "email", "anonymous")
                 file_logger.info(
                     "User %s requested own files, IP=%s",
                     user_email,
                     get_client_ip(self.request),
                 )
+
+            search = self.request.query_params.get("search")
+            if search:
+                if search.startswith("."):
+                    extension = search.lower()
+                    q_filter = Q(original_name__iendswith=extension)
+                else:
+                    parsed_date = None
+
+                    for fmt in ("%Y-%m-%d", "%d.%m.%Y"):
+                        try:
+                            parsed_date = datetime.strptime(search, fmt).date()
+                            break
+                        except ValueError:
+                            continue
+
+                    if parsed_date:
+                        q_filter = Q(uploaded_at__date=parsed_date)
+                    else:
+                        q_filter = Q(original_name__icontains=search)
+
+                queryset = queryset.filter(q_filter)
+
         else:
-            # Для detail-действий не фильтруем — permission класс проверит права
-            # и вернёт 403 вместо 404, что безопаснее (не раскрывает существование)
-            queryset = File.objects.all()  # pylint: disable=no-member
+            queryset = File.objects.all()
 
         return queryset.select_related("owner").order_by("-uploaded_at")
 
@@ -104,9 +120,7 @@ class FileViewSet(viewsets.ModelViewSet):
         Returns:
             type: Serializer class for current action.
         """
-        if self.action in ["create", "upload"]:
-            return FileUploadSerializer
-        return FileSerializer
+        return FileUploadSerializer if self.action in ["create", "upload"] else FileSerializer
 
     def _get_user_email_for_log(self) -> str:
         """
@@ -120,20 +134,35 @@ class FileViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         """Retrieve a list of files for the authenticated user."""
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True, context={"request": request})
 
+        queryset = self.get_queryset()
+        total_count = queryset.count()
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True, context={"request": request})
+            file_logger.info(
+                "File list retrieved: count=%d (total=%d), user=%s, IP=%s",
+                len(page),
+                total_count,
+                self._get_user_email_for_log(),
+                get_client_ip(request),
+            )
+            return self.get_paginated_response(serializer.data)
+
+        # if pagination is not configured (PAGE_SIZE = None), return all records
+        serializer = self.get_serializer(queryset, many=True, context={"request": request})
         file_logger.info(
             "File list retrieved: count=%d, user=%s, IP=%s",
-            queryset.count(),
+            total_count,
             self._get_user_email_for_log(),
             get_client_ip(request),
         )
-
         return Response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
         """Retrieve details of a specific file."""
+
         instance = self.get_object()
         serializer = self.get_serializer(instance, context={"request": request})
 
@@ -154,6 +183,7 @@ class FileViewSet(viewsets.ModelViewSet):
         Expects multipart/form-data with 'file' and optional 'comment' fields.
         Uses FileUploadSerializer to extract metadata from uploaded file.
         """
+
         serializer = self.get_serializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
 
@@ -168,10 +198,8 @@ class FileViewSet(viewsets.ModelViewSet):
                 get_client_ip(request),
             )
 
-            # Для ответа используем FileSerializer (read-only, с дополнительными полями)
             response_serializer = FileSerializer(file_obj, context={"request": request})
             return Response(response_serializer.data, status=status.HTTP_201_CREATED)
-
         except Exception as e:
             file_logger.error(
                 "File upload failed: user=%s, error=%s, IP=%s",
@@ -186,6 +214,7 @@ class FileViewSet(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         """Fully update a file's metadata."""
+
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=False)
         serializer.is_valid(raise_exception=True)
@@ -203,6 +232,7 @@ class FileViewSet(viewsets.ModelViewSet):
 
     def partial_update(self, request, *args, **kwargs):
         """Partially update a file's metadata."""
+
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
@@ -220,6 +250,7 @@ class FileViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         """Delete a file from the storage."""
+
         instance = self.get_object()
         filename = instance.original_name
         owner_email = getattr(instance.owner, "email", "unknown")
@@ -237,7 +268,6 @@ class FileViewSet(viewsets.ModelViewSet):
             )
 
             return Response(status=status.HTTP_204_NO_CONTENT)
-
         except Exception as e:
             file_logger.error(
                 "File deletion failed: id=%d, user=%s, error=%s, IP=%s",
@@ -259,7 +289,7 @@ class FileViewSet(viewsets.ModelViewSet):
         Alternative endpoint to standard create with explicit upload semantics.
         Functionally equivalent to create() but provides clearer API documentation.
         """
-        # get_serializer_class() уже вернёт FileUploadSerializer для action="upload"
+
         serializer = self.get_serializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
 
@@ -276,7 +306,6 @@ class FileViewSet(viewsets.ModelViewSet):
 
             response_serializer = FileSerializer(file_obj, context={"request": request})
             return Response(response_serializer.data, status=status.HTTP_201_CREATED)
-
         except Exception as e:
             file_logger.error(
                 "File upload failed (via upload action): user=%s, error=%s, IP=%s",
@@ -297,9 +326,9 @@ class FileViewSet(viewsets.ModelViewSet):
         Updates last_downloaded timestamp on success.
         Returns FileResponse with Content-Disposition header for attachment.
         """
+
         file_obj = self.get_object()
 
-        # Дополнительная проверка: файл должен иметь сохранённый путь
         if not file_obj.file or not file_obj.file.name:
             file_logger.error(
                 "File has no storage path: id=%d, user=%s, IP=%s",
@@ -343,6 +372,7 @@ class FileViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["patch"], url_path="rename")
     def rename(self, request, *args, **kwargs):
         """Rename a file by updating its original_name field."""
+
         file_obj = self.get_object()
 
         serializer = FileRenameSerializer(data=request.data)
@@ -364,6 +394,7 @@ class FileViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["patch"], url_path="comment")
     def comment(self, request, *args, **kwargs):
         """Update or clear a file's comment field."""
+
         file_obj = self.get_object()
 
         serializer = FileCommentSerializer(data=request.data)
@@ -411,9 +442,9 @@ class FileViewSet(viewsets.ModelViewSet):
             Info: Successful link generation with new UUID.
             Warning: Link generation for already-linked file (replaced).
         """
+
         file_obj = self.get_object()
 
-        # Предупреждение если ссылка уже существует (будет заменена)
         if file_obj.public_link:
             old_link = file_obj.public_link
             file_logger.warning(
@@ -465,6 +496,7 @@ class FileViewSet(viewsets.ModelViewSet):
             Info: Successful link deletion.
             Warning: Attempt to delete non-existent link.
         """
+
         file_obj = self.get_object()
 
         if not file_obj.public_link:

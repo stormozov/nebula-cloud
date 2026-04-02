@@ -1,0 +1,109 @@
+// =============================================================================
+// Styles for user details modal
+// =============================================================================
+
+.user-details-modal-info {
+  max-width: 300px;
+  width: 100%;
+
+  &__section {
+    position: relative;
+    padding: 1rem;
+    background-color: var(--color-bg-tertiary);
+    border-radius: 10px;
+    width: 100%;
+
+    &:not(:last-child) {
+      margin-bottom: 1rem;
+    }
+  }
+
+  &__header {
+    position: relative;
+    display: flex;
+    margin-bottom: 0.8rem;
+
+    &.hovered {
+      .user-details-modal-info__copy-block-btn {
+        opacity: 1;
+        visibility: visible;
+      }
+    }
+  }
+
+  &__title {
+    margin-right: auto;
+    color: var(--color-text-tertiary);
+    cursor: default;
+    transition: transform 0.3s ease;
+  }
+
+  &__items {
+    display: grid;
+    gap: 6px;
+  }
+
+  &__item {
+    position: relative;
+
+    display: block;
+
+    padding: 6px 28px 6px 12px;
+
+    background-color: var(--color-bg-primary);
+    border: 2px solid transparent;
+    border-radius: 6px;
+
+    text-align: left;
+
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      border-color: var(--color-border-tertiary);
+
+      .user-details-modal-info__copy-decor-icon {
+        opacity: 1;
+      }
+    }
+  }
+
+  &__value {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+
+  &__label {
+    margin: 0;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+  }
+
+  &__copy-decor-icon {
+    position: absolute;
+    top: 50%;
+    right: 0.5rem;
+
+    opacity: 0;
+    transition: opacity 0.2s;
+    transform: translateY(-50%);
+  }
+
+  &__copy-block-btn {
+    color: var(--color-text-tertiary);
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.2s ease,
+      visibility 0.2s ease;
+
+    svg {
+      transition: color 0.2s;
+    }
+
+    &:hover:not(:disabled) {
+      color: var(--color-text-secondary);
+    }
+  }
+}
