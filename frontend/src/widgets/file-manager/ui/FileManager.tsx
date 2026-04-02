@@ -401,7 +401,8 @@ export function FileManager({
       {!isLoading &&
         !isFetching &&
         (!data || data.results.length === 0) &&
-        !error && (
+        !error &&
+        (isAdmin || !!debouncedSearchTerm) && (
           <div className="file-manager__empty-message">
             <p>Нет загруженных файлов</p>
           </div>
