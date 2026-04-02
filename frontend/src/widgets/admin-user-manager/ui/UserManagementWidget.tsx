@@ -1,78 +1,24 @@
-import { useEffect, useState } from "react";
-
-import { type IUserListResponse, useGetUsersQuery } from "@/entities/user";
 import {
+  type IUserDetailsModalProps,
   UserDetailsModal,
   UserList,
   UserSearchInput,
-  useUserSearch,
 } from "@/features/admin";
-import { Button, Icon, ModalConfirm, useModalConfirm } from "@/shared/ui";
+import { Button, Icon, ModalConfirm } from "@/shared/ui";
+
+import { useUserManager } from "../lib/useUserManager";
 
 import "./UserManagementWidget.scss";
 
 export function UserManagementWidget() {
-  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [loadedUsers, setLoadedUsers] = useState<IUserListResponse[]>([]);
-  const [pendingAutoNavigateAfterLoad, setPendingAutoNavigateAfterLoad] =
-    useState(false);
-
-  const { searchTerm, setSearchTerm, debouncedSearchTerm } = useUserSearch();
-
   const {
-    data: users,
-    isLoading: usersLoading,
-    error: usersError,
-  } = useGetUsersQuery({
-    page: currentPage,
-    search: debouncedSearchTerm || undefined,
-  });
-
-  const { dialog, requestConfirm, handleConfirm, handleCancel } =
-    useModalConfirm();
-
-  const allUserIds = loadedUsers.map((user) => user.id) ?? [];
-
-  const handleLoadMore = (shouldAutoNavigate: boolean = false) => {
-    setPendingAutoNavigateAfterLoad(shouldAutoNavigate);
-    setCurrentPage((prev) => prev + 1);
-  };
-
-  const handleSearchChange = (value: string) => {
-    setSearchTerm(value);
-    setCurrentPage(1);
-    setSelectedUserId(null);
-    setPendingAutoNavigateAfterLoad(false);
-  };
-
-  // Обработка полученных данных
-  useEffect(() => {
-    if (!users) return;
-
-    if (currentPage === 1) {
-      setTimeout(() => {
-        setLoadedUsers(users.results);
-        setPendingAutoNavigateAfterLoad(false);
-      });
-    } else {
-      setTimeout(() => {
-        setLoadedUsers((prev) => {
-          const existingIds = new Set(prev.map((user) => user.id));
-          const newUsers = users.results.filter(
-            (user) => !existingIds.has(user.id),
-          );
-          if (pendingAutoNavigateAfterLoad && newUsers.length > 0) {
-            setTimeout(() => {
-              setSelectedUserId(newUsers[0].id);
-              setPendingAutoNavigateAfterLoad(false);
-            }, 0);
-          }
-          return [...prev, ...newUsers];
-        });
-      }, 0);
-    }
-  }, [users, currentPage, pendingAutoNavigateAfterLoad]);
+    usersList,
+    selected,
+    pagination,
+    search,
+    confirmModal,
+    userDetailsModal,
+  } = useUserManager();
 
   return (
     <div className="users-management w-full">
@@ -83,29 +29,29 @@ export function UserManagementWidget() {
             size: "small",
           }}
           inputProps={{
-            value: searchTerm,
+            value: search.term,
             className: "users-management__search",
             placeholder: "Поиск по ID, логину или email",
-            onChange: handleSearchChange,
+            onChange: search.setTerm,
           }}
         />
         <div className="users-management__count">
-          Всего пользователей: {users?.count ?? 0}
+          Всего пользователей: {usersList.totalCount}
         </div>
       </header>
 
       <UserList
-        users={loadedUsers}
-        isLoading={usersLoading}
-        error={usersError}
-        onSelectUser={setSelectedUserId}
+        users={usersList.items}
+        isLoading={usersList.isLoading}
+        error={usersList.error}
+        onSelectUser={selected.setUserId}
       />
-      {users?.next && (
+      {usersList.hasMore && (
         <div className="users-management__load-more">
           <Button
-            loading={usersLoading}
-            disabled={usersLoading}
-            onClick={() => handleLoadMore(false)}
+            loading={pagination.isLoadMoreLoading}
+            disabled={pagination.isLoadMoreLoading}
+            onClick={() => pagination.loadMore(false)}
           >
             <Icon name="retry" />
             Загрузить еще
@@ -113,29 +59,22 @@ export function UserManagementWidget() {
         </div>
       )}
 
-      {selectedUserId && (
+      {selected.userId && (
         <UserDetailsModal
-          userId={selectedUserId}
-          allUserIds={allUserIds}
-          hasPaginationMore={users?.next != null}
-          onLoadMore={handleLoadMore}
-          isConfirmOpen={dialog.isOpen}
-          onNavigate={setSelectedUserId}
-          requestConfirm={requestConfirm}
-          onClose={() => setSelectedUserId(null)}
+          modalProps={userDetailsModal as IUserDetailsModalProps["modalProps"]}
         />
       )}
 
       <ModalConfirm
-        isOpen={dialog.isOpen}
-        title={dialog.title}
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
         closeOnOverlayClick={false}
         closeOnEsc={false}
-        onConfirm={handleConfirm}
-        onCancel={handleCancel}
-        onClose={handleCancel}
+        onConfirm={confirmModal.handleConfirm}
+        onCancel={confirmModal.handleCancel}
+        onClose={confirmModal.handleCancel}
       >
-        {dialog.message}
+        {confirmModal.message}
       </ModalConfirm>
     </div>
   );

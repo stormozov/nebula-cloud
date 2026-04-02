@@ -1,6 +1,6 @@
 import classNames from "classnames";
 
-import { type IUserDetailsModalProps, UserNavigation } from "@/features/admin";
+import { type IModalContentProps, UserNavigation } from "@/features/admin";
 import { Button, Heading, Icon, PageWrapper } from "@/shared/ui";
 
 import { useUserDetailsModal } from "../../lib/useUserDetailsModal";
@@ -10,9 +10,16 @@ import { UserDetailsModalInfo } from "../UserDetailsModalInfo/UserDetailsModalIn
 import "./UserDetailsModal.scss";
 
 /**
+ * Props interface for the `UserDetailsModal` component.
+ */
+export interface IUserDetailsModalProps {
+  modalProps: IModalContentProps;
+}
+
+/**
  * Modal component that displays detailed information about a user.
  */
-export function UserDetailsModal(props: IUserDetailsModalProps) {
+export function UserDetailsModal({ modalProps }: IUserDetailsModalProps) {
   const {
     user,
     storageStats,
@@ -22,7 +29,7 @@ export function UserDetailsModal(props: IUserDetailsModalProps) {
     isCurrentUser,
     navigationProps,
     handleCloseWithAnimation,
-  } = useUserDetailsModal(props);
+  } = useUserDetailsModal(modalProps);
 
   if (isLoading) return <div>Загрузка...</div>;
   if (!user || !actionsProps.user) return <div>Пользователь не найден</div>;

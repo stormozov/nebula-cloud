@@ -7,16 +7,13 @@ import {
   useGetUserQuery,
 } from "@/entities/user";
 
-import type {
-  IUserDetailsModalProps,
-  UserDetailsModalActionsType,
-} from "./types";
+import type { IModalContentProps, UserDetailsModalActionsType } from "./types";
 import { useModalClose } from "./useModalClose";
 
 /**
  * Props for the `useUserDetailsModal` hook.
  */
-type UseUserDetailsModalProps = IUserDetailsModalProps;
+type UseUserDetailsModalProps = IModalContentProps;
 
 /**
  * Hook that provides data and actions for the `UserDetailsModal` component.

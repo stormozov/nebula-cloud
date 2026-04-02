@@ -81,9 +81,9 @@ export interface IUserDetailsInfoItem {
 }
 
 /**
- * Props interface for the `UserDetailsModal` component.
+ * Props interface for the modal content component.
  */
-export interface IUserDetailsModalProps {
+export interface IModalContentProps {
   /** The ID of the user whose details are being displayed */
   userId: number;
   /** An array of user IDs */
