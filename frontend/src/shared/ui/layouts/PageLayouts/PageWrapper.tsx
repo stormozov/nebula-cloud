@@ -9,6 +9,8 @@ interface PageWrapperProps {
   direction?: "row" | "column";
   align?: "start" | "center" | "end";
   justify?: "start" | "center" | "end" | "space-between";
+  gap?: number | string;
+  fullWidth?: boolean;
 }
 
 /**
@@ -20,6 +22,8 @@ export function PageWrapper({
   direction = "row",
   align = "start",
   justify = "start",
+  gap,
+  fullWidth,
   ...props
 }: PageWrapperProps) {
   const classes = classNames(
@@ -27,10 +31,13 @@ export function PageWrapper({
     `page__wrapper--direction-${direction}`,
     `page__wrapper--align-${align}`,
     `page__wrapper--justify-${justify}`,
+    {
+      "full-width": fullWidth,
+    },
     className,
   );
   return (
-    <div {...props} className={classes}>
+    <div {...props} style={{ gap }} className={classes}>
       {children}
     </div>
   );

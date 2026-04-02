@@ -11,11 +11,8 @@ The module provides serializers for:
 
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
-from django.db import models
 from rest_framework import serializers
 
-from core.utils import format_size
-from storage.models import File
 from users.models import UserAccount
 
 # ==================================================================================================
@@ -26,10 +23,6 @@ from users.models import UserAccount
 class AdminUserListSerializer(serializers.ModelSerializer):
     """Serializer for listing users in admin panel."""
 
-    full_name = serializers.SerializerMethodField()
-    is_admin = serializers.BooleanField(source="is_staff", read_only=True)
-    storage_stats = serializers.SerializerMethodField()
-
     class Meta:
         """Meta class for AdminUserListSerializer."""
 
@@ -38,48 +31,21 @@ class AdminUserListSerializer(serializers.ModelSerializer):
             "id",
             "username",
             "email",
-            "first_name",
-            "last_name",
-            "full_name",
-            "is_admin",
             "is_active",
-            "date_joined",
-            "last_login",
-            "storage_stats",
+            "is_staff",
         ]
         read_only_fields = [
             "id",
             "username",
             "email",
-            "date_joined",
-            "last_login",
         ]
-
-    def get_full_name(self, obj) -> str:
-        """Get user's full name."""
-        return obj.get_full_name()
-
-    def get_storage_stats(self, obj) -> dict:
-        """Get user's storage statistics."""
-
-        user_files = File.objects.filter(owner=obj)  # pylint: disable=no-member
-        total_size = user_files.aggregate(total=models.Sum("size"))["total"] or 0
-        file_count = user_files.count()
-
-        return {
-            "file_count": file_count,
-            "total_size": total_size,
-            "total_size_formatted": format_size(total_size),
-        }
 
 
 class AdminUserDetailSerializer(serializers.ModelSerializer):
     """Serializer for detailed user information in admin panel."""
 
     full_name = serializers.SerializerMethodField()
-    is_admin = serializers.BooleanField(source="is_staff", read_only=True)
     storage_path = serializers.CharField(read_only=True)
-    storage_stats = serializers.SerializerMethodField()
 
     class Meta:
         """Meta class for AdminUserDetailSerializer."""
@@ -92,12 +58,11 @@ class AdminUserDetailSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "full_name",
-            "is_admin",
+            "is_staff",
             "is_active",
             "date_joined",
             "last_login",
             "storage_path",
-            "storage_stats",
         ]
         read_only_fields = [
             "id",
@@ -111,19 +76,6 @@ class AdminUserDetailSerializer(serializers.ModelSerializer):
     def get_full_name(self, obj) -> str:
         """Get user's full name."""
         return obj.get_full_name()
-
-    def get_storage_stats(self, obj) -> dict:
-        """Get user's storage statistics."""
-
-        user_files = File.objects.filter(owner=obj)  # pylint: disable=no-member
-        total_size = user_files.aggregate(total=models.Sum("size"))["total"] or 0
-        file_count = user_files.count()
-
-        return {
-            "file_count": file_count,
-            "total_size": total_size,
-            "total_size_formatted": format_size(total_size),
-        }
 
 
 class AdminUserUpdateSerializer(serializers.ModelSerializer):
@@ -162,28 +114,16 @@ class AdminPasswordResetSerializer(serializers.Serializer):
         style={"input_type": "password"},
         help_text="Новый пароль пользователя",
     )
-    new_password_confirm = serializers.CharField(
-        write_only=True,
-        required=True,
-        style={"input_type": "password"},
-        help_text="Подтверждение нового пароля",
-    )
 
-    def validate(self, attrs) -> dict:
+    def validate(self, attrs):
         """Validate password reset data."""
 
         new_password = attrs.get("new_password")
-        new_password_confirm = attrs.get("new_password_confirm")
 
-        # Check password confirmation
-        if new_password != new_password_confirm:
-            raise serializers.ValidationError({"new_password_confirm": "Пароли не совпадают."})
-
-        # Validate new password with Django validators
         try:
             validate_password(new_password)
         except DjangoValidationError as e:
-            raise serializers.ValidationError({"new_password": list(e.messages)}) from e
+            raise serializers.ValidationError({"new_password": list(e.messages)})
 
         return attrs
 
@@ -199,7 +139,7 @@ class AdminPasswordResetSerializer(serializers.Serializer):
 class AdminToggleAdminSerializer(serializers.Serializer):
     """Serializer for toggling admin status."""
 
-    is_admin = serializers.BooleanField(
+    is_staff = serializers.BooleanField(
         required=True,
         help_text="Статус администратора",
     )

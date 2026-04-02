@@ -3,7 +3,7 @@ import { useCallback, useRef } from "react";
 
 import { useAppDispatch } from "@/app/store/hooks";
 import { addFiles, generateUploadId } from "@/entities/file-upload";
-import { Button } from "@/shared/ui";
+import { Button, Icon } from "@/shared/ui";
 
 import { fileStorage } from "../../lib/fileStorage";
 import type { IFileUploadButtonProps } from "../../lib/types";
@@ -32,7 +32,7 @@ import "./FileUploadButton.scss";
  * </FileUploadButton>
  */
 export function FileUploadButton({
-  children = "Загрузить файл",
+  children,
   variant = "primary",
   size = "medium",
   fullWidth = false,
@@ -133,6 +133,7 @@ export function FileUploadButton({
         disabled={disabled}
         {...restProps}
       >
+        <Icon name="upload" />
         {children}
       </Button>
     </div>

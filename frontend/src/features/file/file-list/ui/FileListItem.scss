@@ -3,7 +3,6 @@
 // =============================================================================
 
 .file-list-item {
-  display: table-row;
   transition: background-color 0.2s ease;
 
   &:hover {
@@ -41,7 +40,7 @@
     }
 
     &--actions {
-      width: 200px;
+      width: 100%;
       text-align: center;
     }
   }

@@ -28,6 +28,7 @@ Endpoints:
         POST   /api/admin/users/{id}/password/ - Reset user password
         POST   /api/admin/users/{id}/toggle-admin/ - Toggle admin status
         GET    /api/admin/users/{id}/storage-stats/ - Get storage statistics
+        GET    /api/admin/users/{id}/export/ - Export user data
 """
 
 from django.urls import include, path

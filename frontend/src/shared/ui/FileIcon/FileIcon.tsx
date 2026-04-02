@@ -12,7 +12,7 @@ export function FileIcon({
   filename = "",
   size = 24,
   className = "",
-  showTooltip = false,
+  showTooltip = true,
 }: IFileIconProps) {
   const fileType = getFileType(filename);
   const tooltipText = getFileTypeRuLabel(fileType);

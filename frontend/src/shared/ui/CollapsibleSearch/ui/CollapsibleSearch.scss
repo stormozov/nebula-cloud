@@ -1,0 +1,47 @@
+// =============================================================================
+// Style module for collapsible search component
+// =============================================================================
+
+.collapsible-search {
+  display: inline-flex;
+  align-items: center;
+
+  &__button {
+    width: auto;
+  }
+
+  &--open &__button {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: -1;
+
+    width: 0;
+
+    overflow: hidden;
+  }
+
+  &__input {
+    z-index: -1;
+
+    max-width: 0;
+    width: 100%;
+
+    overflow: hidden;
+    opacity: 0;
+    transform: translateX(-100%);
+    transition: all 0.2s ease-in-out;
+  }
+
+  &--open &__input {
+    z-index: 1;
+
+    max-width: 330px;
+    width: 100%;
+
+    opacity: 1;
+
+    transform: translateX(0);
+    transition-delay: 0.05s;
+  }
+}

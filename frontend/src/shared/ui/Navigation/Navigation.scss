@@ -1,0 +1,24 @@
+// =============================================================================
+// Style module for navigation component
+// =============================================================================
+
+.navigation {
+  display: flex;
+  gap: 24px;
+  font-size: 1rem;
+
+  &__link {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    &:not(&--active):hover {
+      color: var(--color-text-link-hover);
+    }
+
+    &--active {
+      color: var(--color-primary);
+      cursor: default;
+    }
+  }
+}

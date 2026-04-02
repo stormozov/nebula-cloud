@@ -1,6 +1,6 @@
 import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 
-import type { IParsedApiErrors } from "@/shared/types/api-errors";
+import type { IParsedApiErrors } from "@/shared/types/api";
 
 /**
  * Parses Django REST Framework validation errors.
@@ -61,13 +61,15 @@ export const parseDjangoApiErrors = (
   }
 
   // Handle generic "detail" error (e.g., login errors)
-  if (
-    "detail" in data &&
-    typeof data.detail === "string" &&
-    data.detail !== ""
-  ) {
-    result.submitError = data.detail;
-    return result;
+  if ("detail" in data && data.detail !== undefined && data.detail !== "") {
+    if (typeof data.detail === "string") {
+      result.submitError = data.detail;
+    } else if (Array.isArray(data.detail) && data.detail.length > 0) {
+      result.submitError = data.detail[0];
+    }
+    if (result.submitError) {
+      return result;
+    }
   }
 
   // Handle field-specific errors (e.g., registration errors)
@@ -120,4 +122,4 @@ export const isError401 = (err: FetchBaseQueryError): boolean => {
   return (
     err && typeof err === "object" && "status" in err && err.status === 401
   );
-}
+};

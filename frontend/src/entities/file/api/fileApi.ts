@@ -7,15 +7,9 @@ import {
   fetchWithAuth,
   getRefreshedToken,
 } from "@/shared/api";
+import type { PaginatedResponse } from "@/shared/types/api";
 import { downloadFile } from "@/shared/utils";
 
-import {
-  removeFile,
-  setError,
-  setFileList,
-  setLoading,
-  updateFile,
-} from "../model/slice";
 import type {
   IFile,
   IFileComment,
@@ -100,20 +94,34 @@ export const fileApi = createApi({
      * to load the file list. Sets loading state before and after the request
      * using `setLoading`.
      */
-    getFiles: build.query<IFile[], void>({
-      query: () => "/storage/files/",
-      providesTags: ["File"],
-      async onQueryStarted(_, { dispatch, queryFulfilled }) {
-        dispatch(setLoading(true));
-        try {
-          const { data } = await queryFulfilled;
-          dispatch(setFileList(data));
-        } catch {
-          dispatch(setError("Не удалось загрузить список файлов"));
-        } finally {
-          dispatch(setLoading(false));
+    getFiles: build.query<
+      PaginatedResponse<IFile>,
+      { userId?: number; page?: number; search?: string }
+    >({
+      query: (params) => {
+        const queryParams = new URLSearchParams();
+
+        if (params?.userId) {
+          queryParams.append("user_id", String(params.userId));
         }
+        if (params?.page) queryParams.append("page", String(params.page));
+        if (params?.search) {
+          queryParams.append("search", String(params.search));
+        }
+
+        const queryString = queryParams.toString();
+        return `/storage/files/${queryString ? `?${queryString}` : ""}`;
       },
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.results.map(({ id }) => ({
+                type: "File" as const,
+                id,
+              })),
+              { type: "File", id: "LIST" },
+            ]
+          : [{ type: "File", id: "LIST" }],
     }),
 
     /**
@@ -146,14 +154,6 @@ export const fileApi = createApi({
         method: "DELETE",
       }),
       invalidatesTags: ["File"],
-      async onQueryStarted(id, { dispatch, queryFulfilled }) {
-        try {
-          await queryFulfilled;
-          dispatch(removeFile(id));
-        } catch {
-          dispatch(setError("Не удалось удалить файл"));
-        }
-      },
     }),
 
     /**
@@ -176,14 +176,6 @@ export const fileApi = createApi({
         body: data,
       }),
       invalidatesTags: ["File"],
-      async onQueryStarted(_, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          dispatch(updateFile(data));
-        } catch {
-          dispatch(setError("Не удалось переименовать файл"));
-        }
-      },
     }),
 
     /**
@@ -205,14 +197,6 @@ export const fileApi = createApi({
         body: data,
       }),
       invalidatesTags: ["File"],
-      async onQueryStarted(_, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          dispatch(updateFile(data));
-        } catch {
-          dispatch(setError("Не удалось обновить комментарий"));
-        }
-      },
     }),
 
     /**
@@ -233,14 +217,6 @@ export const fileApi = createApi({
         method: "POST",
       }),
       invalidatesTags: ["File"],
-      async onQueryStarted(_, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          dispatch(updateFile(data));
-        } catch {
-          dispatch(setError("Не удалось создать публичную ссылку"));
-        }
-      },
     }),
 
     /**
@@ -302,14 +278,6 @@ export const fileApi = createApi({
         method: "DELETE",
       }),
       invalidatesTags: ["File"],
-      async onQueryStarted(_, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          dispatch(updateFile(data));
-        } catch {
-          dispatch(setError("Не удалось удалить публичную ссылку"));
-        }
-      },
     }),
   }),
 });

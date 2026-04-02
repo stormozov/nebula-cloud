@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { AiOutlineClose } from "react-icons/ai";
 
 import type { IFile } from "@/entities/file";
 import { getImageBlobFromApi } from "@/entities/file";
-import { Button } from "@/shared/ui";
+import { Button, Icon } from "@/shared/ui";
 import { truncateWithMiddleEllipsis } from "@/shared/utils";
 
 import "./ImageViewerModal.scss";
@@ -96,7 +95,7 @@ export function ImageViewerModal({
             <h3>Ошибка загрузки изображения</h3>
             <p>{error}</p>
             <Button onClick={onClose}>
-              <AiOutlineClose />
+              <Icon name="close" />
               Закрыть
             </Button>
           </div>
@@ -112,7 +111,7 @@ export function ImageViewerModal({
               onClick={onClose}
               aria-label="Закрыть просмотр"
             >
-              <AiOutlineClose size={16} />
+              <Icon name="close" size={16} />
             </button>
 
             <div className="image-viewer-modal__image-container">

@@ -1,6 +1,7 @@
 import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+import { useAppSelector } from "@/app/store/hooks";
 import type { IFile, IFileRename } from "@/entities/file";
 import {
   downloadFileFromApi,
@@ -11,17 +12,20 @@ import {
   useRenameFileMutation,
   useUpdateCommentMutation,
 } from "@/entities/file";
+import { selectIsQueueCompleted } from "@/entities/file-upload";
 import { EditCommentModal } from "@/features/file/file-comment";
 import { DeleteFileModal } from "@/features/file/file-delete";
 import { ImageViewerModal } from "@/features/file/file-image-preview";
 import { FileList } from "@/features/file/file-list";
 import { PublicLinkModal } from "@/features/file/file-public-link";
 import { RenameFileModal } from "@/features/file/file-rename";
+import { FileSearchInput, useFileSearch } from "@/features/file/file-search";
 import {
   FileUploadButton,
   FileUploadDropzone,
 } from "@/features/file/file-upload";
 import { isError401 } from "@/shared/api";
+import { BackButton, Button, Heading, Icon, PageWrapper } from "@/shared/ui";
 import { camelToSnake, isImageFile } from "@/shared/utils";
 
 import "./FileManager.scss";
@@ -49,7 +53,25 @@ export function FileManager({
   isAdmin = false,
   onFileSelect,
 }: IFileManagerProps) {
-  const { data: files = [], isLoading, error } = useGetFilesQuery();
+  // States
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loadedFiles, setLoadedFiles] = useState<IFile[]>([]);
+
+  const { searchTerm, setSearchTerm, debouncedSearchTerm } = useFileSearch();
+
+  // Queries
+  const { data, isLoading, error, isFetching } = useGetFilesQuery(
+    userId
+      ? {
+          userId,
+          page: currentPage,
+          search: debouncedSearchTerm || undefined,
+        }
+      : {
+          page: currentPage,
+          search: debouncedSearchTerm || undefined,
+        },
+  );
 
   // Mutations
   const [deleteFile, { isLoading: isDeleting }] = useDeleteFileMutation();
@@ -73,7 +95,8 @@ export function FileManager({
   );
   const [selectedFile, setSelectedFile] = useState<IFile | null>(null);
 
-  const hasFiles = files.length > 0;
+  // Listen for upload completion to reset pagination
+  const isUploadQueueCompleted = useAppSelector(selectIsQueueCompleted);
 
   /**
    * Extract error message from RTK Query error object.
@@ -141,10 +164,9 @@ export function FileManager({
     if (!selectedFile) return;
 
     try {
-      const newFileName = camelToSnake({ original_name: newName });
       await renameFile({
         id: selectedFile.id,
-        data: newFileName as IFileRename,
+        data: camelToSnake({ original_name: newName }) as IFileRename,
       }).unwrap();
       setRenameModalOpen(false);
       setSelectedFile(null);
@@ -211,9 +233,8 @@ export function FileManager({
     if (!selectedFile) return;
 
     try {
-      const updatedFile = await generatePublicLink(selectedFile.id).unwrap();
-      setSelectedFile(updatedFile);
-      // Don't close modal - user might want to copy the link
+      await generatePublicLink(selectedFile.id).unwrap();
+      setSelectedFile(selectedFile); // Trigger re-render with cache update
     } catch (err) {
       if (isError401(err as FetchBaseQueryError)) return;
       console.error("Failed to generate link:", err);
@@ -233,10 +254,7 @@ export function FileManager({
     if (!selectedFile) return;
 
     try {
-      const updatedFile = await deletePublicLink(selectedFile.id).unwrap();
-
-      setSelectedFile(updatedFile);
-
+      await deletePublicLink(selectedFile.id).unwrap();
       setLinkModalOpen(false);
       setSelectedFile(null);
     } catch (err) {
@@ -261,42 +279,143 @@ export function FileManager({
     }
   };
 
+  // -- Load more handlers -----------------------------------------------------
+
+  const loadMore = () => {
+    setCurrentPage((prev) => prev + 1);
+  };
+
+  // -- Search handlers --------------------------------------------------------
+
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1);
+  };
+
+  // ---------------------------------------------------------------------------
+  // EFFECTS
+  // ---------------------------------------------------------------------------
+
+  // Reset pagination when uploads complete (new files at top of page 1)
+  useEffect(() => {
+    if (!isUploadQueueCompleted) return;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    setTimeout(() => {
+      setCurrentPage(1);
+      setLoadedFiles([]);
+    });
+  }, [isUploadQueueCompleted]);
+
+  // Load more files when scrolling to bottom
+  useEffect(() => {
+    if (!data) return;
+
+    if (currentPage === 1) {
+      setTimeout(() => setLoadedFiles(data.results));
+    } else {
+      setTimeout(() => {
+        setLoadedFiles((prev) => {
+          const existingIds = new Set(prev.map((f) => f.id));
+          const newFiles = data.results.filter((f) => !existingIds.has(f.id));
+          return [...prev, ...newFiles];
+        });
+      });
+    }
+  }, [data, currentPage]);
+
   // ---------------------------------------------------------------------------
   // RENDER
   // ---------------------------------------------------------------------------
 
   return (
     <div className="file-manager">
-      <div className="file-manager__toolbar">
-        <FileUploadButton variant="primary" size="medium">
-          Загрузить файл
-        </FileUploadButton>
-      </div>
+      <header className="file-manager__header">
+        {!isAdmin ? (
+          <>
+            <Heading level={2} noMargin className="file-manager__header-title">
+              Ваш диск
+            </Heading>
+            <PageWrapper>
+              <FileSearchInput
+                inputProps={{
+                  value: searchTerm,
+                  placeholder: "Поиск по названию и дате загрузки",
+                  onChange: handleSearchChange,
+                }}
+              />
+              <FileUploadButton>Загрузить файл</FileUploadButton>
+            </PageWrapper>
+          </>
+        ) : (
+          <>
+            <PageWrapper>
+              <BackButton />
+              <Heading
+                level={2}
+                noMargin
+                className="file-manager__header-title"
+              >
+                Файлы пользователя{" "}
+                <sup
+                  className="file-manager__header-title-badge"
+                  title={`ID пользователя: ${userId}`}
+                >
+                  <Icon name="person" />
+                  {userId}
+                </sup>
+              </Heading>
+            </PageWrapper>
+            <FileSearchInput
+              buttonProps={{
+                children: "Поиск",
+                size: "small",
+              }}
+              inputProps={{
+                value: searchTerm,
+                placeholder: "Поиск по названию и дате загрузки",
+                onChange: handleSearchChange,
+              }}
+            />
+          </>
+        )}
+      </header>
 
-      {/* Dropzone - ONLY WHEN NO FILES */}
-      {!hasFiles && !isLoading && (
-        <div className="file-manager__dropzone">
-          <FileUploadDropzone
-            mode="local"
-            clickable={true}
-            multiple={true}
-            comment="Загружено через FileManager"
-          />
-        </div>
-      )}
+      {/* Dropzone - ONLY WHEN NO FILES or initial load */}
+      {!isAdmin &&
+        !debouncedSearchTerm &&
+        (!data || data.results.length === 0) &&
+        !error &&
+        !isLoading &&
+        !isFetching && (
+          <div className="file-manager__dropzone">
+            <FileUploadDropzone
+              mode="local"
+              clickable={true}
+              multiple={true}
+              comment="Загружено через FileManager"
+            />
+          </div>
+        )}
+
+      {/* Empty state */}
+      {!isLoading &&
+        !isFetching &&
+        (!data || data.results.length === 0) &&
+        !error &&
+        (isAdmin || !!debouncedSearchTerm) && (
+          <div className="file-manager__empty-message">
+            <p>Нет загруженных файлов</p>
+          </div>
+        )}
 
       {/* File list */}
-      {hasFiles && (
+      {loadedFiles.length > 0 && (
         <div className="file-manager__list">
           <FileList
-            files={files}
+            files={loadedFiles}
             isLoading={isLoading}
             error={getErrorMessage(error)}
-            emptyMessage={
-              hasFiles
-                ? "Файлы не найдены"
-                : "В хранилище нет файлов. Загрузите первый файл!"
-            }
+            emptyMessage="Файлы не найдены"
             onSelectFile={onFileSelect}
             onViewFile={handleView}
             onDownloadFile={handleDownload}
@@ -305,6 +424,18 @@ export function FileManager({
             onEditCommentFile={handleEditComment}
             onDeleteFile={handleDelete}
           />
+          {data?.next && (
+            <div className="file-manager__load-more">
+              <Button
+                loading={isFetching}
+                disabled={isFetching}
+                onClick={loadMore}
+              >
+                <Icon name="retry" />
+                Загрузить ещё
+              </Button>
+            </div>
+          )}
         </div>
       )}
 

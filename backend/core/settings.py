@@ -146,7 +146,7 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticated",
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-    "PAGE_SIZE": 100,
+    "PAGE_SIZE": 10,
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
     ],
@@ -287,6 +287,14 @@ if not DEBUG and not IS_TESTING:
 # ==================================================================================================
 
 if IS_TESTING:
+    # Use SQLite in-memory database for tests
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": ":memory:",
+        }
+    }
+
     # Fast password hashing (speeds up test execution)
     PASSWORD_HASHERS = [
         "django.contrib.auth.hashers.MD5PasswordHasher",

@@ -12,13 +12,13 @@ import {
 } from "redux-persist";
 
 import { fileApi } from "@/entities/file";
-import fileReducer from "@/entities/file/model/slice";
 import type {
   IUploadFileSerialized,
   IUploadState,
 } from "@/entities/file-upload";
 import fileUploadReducer from "@/entities/file-upload/model/slice";
 import { userApi } from "@/entities/user";
+import { adminApi } from "@/entities/user/api/adminApi";
 import userReducer from "@/entities/user/model/slice";
 
 import { resetApiMiddleware } from "../middlewares/resetApiMiddleware";
@@ -132,10 +132,10 @@ const persistedUploadReducer = persistReducer(
 
 const rootReducer = combineReducers({
   user: persistedUserReducer,
-  file: fileReducer,
   fileUpload: persistedUploadReducer,
   [userApi.reducerPath]: userApi.reducer,
   [fileApi.reducerPath]: fileApi.reducer,
+  [adminApi.reducerPath]: adminApi.reducer,
 });
 
 export const store = configureStore({
@@ -162,7 +162,8 @@ export const store = configureStore({
     })
       .concat(resetApiMiddleware)
       .concat(userApi.middleware)
-      .concat(fileApi.middleware),
+      .concat(fileApi.middleware)
+      .concat(adminApi.middleware),
 });
 
 // =============================================================================

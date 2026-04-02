@@ -1,5 +1,6 @@
 import classNames from "classnames";
-import { IoIosCloud } from "react-icons/io";
+
+import { Icon } from "../Icon";
 
 import "./Logo.scss";
 
@@ -17,7 +18,7 @@ interface ILogoProps extends React.HTMLAttributes<HTMLDivElement> {
 export function Logo({ ...props }: ILogoProps) {
   return (
     <div {...props} className={classNames("logo", props.className)}>
-      <IoIosCloud size={30} className="logo__icon" />
+      <Icon name="cloud" size={30} color="primary" className="logo__icon" />
       <p>Nebula Cloud</p>
     </div>
   );

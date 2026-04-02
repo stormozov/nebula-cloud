@@ -1,10 +1,10 @@
 import fileUploadConfig from "@/shared/configs/file-upload.json";
+import { Button, Icon } from "@/shared/ui";
 import { formatFileSize } from "@/shared/utils";
 
 import type { IFileUploadItemProps } from "../../lib/types";
 
 import "./FileUploadItem.scss";
-import { Button } from "@/shared/ui";
 
 /**
  * File upload item component.
@@ -74,19 +74,14 @@ export function FileUploadItem({
           <span className="file-upload-item__icon--pending">⏳</span>
         )}
         {status === "uploading" && (
-          <span
+          <Icon
+            name="retry"
+            color="primary"
             className="file-upload-item__icon--uploading"
-            aria-hidden="true"
-          >
-            ↻
-          </span>
+          />
         )}
-        {status === "success" && (
-          <span className="file-upload-item__icon--success">✓</span>
-        )}
-        {status === "error" && (
-          <span className="file-upload-item__icon--error">✗</span>
-        )}
+        {status === "success" && <Icon name="check" color="success" />}
+        {status === "error" && <Icon name="close" color="error" />}
       </div>
 
       {/* File Info */}
@@ -138,7 +133,7 @@ export function FileUploadItem({
             title="Отменить загрузку"
             aria-label="Отменить загрузку"
           >
-            ✕
+            <Icon name="close" color="error" />
           </Button>
         )}
 
@@ -152,7 +147,7 @@ export function FileUploadItem({
               title="Повторить загрузку"
               aria-label="Повторить загрузку"
             >
-              ↻
+              <Icon name="retry" color="primary" />
             </Button>
             <Button
               type="button"
@@ -162,7 +157,7 @@ export function FileUploadItem({
               title="Удалить из списка"
               aria-label="Удалить из списка"
             >
-              🗑️
+              <Icon name="trash" color="error" />
             </Button>
           </>
         )}
@@ -178,7 +173,7 @@ export function FileUploadItem({
             title="Удалить из списка"
             aria-label="Удалить из списка"
           >
-            🗑️
+            <Icon name="trash" color="error" />
           </Button>
         )}
       </div>

@@ -1,0 +1,35 @@
+// =============================================================================
+// Styles for user list item
+// =============================================================================
+
+.users-list {
+  &__body-row {
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid var(--color-border-primary);
+    }
+
+    &:hover {
+      background-color: var(--color-bg-secondary);
+    }
+
+    &:focus-visible {
+      background-color: var(--color-bg-secondary);
+      outline: 2px solid var(--color-border-focus);
+      outline-offset: -2px;
+      color: var(--color-text-link-hover);
+    }
+  }
+
+  &__body-cell {
+    padding: 12px;
+    font-size: 14px;
+    text-align: center;
+
+    svg {
+      display: inline;
+    }
+  }
+}

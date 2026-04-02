@@ -14,7 +14,7 @@
  * formatDate(null); // → "—"
  * ```
  */
-export const formatDate = (dateString: string | null): string => {
+export const formatDate = (dateString: string | null | undefined): string => {
   if (!dateString) return "—";
   return new Date(dateString).toLocaleDateString("ru-RU", {
     year: "numeric",

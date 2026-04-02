@@ -426,6 +426,32 @@ Authorization: Bearer <access_token>
 
 ---
 
+### Export user data to JSON
+
+**Endpoint:** `GET /api/admin/users/{id}/export/`
+
+**Request Body:**
+```json
+{
+    "id": "123",
+    "username": "Adam",
+    "email": "adam@mail.ru",
+    "full_name": "Adam Rocky",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2024-01-01T12:00:00Z",
+    "last_login": "2024-01-01T12:00:00Z",
+    "storage_path": "storage/123/",
+    "storage_stats": {
+        "fileCount": 6,
+        "totalSize": 867089,
+        "totalSizeFormatted": "846.77 KB"
+    }
+}
+```
+
+---
+
 ## Error Codes
 
 | Code | Description           |

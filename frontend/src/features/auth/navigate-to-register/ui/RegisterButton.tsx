@@ -2,7 +2,7 @@ import classNames from "classnames";
 import { useNavigate } from "react-router";
 
 import type { IButtonProps } from "@/shared/ui";
-import { Button } from "@/shared/ui";
+import { Button, Icon } from "@/shared/ui";
 
 import "./RegisterButton.scss";
 
@@ -39,6 +39,7 @@ export function RegisterButton({
       onClick={handleClick}
       {...restProps}
     >
+      <Icon name="register" />
       {children}
     </Button>
   );

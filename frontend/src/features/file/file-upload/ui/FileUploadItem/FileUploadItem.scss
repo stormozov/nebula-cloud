@@ -75,21 +75,8 @@
     font-weight: bold;
   }
 
-  &__icon--pending {
-    color: var(--color-warning);
-  }
-
   &__icon--uploading {
-    color: var(--color-primary);
     animation: spin 1s linear infinite;
-  }
-
-  &__icon--success {
-    color: var(--color-success);
-  }
-
-  &__icon--error {
-    color: var(--color-error);
   }
 
   // ---------------------------------------------------------------------------
@@ -98,6 +85,7 @@
 
   &__info {
     min-width: 0;
+    width: 100%;
   }
 
   &__name {

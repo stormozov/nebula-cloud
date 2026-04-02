@@ -1,0 +1,13 @@
+// =============================================================================
+// Style module for status badge component
+// =============================================================================
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  &.center-x {
+    justify-content: center;
+  }
+}
