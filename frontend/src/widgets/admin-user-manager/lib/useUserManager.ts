@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { type IUserListResponse, useGetUsersQuery } from "@/entities/user";
 import { useUserSearch } from "@/features/admin";
@@ -41,6 +41,15 @@ export const useUserManager = () => {
     setSelectedUserId(null);
     setPendingAutoNavigateAfterLoad(false);
   };
+
+  const removeUserLocally = useCallback(
+    (userId: number) => {
+      setLoadedUsers((prev) => prev.filter((user) => user.id !== userId));
+      if (selectedUserId === userId) setSelectedUserId(null);
+      setCurrentPage(1);
+    },
+    [selectedUserId],
+  );
 
   useEffect(() => {
     if (!users) return;
@@ -120,6 +129,7 @@ export const useUserManager = () => {
       onNavigate: setSelectedUserId,
       requestConfirm,
       onClose: () => setSelectedUserId(null),
-    }
+      onUserDeleted: removeUserLocally,
+    },
   };
 };

@@ -13,7 +13,9 @@ import { useModalClose } from "./useModalClose";
 /**
  * Props for the `useUserDetailsModal` hook.
  */
-type UseUserDetailsModalProps = IModalContentProps;
+type UseUserDetailsModalProps = IModalContentProps & {
+  onUserDeleted?: (userId: number) => void;
+};
 
 /**
  * Hook that provides data and actions for the `UserDetailsModal` component.
@@ -26,6 +28,7 @@ export function useUserDetailsModal({
   onNavigate,
   requestConfirm,
   onClose,
+  onUserDeleted,
   isConfirmOpen = false,
 }: UseUserDetailsModalProps) {
   const [action, setAction] = useState<UserDetailsModalActionsType>("none");
@@ -45,10 +48,11 @@ export function useUserDetailsModal({
   const handleActionSuccess = useCallback(
     (message?: string, close?: boolean) => {
       handleInlineFormClose();
+      if (message === "delete" && user?.id) onUserDeleted?.(user.id);
       if (close) handleCloseWithAnimation();
       if (message) console.log(message);
     },
-    [handleInlineFormClose, handleCloseWithAnimation],
+    [handleInlineFormClose, handleCloseWithAnimation, onUserDeleted, user],
   );
 
   if (!user) return {};
