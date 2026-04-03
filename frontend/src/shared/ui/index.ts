@@ -2,6 +2,7 @@ export * from "./buttons";
 export * from "./CollapsibleSearch";
 export * from "./CopyIcon";
 export * from "./Divider";
+export * from "./DropdownMenu";
 export * from "./FileIcon";
 export * from "./form";
 export * from "./Heading";

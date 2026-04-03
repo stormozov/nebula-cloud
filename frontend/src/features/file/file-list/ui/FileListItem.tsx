@@ -1,6 +1,6 @@
-import { memo, useState } from "react";
+import { memo, useCallback, useState } from "react";
 
-import { FileIcon } from "@/shared/ui";
+import { DropdownMenu, FileIcon, type IContextMenuState } from "@/shared/ui";
 import {
   formatDate,
   formatFileSize,
@@ -8,9 +8,14 @@ import {
 } from "@/shared/utils";
 
 import type { IFileListItemProps } from "../lib/types";
-import { FileItemActions } from "./FileItemActions";
+import { useFileActions } from "../lib/useFileActions";
 
 import "./FileListItem.scss";
+
+const initialContextMenuState: IContextMenuState = {
+  isOpen: false,
+  position: { x: 0, y: 0 },
+};
 
 export function FileListItemPlain({
   file,
@@ -23,80 +28,124 @@ export function FileListItemPlain({
   onEditComment,
   onDelete,
 }: IFileListItemProps) {
-  const [showActions, setShowActions] = useState(false);
+  const [contextMenu, setContextMenu] = useState<IContextMenuState>(
+    initialContextMenuState,
+  );
 
-  const handleMouseEnter = () => {
-    if (!disabled) setShowActions(true);
-  };
+  const actions = useFileActions({
+    file,
+    onView,
+    onDownload,
+    onPublicLink,
+    onRename,
+    onEditComment,
+    onDelete,
+  });
 
-  const handleMouseLeave = () => {
-    setShowActions(false);
-  };
-
-  const handleClick = () => {
+  const handleRowClick = useCallback(() => {
     if (!disabled && onSelect) onSelect(file);
-  };
+  }, [disabled, onSelect, file]);
+
+  const handleContextMenu = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      if (actions.length === 0) return;
+      setContextMenu({
+        isOpen: true,
+        position: { x: e.clientX, y: e.clientY },
+      });
+    },
+    [actions.length],
+  );
+
+  const handleContextMenuClose = useCallback(() => {
+    setContextMenu((prev) => ({ ...prev, isOpen: false }));
+  }, []);
 
   return (
-    <tr
-      className="file-list-item"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      onClick={handleClick}
-      tabIndex={disabled ? -1 : 0}
-      aria-selected={false}
-    >
-      <td className="file-list-item__cell file-list-item__cell--icon">
-        <FileIcon filename={file.originalName} size={32} />
-      </td>
+    <>
+      <tr
+        className="file-list-item"
+        onClick={handleRowClick}
+        onContextMenu={handleContextMenu}
+        tabIndex={disabled ? -1 : 0}
+        aria-selected={false}
+      >
+        <td className="file-list-item__cell file-list-item__cell--icon">
+          <FileIcon filename={file.originalName} size={32} />
+        </td>
 
-      <td className="file-list-item__cell file-list-item__cell--name">
-        <span className="file-list-item__name" title={file.originalName}>
-          {truncateWithMiddleEllipsis(file.originalName)}
-        </span>
-      </td>
+        <td className="file-list-item__cell file-list-item__cell--name">
+          <span className="file-list-item__name" title={file.originalName}>
+            {truncateWithMiddleEllipsis(file.originalName)}
+          </span>
+        </td>
 
-      <td className="file-list-item__cell file-list-item__cell--comment">
-        <span
-          className="file-list-item__comment"
-          title={truncateWithMiddleEllipsis(file.comment || "Нет комментария")}
+        <td className="file-list-item__cell file-list-item__cell--comment">
+          <span
+            className="file-list-item__comment"
+            title={truncateWithMiddleEllipsis(
+              file.comment || "Нет комментария",
+            )}
+          >
+            {file.comment || "—"}
+          </span>
+        </td>
+
+        <td className="file-list-item__cell file-list-item__cell--size">
+          {formatFileSize(file.size)}
+        </td>
+
+        <td
+          className="file-list-item__cell file-list-item__cell--uploaded"
+          title={file.uploadedAt}
         >
-          {truncateWithMiddleEllipsis(file.comment || "—", 35, 3, 2)}
-        </span>
-      </td>
+          {formatDate(file.uploadedAt)}
+        </td>
 
-      <td className="file-list-item__cell file-list-item__cell--size">
-        {formatFileSize(file.size)}
-      </td>
+        <td
+          className="file-list-item__cell file-list-item__cell--downloaded"
+          title={file.lastDownloaded || "Еще не был скачан"}
+        >
+          {formatDate(file.lastDownloaded)}
+        </td>
 
-      <td className="file-list-item__cell file-list-item__cell--uploaded">
-        {formatDate(file.uploadedAt)}
-      </td>
-
-      <td className="file-list-item__cell file-list-item__cell--downloaded">
-        {formatDate(file.lastDownloaded)}
-      </td>
-
-      <td className="file-list-item__cell file-list-item__cell--actions">
-        <FileItemActions
-          file={file}
-          isVisible={showActions}
-          disabled={disabled}
-          onView={onView}
-          onDownload={onDownload}
-          onPublicLink={onPublicLink}
-          onRename={onRename}
-          onEditComment={onEditComment}
-          onDelete={onDelete}
+        <td className="file-list-item__cell file-list-item__cell--actions">
+          {actions.length > 0 && (
+            <DropdownMenu
+              triggerButtonProps={{
+                icon: { name: "more" },
+                variant: "secondary",
+                size: "small",
+                className: "file-list-item__actions-button",
+                "aria-label": "Действия с файлом",
+              }}
+              actions={actions}
+              item={file}
+              placement="bottom-end"
+            />
+          )}
+        </td>
+      </tr>
+      {actions.length > 0 && (
+        <DropdownMenu
+          actions={actions}
+          item={file}
+          position={contextMenu.isOpen ? contextMenu.position : undefined}
+          isOpen={contextMenu.isOpen}
+          onOpenChange={(open) => !open && handleContextMenuClose()}
+          placement="bottom-start"
+          closeOnClickOutside
+          closeOnEscape
         />
-      </td>
-    </tr>
+      )}
+    </>
   );
 }
 
 /**
  * A component that renders a single row in a file list, displaying file
- * metadata and providing interactive actions.
+ * metadata and providing interactive actions via dropdown menu.
  */
 export const FileListItem = memo(FileListItemPlain, (prevProps, nextProps) => {
   return (
@@ -104,6 +153,13 @@ export const FileListItem = memo(FileListItemPlain, (prevProps, nextProps) => {
     prevProps.file.originalName === nextProps.file.originalName &&
     prevProps.file.size === nextProps.file.size &&
     prevProps.file.comment === nextProps.file.comment &&
-    prevProps.disabled === nextProps.disabled
+    prevProps.file.hasPublicLink === nextProps.file.hasPublicLink &&
+    prevProps.disabled === nextProps.disabled &&
+    prevProps.onView === nextProps.onView &&
+    prevProps.onDownload === nextProps.onDownload &&
+    prevProps.onPublicLink === nextProps.onPublicLink &&
+    prevProps.onRename === nextProps.onRename &&
+    prevProps.onEditComment === nextProps.onEditComment &&
+    prevProps.onDelete === nextProps.onDelete
   );
 });

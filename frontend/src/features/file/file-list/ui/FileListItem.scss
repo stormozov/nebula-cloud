@@ -12,36 +12,14 @@
   &__cell {
     padding: 12px;
     border-bottom: 1px solid var(--color-border-primary);
-    vertical-align: middle;
-
     font-size: 12px;
     color: var(--color-text-tertiary);
+    vertical-align: middle;
 
-    &--icon {
-      width: 50px;
-      text-align: center;
-    }
-
-    &--name {
-      min-width: 200px;
-    }
-
-    &--comment {
-      min-width: 200px;
-    }
-
-    &--size {
-      width: 100px;
-    }
-
+    &--size,
     &--uploaded,
     &--downloaded {
-      width: 140px;
-    }
-
-    &--actions {
-      width: 100%;
-      text-align: center;
+      width: 100px;
     }
   }
 
@@ -55,5 +33,20 @@
     white-space: nowrap;
 
     overflow: hidden;
+  }
+
+  &__comment {
+    display: block;
+    width: 100%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  &__actions-button {
+    svg {
+      max-width: unset;
+      height: unset;
+    }
   }
 }

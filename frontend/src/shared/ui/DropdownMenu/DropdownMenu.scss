@@ -1,0 +1,105 @@
+// =============================================================================
+// Styles module for DropdownMenu component
+// =============================================================================
+
+.dropdown-menu {
+  display: inline-block;
+
+  &__trigger-wrapper {
+    display: inline-flex;
+  }
+
+  &__menu {
+    z-index: 1000;
+
+    padding: 4px;
+
+    min-width: 160px;
+
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px var(--color-shadow-sm);
+
+    overflow: hidden;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 8px 12px;
+    
+    width: 100%;
+    
+    background-color: none;
+    border: none;
+    border-radius: 4px;
+    outline: 2px solid transparent;
+    
+    font-size: 0.875rem;
+    color: var(--color-text-primary);
+    
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover:not(&--disabled) {
+      background-color: var(--color-bg-secondary);
+      outline-color: var(--color-info-light);
+      color: var(--color-text-link-hover);
+    }
+
+    &:focus-visible {
+      background-color: var(--color-bg-secondary);
+      outline-color: var(--color-border-focus);
+      outline-offset: -2px;
+      color: var(--color-text-link-hover);
+    }
+
+    &--danger {
+      color: var(--color-error);
+
+      svg {
+        fill: var(--color-error);
+      }
+
+      &:hover:not(&--disabled) {
+        background-color: var(--color-error);
+        outline-color: var(--color-error);
+        color: var(--color-text-inverse);
+        
+        svg {
+          fill: var(--color-text-inverse);
+        }
+      }
+
+      &:focus-visible {
+        background-color: var(--color-error);
+        outline-color: var(--color-error);
+        outline-offset: -2px;
+        color: var(--color-text-inverse);
+
+        svg {
+          fill: var(--color-text-inverse);
+        }
+      }
+    }
+
+    &--disabled {
+      opacity: 0.5;
+      cursor: default;
+      pointer-events: none;
+    }
+  }
+
+  &__item-icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  &__item-label {
+    white-space: nowrap;
+  }
+}

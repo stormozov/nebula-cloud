@@ -1,6 +1,7 @@
-import type { IUserListResponse } from "@/entities/user";
+import type { IUserListResponse, UserListItemCopyField } from "@/entities/user";
+import { copyUserField } from "@/entities/user/model/utils";
 
-import { UserListItem } from "../UserListItem/UserListItem";
+import { UserListItemMemo } from "../UserListItem/UserListItem";
 
 import "./UserList.scss";
 
@@ -25,6 +26,18 @@ export function UserList({
   error,
   onSelectUser,
 }: IUserListProps) {
+  const handleCopyField = async (
+    user: IUserListResponse,
+    field: UserListItemCopyField,
+  ) => {
+    await copyUserField(
+      user,
+      field,
+      (message) => console.log(message),
+      () => console.log("Не удалось скопировать поле"),
+    );
+  };
+
   if (isLoading) return <div className="users-list-loading">Загрузка...</div>;
   if (error) {
     return (
@@ -49,10 +62,11 @@ export function UserList({
         </thead>
         <tbody className="users-list__body">
           {users?.map((user) => (
-            <UserListItem
+            <UserListItemMemo
               key={user.id}
               user={user}
               onSelectUser={onSelectUser}
+              onCopyField={handleCopyField}
             />
           ))}
         </tbody>

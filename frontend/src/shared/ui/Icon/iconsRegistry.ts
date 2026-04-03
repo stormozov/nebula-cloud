@@ -30,6 +30,7 @@ import { IoReloadSharp, IoSearch } from "react-icons/io5";
 import { MdEdit, MdLogin, MdLogout, MdOutlineDoNotDisturbAlt } from "react-icons/md";
 import { PiPasswordBold, PiWarningDiamondFill } from "react-icons/pi";
 import { RiAdminFill } from "react-icons/ri";
+import { FiMoreVertical } from "react-icons/fi";
 
 /**
  * A constant object that maps icon names to their corresponding React component
@@ -56,6 +57,7 @@ export const ICONS = {
   pencil: FaPencil,
   export: FaFileExport,
   search: IoSearch,
+  more: FiMoreVertical,
 
   // ========== Navigation & UI ==========
   close: AiOutlineClose,
