@@ -234,7 +234,6 @@ export function FileManager({
 
     try {
       await generatePublicLink(selectedFile.id).unwrap();
-      setSelectedFile(selectedFile); // Trigger re-render with cache update
     } catch (err) {
       if (isError401(err as FetchBaseQueryError)) return;
       console.error("Failed to generate link:", err);
@@ -295,6 +294,21 @@ export function FileManager({
   // ---------------------------------------------------------------------------
   // EFFECTS
   // ---------------------------------------------------------------------------
+
+  // Synchronizing selectedFile with the latest data from the cache for the modal
+  useEffect(() => {
+    if (linkModalOpen && selectedFile && data?.results) {
+      const updatedFile = data.results.find((f) => f.id === selectedFile.id);
+      if (
+        updatedFile &&
+        (updatedFile.hasPublicLink !== selectedFile.hasPublicLink ||
+          updatedFile.publicLinkUrl !== selectedFile.publicLinkUrl)
+      ) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setSelectedFile(updatedFile);
+      }
+    }
+  }, [data, linkModalOpen, selectedFile]);
 
   // Reset pagination when uploads complete (new files at top of page 1)
   useEffect(() => {
