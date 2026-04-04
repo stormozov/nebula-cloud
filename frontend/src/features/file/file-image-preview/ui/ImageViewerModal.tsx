@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 
 import type { IFile } from "@/entities/file";
 import { getImageBlobFromApi } from "@/entities/file";
+import { useBodyScrollLock } from "@/shared/hooks";
 import { Button, Icon } from "@/shared/ui";
 import { truncateWithMiddleEllipsis } from "@/shared/utils";
 
@@ -34,6 +35,8 @@ export function ImageViewerModal({
 
   const modalRef = useRef<HTMLDivElement>(null);
   const imageUrlRef = useRef<string | null>(null);
+
+  useBodyScrollLock(isOpen);
 
   useEffect(() => {
     if (!isOpen || !file) {

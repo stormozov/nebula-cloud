@@ -1,6 +1,8 @@
 import classNames from "classnames";
 import { useCallback, useEffect, useRef } from "react";
 
+import { useBodyScrollLock } from "@/shared/hooks";
+
 import { Button } from "../buttons";
 import type { IModalProps } from "./types";
 
@@ -81,20 +83,18 @@ export function Modal({
 
       // Add keyboard listener
       document.addEventListener("keydown", handleKeyDown);
-
-      // Prevent body scroll
-      document.body.style.overflow = "hidden";
     }
 
     return () => {
       // Cleanup
       document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "";
 
       // Restore previous focus or target
       previousFocusRef.current?.focus();
     };
   }, [isOpen, handleKeyDown, focusTarget]);
+
+  useBodyScrollLock(isOpen);
 
   // ---------------------------------------------------------------------------
   // RENDER

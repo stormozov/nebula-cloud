@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { type IUserListResponse, useGetUsersQuery } from "@/entities/user";
 import { useUserSearch } from "@/features/admin";
+import { useBodyScrollLock } from "@/shared/hooks";
 import { useModalConfirm } from "@/shared/ui";
 
 /**
@@ -14,6 +15,7 @@ export const useUserManager = () => {
   const [pendingAutoNavigateAfterLoad, setPendingAutoNavigateAfterLoad] =
     useState(false);
 
+  useBodyScrollLock(!!selectedUserId);
   const { searchTerm, setSearchTerm, debouncedSearchTerm } = useUserSearch();
 
   const {

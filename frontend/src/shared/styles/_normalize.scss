@@ -1,6 +1,6 @@
-// ============================================
+// =============================================================================
 // Normalize CSS
-// ============================================
+// =============================================================================
 
 // 1. Box sizing для всех элементов
 *,
@@ -13,6 +13,8 @@
 * {
   margin: 0;
   padding: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-scrollbar-thumb) var(--color-scrollbar-track);
 }
 
 // 3. Base styles for html
@@ -120,18 +122,18 @@ pre {
 hr {
   margin: 1.5rem 0;
   border: none;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--color-border-primary);
 }
 
 // 14. Highlight
 ::selection {
-  background-color: #e0e7ff;
-  color: #111827;
+  background-color: var(--color-selection-bg);
+  color: var(--color-selection-text);
 }
 
 // 15. Focus
 :focus-visible {
-  outline: 2px solid #4f46e5;
+  outline: 2px solid var(--color-primary-focus);
   outline-offset: 2px;
 }
 
@@ -142,16 +144,14 @@ hr {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f3f4f6;
-  border-radius: 4px;
+  background: var(--color-scrollbar-track);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #9ca3af;
-  border-radius: 4px;
+  background: var(--color-scrollbar-thumb);
 
   &:hover {
-    background: #6b7280;
+    background: var(--color-scrollbar-thumb-hover);
   }
 }
 

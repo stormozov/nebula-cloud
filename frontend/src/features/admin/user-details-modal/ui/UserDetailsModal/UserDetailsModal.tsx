@@ -1,6 +1,7 @@
 import classNames from "classnames";
 
 import { type IModalContentProps, UserNavigation } from "@/features/admin";
+import { useBodyScrollLock } from "@/shared/hooks";
 import { Button, Heading, Icon, PageWrapper } from "@/shared/ui";
 
 import { useUserDetailsModal } from "../../lib/useUserDetailsModal";
@@ -30,6 +31,7 @@ export function UserDetailsModal({ modalProps }: IUserDetailsModalProps) {
     navigationProps,
     handleCloseWithAnimation,
   } = useUserDetailsModal(modalProps);
+  useBodyScrollLock(true);
 
   if (isLoading) return <div>Загрузка...</div>;
   if (!user || !actionsProps.user) return <div>Пользователь не найден</div>;
@@ -74,8 +76,7 @@ export function UserDetailsModal({ modalProps }: IUserDetailsModalProps) {
                   title="Закрыть окно (ESC)"
                   aria-label="Закрыть окно"
                   onClick={handleCloseWithAnimation}
-                >
-                </Button>
+                />
               </PageWrapper>
             </PageWrapper>
           </header>
