@@ -46,6 +46,39 @@ export function FileListItemPlain({
     if (!disabled && onSelect) onSelect(file);
   }, [disabled, onSelect, file]);
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTableRowElement>) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onSelect?.(file);
+      onView?.(file);
+    }
+
+    if (event.key === "Delete") {
+      event.preventDefault();
+      onDelete?.(file);
+    }
+
+    if (event.key === "r" || event.key === "F2") {
+      event.preventDefault();
+      onRename?.(file);
+    }
+    
+    if (event.key === "c") {
+      event.preventDefault();
+      onEditComment?.(file);
+    }
+
+    if (event.key === "l") {
+      event.preventDefault();
+      onPublicLink?.(file);
+    };
+
+    if (event.key === "v") {
+      event.preventDefault();
+      onDownload?.(file);
+    };
+  };
+
   const handleContextMenu = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
@@ -67,6 +100,8 @@ export function FileListItemPlain({
       <tr
         className="file-list-item"
         onClick={handleRowClick}
+        onDoubleClick={() => onView?.(file)}
+        onKeyDown={handleKeyDown}
         onContextMenu={handleContextMenu}
         tabIndex={disabled ? -1 : 0}
         aria-selected={false}
