@@ -1,7 +1,9 @@
 import classNames from "classnames";
+import { useRef } from "react";
+import { createPortal } from "react-dom";
 
 import { type IModalContentProps, UserNavigation } from "@/features/admin";
-import { useBodyScrollLock } from "@/shared/hooks";
+import { useBodyScrollLock, useFocusTrap } from "@/shared/hooks";
 import { Button, Heading, Icon, PageWrapper } from "@/shared/ui";
 
 import { useUserDetailsModal } from "../../lib/useUserDetailsModal";
@@ -33,13 +35,26 @@ export function UserDetailsModal({ modalProps }: IUserDetailsModalProps) {
   } = useUserDetailsModal(modalProps);
   useBodyScrollLock(true);
 
+  const modalContentRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  useFocusTrap({
+    active: !isClosing,
+    containerRef: modalContentRef,
+    onEscape: handleCloseWithAnimation,
+    initialFocusRef: closeButtonRef,
+  });
+
   if (isLoading) return <div>Загрузка...</div>;
   if (!user || !actionsProps.user) return <div>Пользователь не найден</div>;
 
-  return (
+  const modalContent = (
     <div className={classNames("user-details-modal", { closing: isClosing })}>
       <div className="user-details-modal__overlay" />
-      <aside className="user-details-modal__content-wrapper">
+      <aside
+        ref={modalContentRef}
+        className="user-details-modal__content-wrapper"
+      >
         <div className="container">
           <header className="user-details-modal__header">
             <PageWrapper
@@ -70,6 +85,7 @@ export function UserDetailsModal({ modalProps }: IUserDetailsModalProps) {
                   onNavigate={navigationProps.onNavigate}
                 />
                 <Button
+                  ref={closeButtonRef}
                   variant="secondary"
                   size="small"
                   icon={{ name: "close" }}
@@ -89,4 +105,8 @@ export function UserDetailsModal({ modalProps }: IUserDetailsModalProps) {
       </aside>
     </div>
   );
+
+  return typeof document !== "undefined"
+    ? createPortal(modalContent, document.body)
+    : null;
 }
