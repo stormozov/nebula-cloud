@@ -57,30 +57,4 @@
   &__body {
     background-color: var(--color-bg-primary);
   }
-
-  &__loader,
-  &__error,
-  &__empty {
-    padding: 48px 24px;
-    font-size: 16px;
-    text-align: center;
-    color: var(--color-text-secondary);
-  }
-
-  &__error {
-    background-color: var(--color-error-light);
-    color: var(--color-error);
-  }
-
-  &__empty {
-    color: var(--color-text-tertiary);
-  }
-
-  &--loading,
-  &--error,
-  &--empty {
-    .file-list__table {
-      display: none;
-    }
-  }
 }

@@ -1,17 +1,13 @@
 import { memo } from "react";
+
 import type { IFileListBodyProps } from "../lib/types";
-import { FileListItem } from "./FileListItem";
+import { FileListItem } from "./FileListItem/FileListItem";
 
 export function FileListBodyPlain({
   files,
   disabled = false,
   onSelect,
-  onView,
-  onDownload,
-  onPublicLink,
-  onRename,
-  onEditComment,
-  onDelete,
+  handlers,
 }: IFileListBodyProps) {
   return (
     <tbody className="file-list__body">
@@ -20,13 +16,8 @@ export function FileListBodyPlain({
           key={file.id}
           file={file}
           disabled={disabled}
+          handlers={handlers}
           onSelect={onSelect}
-          onView={onView}
-          onDownload={onDownload}
-          onPublicLink={onPublicLink}
-          onRename={onRename}
-          onEditComment={onEditComment}
-          onDelete={onDelete}
         />
       ))}
     </tbody>

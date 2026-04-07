@@ -18,19 +18,31 @@ import {
   FaCheck,
   FaComment,
   FaCopy,
-  FaDownload,FaFileExport, 
+  FaDownload,
+  FaFileExport,
   FaLinkSlash,
   FaPencil,
   FaShareNodes,
   FaTrashCan,
-  FaUser
+  FaUser,
 } from "react-icons/fa6";
+import { FiMoreVertical } from "react-icons/fi";
 import { IoIosArrowBack, IoIosArrowForward, IoIosCloud } from "react-icons/io";
 import { IoReloadSharp, IoSearch } from "react-icons/io5";
-import { MdEdit, MdLogin, MdLogout, MdOutlineDoNotDisturbAlt } from "react-icons/md";
+import {
+  MdEdit,
+  MdLogin,
+  MdLogout,
+  MdOutlineDoNotDisturbAlt,
+} from "react-icons/md";
 import { PiPasswordBold, PiWarningDiamondFill } from "react-icons/pi";
 import { RiAdminFill } from "react-icons/ri";
-import { FiMoreVertical } from "react-icons/fi";
+
+import CloudBadIcon from "@/assets/images/icons/CloudBadIcon.svg?react";
+import CloudLoadingIcon from "@/assets/images/icons/CloudLoadingIcon.svg?react";
+import CloudWarningIcon from "@/assets/images/icons/CloudWarningIcon.svg?react";
+
+import { createIconAdapter } from "./iconAdapter";
 
 /**
  * A constant object that maps icon names to their corresponding React component
@@ -70,6 +82,9 @@ export const ICONS = {
   warning: PiWarningDiamondFill,
   infoSquare: BsInfoSquareFill,
   doNotDisturb: MdOutlineDoNotDisturbAlt,
+  cloudBad: createIconAdapter(CloudBadIcon),
+  cloudWarning: createIconAdapter(CloudWarningIcon),
+  cloudLoading: createIconAdapter(CloudLoadingIcon),
 
   // ========== User & Admin ==========
   person: FaUser,

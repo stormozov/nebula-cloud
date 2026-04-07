@@ -1,106 +1,39 @@
-import { memo, useCallback, useState } from "react";
+import { memo } from "react";
 
-import { DropdownMenu, FileIcon, type IContextMenuState } from "@/shared/ui";
+import { DropdownMenu, FileIcon } from "@/shared/ui";
 import {
   formatDate,
   formatFileSize,
   truncateWithMiddleEllipsis,
 } from "@/shared/utils";
 
-import type { IFileListItemProps } from "../lib/types";
-import { useFileActions } from "../lib/useFileActions";
+import type { IFileListItemProps } from "../../lib/types";
+import { useFileActions } from "../../lib/useFileActions";
+import { useFileRowInteractions } from "./useFileRowInteractions";
 
 import "./FileListItem.scss";
-
-const initialContextMenuState: IContextMenuState = {
-  isOpen: false,
-  position: { x: 0, y: 0 },
-};
 
 export function FileListItemPlain({
   file,
   disabled = false,
   onSelect,
-  onView,
-  onDownload,
-  onPublicLink,
-  onRename,
-  onEditComment,
-  onDelete,
+  handlers = {},
 }: IFileListItemProps) {
-  const [contextMenu, setContextMenu] = useState<IContextMenuState>(
-    initialContextMenuState,
-  );
-
-  const actions = useFileActions({
-    file,
-    onView,
-    onDownload,
-    onPublicLink,
-    onRename,
-    onEditComment,
-    onDelete,
-  });
-
-  const handleRowClick = useCallback(() => {
-    if (!disabled && onSelect) onSelect(file);
-  }, [disabled, onSelect, file]);
-
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLTableRowElement>) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      onSelect?.(file);
-      onView?.(file);
-    }
-
-    if (event.key === "Delete") {
-      event.preventDefault();
-      onDelete?.(file);
-    }
-
-    if (event.key === "r" || event.key === "F2") {
-      event.preventDefault();
-      onRename?.(file);
-    }
-    
-    if (event.key === "c") {
-      event.preventDefault();
-      onEditComment?.(file);
-    }
-
-    if (event.key === "l") {
-      event.preventDefault();
-      onPublicLink?.(file);
-    };
-
-    if (event.key === "v") {
-      event.preventDefault();
-      onDownload?.(file);
-    };
-  };
-
-  const handleContextMenu = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault();
-      if (actions.length === 0) return;
-      setContextMenu({
-        isOpen: true,
-        position: { x: e.clientX, y: e.clientY },
-      });
-    },
-    [actions.length],
-  );
-
-  const handleContextMenuClose = useCallback(() => {
-    setContextMenu((prev) => ({ ...prev, isOpen: false }));
-  }, []);
+  const actions = useFileActions({ file, handlers });
+  const {
+    contextMenu,
+    handleRowClick,
+    handleKeyDown,
+    handleContextMenu,
+    handleContextMenuClose,
+  } = useFileRowInteractions({ file, handlers, actions, disabled, onSelect });
 
   return (
     <>
       <tr
         className="file-list-item"
         onClick={handleRowClick}
-        onDoubleClick={() => onView?.(file)}
+        onDoubleClick={() => handlers.onView?.(file)}
         onKeyDown={handleKeyDown}
         onContextMenu={handleContextMenu}
         tabIndex={disabled ? -1 : 0}
@@ -190,11 +123,11 @@ export const FileListItem = memo(FileListItemPlain, (prevProps, nextProps) => {
     prevProps.file.comment === nextProps.file.comment &&
     prevProps.file.hasPublicLink === nextProps.file.hasPublicLink &&
     prevProps.disabled === nextProps.disabled &&
-    prevProps.onView === nextProps.onView &&
-    prevProps.onDownload === nextProps.onDownload &&
-    prevProps.onPublicLink === nextProps.onPublicLink &&
-    prevProps.onRename === nextProps.onRename &&
-    prevProps.onEditComment === nextProps.onEditComment &&
-    prevProps.onDelete === nextProps.onDelete
+    prevProps.handlers?.onView === nextProps.handlers?.onView &&
+    prevProps.handlers?.onDownload === nextProps.handlers?.onDownload &&
+    prevProps.handlers?.onPublicLink === nextProps.handlers?.onPublicLink &&
+    prevProps.handlers?.onRename === nextProps.handlers?.onRename &&
+    prevProps.handlers?.onEditComment === nextProps.handlers?.onEditComment &&
+    prevProps.handlers?.onDelete === nextProps.handlers?.onDelete
   );
 });

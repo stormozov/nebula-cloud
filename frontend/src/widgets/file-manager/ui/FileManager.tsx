@@ -16,7 +16,7 @@ import { selectIsQueueCompleted } from "@/entities/file-upload";
 import { EditCommentModal } from "@/features/file/file-comment";
 import { DeleteFileModal } from "@/features/file/file-delete";
 import { ImageViewerModal } from "@/features/file/file-image-preview";
-import { FileList } from "@/features/file/file-list";
+import { FileList, type IFileListProps } from "@/features/file/file-list";
 import { PublicLinkModal } from "@/features/file/file-public-link";
 import { RenameFileModal } from "@/features/file/file-rename";
 import { FileSearchInput, useFileSearch } from "@/features/file/file-search";
@@ -25,6 +25,7 @@ import {
   FileUploadDropzone,
 } from "@/features/file/file-upload";
 import { isError401 } from "@/shared/api";
+import fileListConfig from "@/shared/configs/file-list.json";
 import { BackButton, Button, Heading, Icon, PageWrapper } from "@/shared/ui";
 import { camelToSnake, isImageFile } from "@/shared/utils";
 
@@ -292,6 +293,29 @@ export function FileManager({
   };
 
   // ---------------------------------------------------------------------------
+  // PREPARE DATA FOR LIST
+  // ---------------------------------------------------------------------------
+
+  const preparedListData: IFileListProps = {
+    files: loadedFiles,
+    states: {
+      isLoading: isLoading || isFetching,
+      error: getErrorMessage(error),
+      emptyMessage: "Нет загруженных файлов",
+    },
+    handlers: {
+      onView: handleView,
+      onDownload: handleDownload,
+      onPublicLink: handlePublicLink,
+      onRename: handleRename,
+      onEditComment: handleEditComment,
+      onDelete: handleDelete,
+    },
+    headers: fileListConfig.header_columns,
+    onSelectFile: onFileSelect,
+  };
+
+  // ---------------------------------------------------------------------------
   // EFFECTS
   // ---------------------------------------------------------------------------
 
@@ -425,19 +449,7 @@ export function FileManager({
       {/* File list */}
       {loadedFiles.length > 0 && (
         <div className="file-manager__list">
-          <FileList
-            files={loadedFiles}
-            isLoading={isLoading}
-            error={getErrorMessage(error)}
-            emptyMessage="Файлы не найдены"
-            onSelectFile={onFileSelect}
-            onViewFile={handleView}
-            onDownloadFile={handleDownload}
-            onPublicLinkFile={handlePublicLink}
-            onRenameFile={handleRename}
-            onEditCommentFile={handleEditComment}
-            onDeleteFile={handleDelete}
-          />
+          <FileList {...preparedListData} />
           {data?.next && (
             <div className="file-manager__load-more">
               <Button

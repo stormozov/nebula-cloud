@@ -3,7 +3,7 @@ import { useCallback, useMemo } from "react";
 /**
  * Interface defining the props for the `useUserNavigation` hook.
  */
-export interface IUserNavigationProps {
+export interface IUseUserNavigationProps {
   currentUserId: number;
   allUserIds: number[];
   hasPaginationMore: boolean;
@@ -20,7 +20,7 @@ export const useUserNavigation = ({
   onNavigate,
   hasPaginationMore,
   onLoadMore,
-}: IUserNavigationProps) => {
+}: IUseUserNavigationProps) => {
   const currentIndex = useMemo(() => {
     return allUserIds.indexOf(currentUserId);
   }, [currentUserId, allUserIds]);

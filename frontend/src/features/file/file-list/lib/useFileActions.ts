@@ -4,18 +4,15 @@ import type { IFile } from "@/entities/file";
 import type { IDropdownMenuActionItem } from "@/shared/ui/DropdownMenu/types";
 import { isImageFile } from "@/shared/utils";
 
+import type { IFileHandlersProps } from "./types";
+
 /**
- * Properties for the `useFileActions` hook.
+ * Props for `useFileActions` hook.
  */
-export interface UseFileActionsProps {
+interface IUseFileActionsProps {
   file: IFile;
-  onView?: (file: IFile) => void;
-  onDownload?: (file: IFile) => void;
-  onPublicLink?: (file: IFile) => void;
-  onRename?: (file: IFile) => void;
-  onEditComment?: (file: IFile) => void;
-  onDelete?: (file: IFile) => void;
-}
+  handlers: IFileHandlersProps;
+};
 
 /**
  * Generates action items for a file to be used in `DropdownMenu`.
@@ -24,13 +21,17 @@ export interface UseFileActionsProps {
  */
 export const useFileActions = ({
   file,
-  onView,
-  onDownload,
-  onPublicLink,
-  onRename,
-  onEditComment,
-  onDelete,
-}: UseFileActionsProps): IDropdownMenuActionItem<IFile>[] => {
+  handlers,
+}: IUseFileActionsProps): IDropdownMenuActionItem<IFile>[] => {
+  const {
+    onView,
+    onDownload,
+    onPublicLink,
+    onRename,
+    onEditComment,
+    onDelete,
+  } = handlers;
+
   const isViewable = onView && isImageFile(file);
 
   const viewAction = useMemo<IDropdownMenuActionItem<IFile> | null>(

@@ -1,4 +1,4 @@
 export * from "./FileList";
 export * from "./FileListBody";
 export * from "./FileListHeader";
-export * from "./FileListItem";
+export * from "./FileListItem/FileListItem";

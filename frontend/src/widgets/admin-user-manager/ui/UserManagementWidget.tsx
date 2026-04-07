@@ -42,11 +42,11 @@ export function UserManagementWidget() {
 
       <UserList
         users={usersList.items}
-        isLoading={usersList.isLoading}
-        error={usersList.error}
+        states={usersList.states}
         onSelectUser={selected.setUserId}
       />
-      {usersList.hasMore && (
+
+      {usersList.items.length > 0 && usersList.hasMore && (
         <div className="users-management__load-more">
           <Button
             icon={{ name: "retry" }}

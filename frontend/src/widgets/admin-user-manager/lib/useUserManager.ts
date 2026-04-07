@@ -5,11 +5,13 @@ import { useUserSearch } from "@/features/admin";
 import { useBodyScrollLock } from "@/shared/hooks";
 import { useModalConfirm } from "@/shared/ui";
 
+import type { IUseUserManagerReturns, SelectUser } from "./types";
+
 /**
  * Hooks for managing users list and user details.
  */
-export const useUserManager = () => {
-  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+export const useUserManager = (): IUseUserManagerReturns => {
+  const [selectedUserId, setSelectedUserId] = useState<SelectUser>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [loadedUsers, setLoadedUsers] = useState<IUserListResponse[]>([]);
   const [pendingAutoNavigateAfterLoad, setPendingAutoNavigateAfterLoad] =
@@ -32,6 +34,10 @@ export const useUserManager = () => {
 
   const allUserIds = loadedUsers.map((user) => user.id) ?? [];
 
+  // ---------------------------------------------------------------------------
+  // HANDLERS
+  // ---------------------------------------------------------------------------
+
   const handleLoadMore = (shouldAutoNavigate: boolean = false) => {
     setPendingAutoNavigateAfterLoad(shouldAutoNavigate);
     setCurrentPage((prev) => prev + 1);
@@ -44,7 +50,7 @@ export const useUserManager = () => {
     setPendingAutoNavigateAfterLoad(false);
   };
 
-  const removeUserLocally = useCallback(
+  const handleRemoveUserLocally = useCallback(
     (userId: number) => {
       setLoadedUsers((prev) => prev.filter((user) => user.id !== userId));
       if (selectedUserId === userId) setSelectedUserId(null);
@@ -52,6 +58,10 @@ export const useUserManager = () => {
     },
     [selectedUserId],
   );
+
+  // ---------------------------------------------------------------------------
+  // EFFECTS
+  // ---------------------------------------------------------------------------
 
   useEffect(() => {
     if (!users) return;
@@ -80,30 +90,37 @@ export const useUserManager = () => {
     }
   }, [users, currentPage, pendingAutoNavigateAfterLoad]);
 
+  // ---------------------------------------------------------------------------
+  // RENDER
+  // ---------------------------------------------------------------------------
+
   return {
-    // Data for users list
+    // -- Data for users list --------------------------------------------------
     usersList: {
       items: loadedUsers,
       allIds: allUserIds,
       totalCount: users?.count ?? 0,
       hasMore: users?.next != null,
-      isLoading: usersLoading,
-      error: usersError,
+      states: {
+        isLoading: usersLoading,
+        error: usersError,
+        emptyMessage: "Пользователи не найдены",
+      },
     },
 
-    // Selected user
+    // -- Selected user --------------------------------------------------------
     selected: {
       userId: selectedUserId,
       setUserId: setSelectedUserId,
     },
 
-    // Pagination and load more
+    // -- Pagination and load more ---------------------------------------------
     pagination: {
       isLoadMoreLoading: usersLoading,
       loadMore: handleLoadMore,
     },
 
-    // Search
+    // -- Search ---------------------------------------------------------------
     search: {
       term: searchTerm,
       debouncedTerm: debouncedSearchTerm,
@@ -111,7 +128,7 @@ export const useUserManager = () => {
       onSearchChange: handleSearchChange,
     },
 
-    // Confirm modal
+    // -- Confirm modal --------------------------------------------------------
     confirmModal: {
       isOpen: dialog.isOpen,
       title: dialog.title,
@@ -121,7 +138,7 @@ export const useUserManager = () => {
       handleCancel,
     },
 
-    // User details modal
+    // -- User details modal ---------------------------------------------------
     userDetailsModal: {
       userId: selectedUserId,
       allUserIds,
@@ -131,7 +148,7 @@ export const useUserManager = () => {
       onNavigate: setSelectedUserId,
       requestConfirm,
       onClose: () => setSelectedUserId(null),
-      onUserDeleted: removeUserLocally,
+      onUserDeleted: handleRemoveUserLocally,
     },
   };
 };
