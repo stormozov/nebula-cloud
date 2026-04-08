@@ -1,4 +1,3 @@
-import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { useCallback } from "react";
 
 import type { IFile, IFileRename } from "@/entities/file";
@@ -10,7 +9,6 @@ import {
   useRenameFileMutation,
   useUpdateCommentMutation,
 } from "@/entities/file";
-import { isError401 } from "@/shared/api";
 import { camelToSnake } from "@/shared/utils";
 
 import type { ModalType } from "./useFileManagerModals";
@@ -81,7 +79,6 @@ export const useFileManagerActions = ({
       await deleteFile(selectedFile.id).unwrap();
       closeModal("delete");
     } catch (err) {
-      if (isError401(err as FetchBaseQueryError)) return;
       console.error("Failed to delete file:", err);
     }
   }, [selectedFile, deleteFile, closeModal]);
@@ -96,7 +93,6 @@ export const useFileManagerActions = ({
         }).unwrap();
         closeModal("rename");
       } catch (err) {
-        if (isError401(err as FetchBaseQueryError)) return;
         console.error("Failed to rename file:", err);
       }
     },
@@ -113,7 +109,6 @@ export const useFileManagerActions = ({
         }).unwrap();
         closeModal("comment");
       } catch (err) {
-        if (isError401(err as FetchBaseQueryError)) return;
         console.error("Failed to update comment:", err);
       }
     },
@@ -124,7 +119,6 @@ export const useFileManagerActions = ({
     try {
       await downloadFileFromApi(file.id, file.originalName);
     } catch (err) {
-      if (isError401(err as FetchBaseQueryError)) return;
       console.error("Download failed:", err);
     }
   }, []);
@@ -134,7 +128,6 @@ export const useFileManagerActions = ({
     try {
       await generatePublicLink(selectedFile.id).unwrap();
     } catch (err) {
-      if (isError401(err as FetchBaseQueryError)) return;
       console.error("Failed to generate link:", err);
     }
   }, [selectedFile, generatePublicLink]);
@@ -145,7 +138,6 @@ export const useFileManagerActions = ({
       await deletePublicLink(selectedFile.id).unwrap();
       closeModal("link");
     } catch (err) {
-      if (isError401(err as FetchBaseQueryError)) return;
       console.error("Failed to delete link:", err);
     }
   }, [selectedFile, deletePublicLink, closeModal]);
