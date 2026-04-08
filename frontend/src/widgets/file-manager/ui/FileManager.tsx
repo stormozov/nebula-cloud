@@ -1,33 +1,24 @@
-import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 
 import { useAppSelector } from "@/app/store/hooks";
-import type { IFile, IFileRename } from "@/entities/file";
-import {
-  downloadFileFromApi,
-  useDeleteFileMutation,
-  useDeletePublicLinkMutation,
-  useGeneratePublicLinkMutation,
-  useGetFilesQuery,
-  useRenameFileMutation,
-  useUpdateCommentMutation,
-} from "@/entities/file";
+import type { IFile } from "@/entities/file";
 import { selectIsQueueCompleted } from "@/entities/file-upload";
 import { EditCommentModal } from "@/features/file/file-comment";
 import { DeleteFileModal } from "@/features/file/file-delete";
 import { ImageViewerModal } from "@/features/file/file-image-preview";
-import { FileList, type IFileListProps } from "@/features/file/file-list";
+import type { IFileListProps } from "@/features/file/file-list";
 import { PublicLinkModal } from "@/features/file/file-public-link";
 import { RenameFileModal } from "@/features/file/file-rename";
-import { FileSearchInput, useFileSearch } from "@/features/file/file-search";
-import {
-  FileUploadButton,
-  FileUploadDropzone,
-} from "@/features/file/file-upload";
-import { isError401 } from "@/shared/api";
+import { useFileSearch } from "@/features/file/file-search";
 import fileListConfig from "@/shared/configs/file-list.json";
-import { BackButton, Button, Heading, Icon, PageWrapper } from "@/shared/ui";
-import { camelToSnake, isImageFile } from "@/shared/utils";
+import { getErrorMessage, isImageFile } from "@/shared/utils";
+
+import { useFileManagerActions } from "../lib/hooks/useFileManagerActions";
+import { useFileManagerModals } from "../lib/hooks/useFileManagerModals";
+import { useFileManagerPagination } from "../lib/hooks/useFileManagerPagination";
+import { FileManagerContent } from "./FileManagerContent";
+import { FileManagerDropzone } from "./FileManagerDropzone";
+import { FileManagerHeader } from "./FileManagerHeader";
 
 import "./FileManager.scss";
 
@@ -44,276 +35,122 @@ export interface IFileManagerProps {
 }
 
 /**
- * File manager widget.
+ * Main File Manager component that orchestrates file display, search, upload,
+ * and management actions.
  *
- * Combines file list, upload button, and dropzone into a single component.
- * Used on client disk page and admin file management page.
+ * @example
+ * <FileManager userId={123} isAdmin={true} onFileSelect={handleFileSelect} />
  */
 export function FileManager({
   userId,
   isAdmin = false,
   onFileSelect,
 }: IFileManagerProps) {
-  // States
-  const [currentPage, setCurrentPage] = useState(1);
-  const [loadedFiles, setLoadedFiles] = useState<IFile[]>([]);
-
   const { searchTerm, setSearchTerm, debouncedSearchTerm } = useFileSearch();
 
-  // Queries
-  const { data, isLoading, error, isFetching } = useGetFilesQuery(
-    userId
-      ? {
-          userId,
-          page: currentPage,
-          search: debouncedSearchTerm || undefined,
-        }
-      : {
-          page: currentPage,
-          search: debouncedSearchTerm || undefined,
-        },
-  );
+  const {
+    files,
+    isLoading,
+    isFetching,
+    error,
+    hasNextPage,
+    loadMore,
+    resetPagination,
+  } = useFileManagerPagination({
+    userId,
+    searchTerm: debouncedSearchTerm,
+  });
 
-  // Mutations
-  const [deleteFile, { isLoading: isDeleting }] = useDeleteFileMutation();
-  const [renameFile, { isLoading: isRenaming }] = useRenameFileMutation();
-  const [updateComment, { isLoading: isUpdatingComment }] =
-    useUpdateCommentMutation();
-  const [generatePublicLink, { isLoading: isGeneratingLink }] =
-    useGeneratePublicLinkMutation();
-  const [deletePublicLink, { isLoading: isDeletingLink }] =
-    useDeletePublicLinkMutation();
+  const {
+    modalOpen,
+    selectedFile,
+    selectedImageFile,
+    openModal,
+    closeModal,
+    setSelectedImageFile,
+    updateSelectedFile,
+  } = useFileManagerModals();
 
-  // Modal states
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [renameModalOpen, setRenameModalOpen] = useState(false);
-  const [commentModalOpen, setCommentModalOpen] = useState(false);
-  const [linkModalOpen, setLinkModalOpen] = useState(false);
-  const [imageViewerOpen, setImageViewerOpen] = useState(false);
-
-  const [selectedImageFile, setSelectedImageFile] = useState<IFile | null>(
-    null,
-  );
-  const [selectedFile, setSelectedFile] = useState<IFile | null>(null);
+  const {
+    isDeleting,
+    isRenaming,
+    isUpdatingComment,
+    isGeneratingLink,
+    isDeletingLink,
+    handleDeleteConfirm,
+    handleRenameSubmit,
+    handleCommentUpdate,
+    handleDownloadFile,
+    handleGeneratePublicLink,
+    handleDeletePublicLink,
+    handleCopyPublicLink,
+  } = useFileManagerActions({
+    selectedFile,
+    closeModal,
+  });
 
   // Listen for upload completion to reset pagination
   const isUploadQueueCompleted = useAppSelector(selectIsQueueCompleted);
-
-  /**
-   * Extract error message from RTK Query error object.
-   */
-  const getErrorMessage = (err: typeof error): string | null => {
-    if (!err || typeof err !== "object") return "";
-
-    // RTK Query error can be FetchBaseQueryError or SerializedError
-    if ("status" in err) {
-      // FetchBaseQueryError (HTTP error)
-      const httpError = err as FetchBaseQueryError;
-      if (httpError.status === 401) return null;
-      const data = httpError.data as { detail?: string } | undefined;
-      return data?.detail || `Ошибка ${httpError.status}`;
-    }
-
-    if ("message" in err) {
-      // SerializedError
-      return (err as { message?: string }).message || "Неизвестная ошибка";
-    }
-
-    // Fallback
-    return "Не удалось загрузить файлы";
-  };
 
   // ---------------------------------------------------------------------------
   // HANDLERS
   // ---------------------------------------------------------------------------
 
-  // -- Delete file handlers ---------------------------------------------------
-
-  const handleDelete = (file: IFile): void => {
-    setSelectedFile(file);
-    setDeleteModalOpen(true);
-  };
-
-  const handleDeleteConfirm = async (): Promise<void> => {
-    if (!selectedFile) return;
-
-    try {
-      await deleteFile(selectedFile.id).unwrap();
-      setDeleteModalOpen(false);
-      setSelectedFile(null);
-    } catch (err) {
-      if (isError401(err as FetchBaseQueryError)) return;
-      console.error("Failed to delete file:", err);
-      // Error is handled by RTK Query onError in fileApi.ts
-    }
-  };
-
-  const handleDeleteClose = (): void => {
-    if (isDeleting) return;
-    setDeleteModalOpen(false);
-    setSelectedFile(null);
-  };
-
-  // -- Rename file handlers ---------------------------------------------------
-
-  const handleRename = (file: IFile): void => {
-    setSelectedFile(file);
-    setRenameModalOpen(true);
-  };
-
-  const handleRenameSubmit = async (newName: string): Promise<void> => {
-    if (!selectedFile) return;
-
-    try {
-      await renameFile({
-        id: selectedFile.id,
-        data: camelToSnake({ original_name: newName }) as IFileRename,
-      }).unwrap();
-      setRenameModalOpen(false);
-      setSelectedFile(null);
-    } catch (err) {
-      if (isError401(err as FetchBaseQueryError)) return;
-      console.error("Failed to rename file:", err);
-    }
-  };
-
-  const handleRenameClose = (): void => {
-    if (isRenaming) return;
-    setRenameModalOpen(false);
-    setSelectedFile(null);
-  };
-
-  // -- Comment handlers -------------------------------------------------------
-
-  const handleEditComment = (file: IFile): void => {
-    setSelectedFile(file);
-    setCommentModalOpen(true);
-  };
-
-  const handleCommentSubmit = async (newComment: string): Promise<void> => {
-    if (!selectedFile) return;
-
-    try {
-      await updateComment({
-        id: selectedFile.id,
-        data: { comment: newComment },
-      }).unwrap();
-      setCommentModalOpen(false);
-      setSelectedFile(null);
-    } catch (err) {
-      if (isError401(err as FetchBaseQueryError)) return;
-      console.error("Failed to update comment:", err);
-    }
-  };
-
-  const handleCommentClose = (): void => {
-    if (isUpdatingComment) return;
-    setCommentModalOpen(false);
-    setSelectedFile(null);
-  };
-
-  // -- Download handlers ------------------------------------------------------
-
-  const handleDownload = async (file: IFile): Promise<void> => {
-    try {
-      await downloadFileFromApi(file.id, file.originalName);
-    } catch (err) {
-      if (isError401(err as FetchBaseQueryError)) return;
-      console.error("Download failed:", err);
-    }
-  };
-
-  // -- Public link handlers ---------------------------------------------------
-
-  const handlePublicLink = (file: IFile): void => {
-    setSelectedFile(file);
-    setLinkModalOpen(true);
-  };
-
-  const handleGenerateLink = async (): Promise<void> => {
-    if (!selectedFile) return;
-
-    try {
-      await generatePublicLink(selectedFile.id).unwrap();
-    } catch (err) {
-      if (isError401(err as FetchBaseQueryError)) return;
-      console.error("Failed to generate link:", err);
-    }
-  };
-
-  const handleCopyLink = async (url: string): Promise<void> => {
-    try {
-      await navigator.clipboard.writeText(url);
-    } catch (err) {
-      console.error("Failed to copy link:", err);
-      alert("Не удалось скопировать ссылку");
-    }
-  };
-
-  const handleDeleteLink = async (): Promise<void> => {
-    if (!selectedFile) return;
-
-    try {
-      await deletePublicLink(selectedFile.id).unwrap();
-      setLinkModalOpen(false);
-      setSelectedFile(null);
-    } catch (err) {
-      if (isError401(err as FetchBaseQueryError)) return;
-      console.error("Failed to delete link:", err);
-    }
-  };
-
-  const handleLinkClose = (): void => {
-    if (isGeneratingLink && isDeletingLink) return;
-    setLinkModalOpen(false);
-    setSelectedFile(null);
-  };
-
   // -- View handlers ----------------------------------------------------------
 
-  const handleView = (file: IFile): void => {
-    if (isImageFile(file)) {
+  const handleView = useCallback(
+    (file: IFile): void => {
+      if (!isImageFile(file)) return;
       setSelectedImageFile(file);
-      setImageViewerOpen(true);
-      return;
-    }
-  };
-
-  // -- Load more handlers -----------------------------------------------------
-
-  const loadMore = () => {
-    setCurrentPage((prev) => prev + 1);
-  };
+      openModal("imageViewer", file);
+    },
+    [setSelectedImageFile, openModal],
+  );
 
   // -- Search handlers --------------------------------------------------------
 
-  const handleSearchChange = (value: string) => {
-    setSearchTerm(value);
-    setCurrentPage(1);
-  };
+  const handleSearchChange = useCallback(
+    (value: string) => {
+      setSearchTerm(value);
+      resetPagination();
+    },
+    [setSearchTerm, resetPagination],
+  );
 
   // ---------------------------------------------------------------------------
   // PREPARE DATA FOR LIST
   // ---------------------------------------------------------------------------
 
-  const preparedListData: IFileListProps = {
-    files: loadedFiles,
-    states: {
-      isLoading: isLoading || isFetching,
-      error: getErrorMessage(error),
-      emptyMessage: "Нет загруженных файлов",
-    },
-    handlers: {
-      onView: handleView,
-      onDownload: handleDownload,
-      onPublicLink: handlePublicLink,
-      onRename: handleRename,
-      onEditComment: handleEditComment,
-      onDelete: handleDelete,
-    },
-    headers: fileListConfig.header_columns,
-    onSelectFile: onFileSelect,
-  };
+  const preparedListData = useMemo<IFileListProps>(
+    () => ({
+      files: files || [],
+      states: {
+        isLoading: isLoading || isFetching,
+        error: getErrorMessage(error),
+        emptyMessage: "Нет загруженных файлов",
+      },
+      handlers: {
+        onView: handleView,
+        onDownload: handleDownloadFile,
+        onPublicLink: (file: IFile) => openModal("link", file),
+        onRename: (file: IFile) => openModal("rename", file),
+        onEditComment: (file: IFile) => openModal("comment", file),
+        onDelete: (file: IFile) => openModal("delete", file),
+      },
+      headers: fileListConfig.header_columns,
+      onSelectFile: onFileSelect,
+    }),
+    [
+      files,
+      isLoading,
+      isFetching,
+      error,
+      handleView,
+      handleDownloadFile,
+      openModal,
+      onFileSelect,
+    ],
+  );
 
   // ---------------------------------------------------------------------------
   // EFFECTS
@@ -321,45 +158,24 @@ export function FileManager({
 
   // Synchronizing selectedFile with the latest data from the cache for the modal
   useEffect(() => {
-    if (linkModalOpen && selectedFile && data?.results) {
-      const updatedFile = data.results.find((f) => f.id === selectedFile.id);
+    if (modalOpen.link && selectedFile && files.length) {
+      const updatedFile = files.find((f) => f.id === selectedFile.id);
       if (
         updatedFile &&
         (updatedFile.hasPublicLink !== selectedFile.hasPublicLink ||
           updatedFile.publicLinkUrl !== selectedFile.publicLinkUrl)
       ) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setSelectedFile(updatedFile);
+        updateSelectedFile(updatedFile);
       }
     }
-  }, [data, linkModalOpen, selectedFile]);
+  }, [files, modalOpen.link, selectedFile, updateSelectedFile]);
 
   // Reset pagination when uploads complete (new files at top of page 1)
   useEffect(() => {
     if (!isUploadQueueCompleted) return;
     window.scrollTo({ top: 0, behavior: "smooth" });
-    setTimeout(() => {
-      setCurrentPage(1);
-      setLoadedFiles([]);
-    });
-  }, [isUploadQueueCompleted]);
-
-  // Load more files when scrolling to bottom
-  useEffect(() => {
-    if (!data) return;
-
-    if (currentPage === 1) {
-      setTimeout(() => setLoadedFiles(data.results));
-    } else {
-      setTimeout(() => {
-        setLoadedFiles((prev) => {
-          const existingIds = new Set(prev.map((f) => f.id));
-          const newFiles = data.results.filter((f) => !existingIds.has(f.id));
-          return [...prev, ...newFiles];
-        });
-      });
-    }
-  }, [data, currentPage]);
+    resetPagination();
+  }, [isUploadQueueCompleted, resetPagination]);
 
   // ---------------------------------------------------------------------------
   // RENDER
@@ -368,140 +184,69 @@ export function FileManager({
   return (
     <div className="file-manager">
       <header className="file-manager__header">
-        {!isAdmin ? (
-          <>
-            <Heading level={2} noMargin className="file-manager__header-title">
-              Ваш диск
-            </Heading>
-            <PageWrapper>
-              <FileSearchInput
-                inputProps={{
-                  value: searchTerm,
-                  placeholder: "Поиск по названию и дате загрузки",
-                  onChange: handleSearchChange,
-                }}
-              />
-              <FileUploadButton>Загрузить файл</FileUploadButton>
-            </PageWrapper>
-          </>
-        ) : (
-          <>
-            <PageWrapper>
-              <BackButton />
-              <Heading
-                level={2}
-                noMargin
-                className="file-manager__header-title"
-              >
-                Файлы пользователя{" "}
-                <sup
-                  className="file-manager__header-title-badge"
-                  title={`ID пользователя: ${userId}`}
-                >
-                  <Icon name="person" />
-                  {userId}
-                </sup>
-              </Heading>
-            </PageWrapper>
-            <FileSearchInput
-              buttonProps={{
-                children: "Поиск",
-                size: "small",
-              }}
-              inputProps={{
-                value: searchTerm,
-                placeholder: "Поиск по названию и дате загрузки",
-                onChange: handleSearchChange,
-              }}
-            />
-          </>
-        )}
+        <FileManagerHeader
+          isAdmin={isAdmin}
+          userId={userId}
+          searchTerm={searchTerm}
+          onSearchChange={handleSearchChange}
+        />
       </header>
 
-      {/* Dropzone - ONLY WHEN NO FILES or initial load */}
-      {!isAdmin &&
-        !debouncedSearchTerm &&
-        (!data || data.results.length === 0) &&
-        !error &&
-        !isLoading &&
-        !isFetching && (
-          <div className="file-manager__dropzone">
-            <FileUploadDropzone
-              mode="local"
-              clickable={true}
-              multiple={true}
-              comment="Загружено через FileManager"
-            />
-          </div>
-        )}
+      <FileManagerDropzone
+        isVisible={
+          !isAdmin &&
+          !debouncedSearchTerm &&
+          files.length === 0 &&
+          !error &&
+          !isLoading &&
+          !isFetching
+        }
+      />
 
-      {/* Empty state */}
-      {!isLoading &&
-        !isFetching &&
-        (!data || data.results.length === 0) &&
-        !error &&
-        (isAdmin || !!debouncedSearchTerm) && (
-          <div className="file-manager__empty-message">
-            <p>Нет загруженных файлов</p>
-          </div>
-        )}
-
-      {/* File list */}
-      {loadedFiles.length > 0 && (
-        <div className="file-manager__list">
-          <FileList {...preparedListData} />
-          {data?.next && (
-            <div className="file-manager__load-more">
-              <Button
-                icon={{ name: "retry" }}
-                loading={isFetching}
-                disabled={isFetching}
-                onClick={loadMore}
-              >
-                Загрузить ещё
-              </Button>
-            </div>
-          )}
-        </div>
-      )}
+      <FileManagerContent
+        hasNextPage={hasNextPage}
+        isFetching={isFetching}
+        loadMore={loadMore}
+        fileListProps={preparedListData}
+      />
 
       {/* File actions modals */}
       <DeleteFileModal
-        isOpen={deleteModalOpen}
+        isOpen={modalOpen.delete}
         file={selectedFile}
         onConfirm={handleDeleteConfirm}
-        onClose={handleDeleteClose}
+        onClose={() => closeModal("delete")}
         isDeleting={isDeleting}
       />
       <RenameFileModal
         key={selectedFile?.id}
-        isOpen={renameModalOpen}
-        onClose={handleRenameClose}
+        isOpen={modalOpen.rename}
+        onClose={() => closeModal("rename")}
         file={selectedFile}
         onSubmit={handleRenameSubmit}
         isSubmitting={isRenaming}
       />
       <EditCommentModal
-        isOpen={commentModalOpen}
-        onClose={handleCommentClose}
+        isOpen={modalOpen.comment}
+        onClose={() => closeModal("comment")}
         file={selectedFile}
-        onSubmit={handleCommentSubmit}
+        onSubmit={handleCommentUpdate}
         isSubmitting={isUpdatingComment}
       />
       <PublicLinkModal
-        isOpen={linkModalOpen}
+        isOpen={modalOpen.link}
         file={selectedFile}
-        onGenerate={handleGenerateLink}
-        onCopy={handleCopyLink}
-        onClose={handleLinkClose}
-        onDelete={handleDeleteLink}
+        onGenerate={handleGeneratePublicLink}
+        onCopy={handleCopyPublicLink}
+        onClose={() => closeModal("link")}
+        onDelete={handleDeletePublicLink}
         isGenerating={isGeneratingLink}
         isDeleting={isDeletingLink}
       />
       <ImageViewerModal
-        isOpen={imageViewerOpen}
+        isOpen={modalOpen.imageViewer}
         file={selectedImageFile}
-        onClose={() => setImageViewerOpen(false)}
+        onClose={() => closeModal("imageViewer")}
       />
     </div>
   );

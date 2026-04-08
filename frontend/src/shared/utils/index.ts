@@ -1,4 +1,5 @@
 export * from "./converters";
+export * from "./errorUtils";
 export * from "./file/copy-to-clipboard";
 export * from "./file/download-file";
 export * from "./file/file-extension-utils";
