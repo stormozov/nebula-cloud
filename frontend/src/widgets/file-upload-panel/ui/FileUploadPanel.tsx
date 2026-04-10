@@ -15,6 +15,7 @@ import {
   setPanelVisible,
 } from "@/entities/file-upload";
 import { FileUploadItem } from "@/features/file/file-upload";
+import { useAnimatedClose } from "@/shared/hooks";
 import { Button, Icon } from "@/shared/ui";
 
 import "./FileUploadPanel.scss";
@@ -33,15 +34,14 @@ export function FileUploadPanel() {
   const canClosePanel = useAppSelector(selectCanClosePanel);
   const stats = useAppSelector(selectUploadStats);
 
-  /**
-   * Handle panel close button click.
-   * Only allowed when queue is completed or empty.
-   */
-  const handleClose = (): void => {
-    if (!canClosePanel) return;
-    dispatch(setPanelVisible(false));
-    dispatch(clearCompleted());
-  };
+  const { isClosing, handleCloseWithAnimation } = useAnimatedClose({
+    onClose: () => {
+      dispatch(setPanelVisible(false));
+      dispatch(clearCompleted());
+    },
+    isBlocked: !canClosePanel,
+    animationDuration: 300,
+  });
 
   /**
    * Handle cancel upload button click.
@@ -50,18 +50,11 @@ export function FileUploadPanel() {
     dispatch(cancelUpload({ uploadId }));
   };
 
-  /**
-   * Handle retry upload button click.
-   * For failed uploads, user needs to re-select the file.
-   */
   const handleRetry = (uploadId: string): void => {
     dispatch(retryUpload({ uploadId }));
     console.warn("Retry upload:", uploadId);
   };
 
-  /**
-   * Handle remove from queue button click.
-   */
   const handleRemove = (uploadId: string): void => {
     dispatch(removeFile({ uploadId }));
   };
@@ -82,27 +75,26 @@ export function FileUploadPanel() {
   };
 
   // Don't render if panel is hidden and queue is empty
-  if (!isPanelVisible && queue.length === 0) return null;
+  if (!isPanelVisible && queue.length === 0 && !isClosing) return null;
 
   return (
     <div
       className={classNames("file-upload-panel", {
         "file-upload-panel--visible": isPanelVisible,
+        "file-upload-panel--closing": isClosing,
       })}
     >
       {/* Header */}
       <header className="file-upload-panel__header">
         <div className="file-upload-panel__title">
           {getPanelTitle()}
-          {isQueueCompleted && (
-            <Icon name="check" color="success" />
-          )}
+          {isQueueCompleted && <Icon name="check" color="success" />}
         </div>
         <Button
           type="button"
           variant="ghost"
           className="file-upload-panel__close-btn"
-          onClick={handleClose}
+          onClick={handleCloseWithAnimation}
           disabled={!canClosePanel}
           title={
             canClosePanel
@@ -150,7 +142,7 @@ export function FileUploadPanel() {
             variant="outline"
             size="small"
             className="file-upload-panel__clear-btn"
-            onClick={handleClose}
+            onClick={handleCloseWithAnimation}
           >
             <Icon name="trash" />
             Очистить

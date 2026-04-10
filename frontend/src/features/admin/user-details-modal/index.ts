@@ -2,7 +2,6 @@
 export * from "./lib/types";
 export * from "./lib/useBlockHover";
 export * from "./lib/useClipboardWithHandlers";
-export * from "./lib/useModalClose";
 export * from "./lib/useUserBlocksData";
 export * from "./lib/useUserDetailsModal";
 

@@ -1,58 +1,54 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
- * Props for the `useModalClose` hook.
+ * Props interface for the `useAnimatedClose` hook.
  */
-interface UseModalCloseProps {
-  /** Callback to close the modal */
+export interface IUseAnimatedCloseProps {
+  /** Callback to execute after animation completes (actual close) */
   onClose: () => void;
-  /** Whether the modal should be blocked from closing */
+  /** Whether closing is blocked (e.g., during active upload) */
   isBlocked?: boolean;
-  /** Duration of the closing animation in milliseconds */
+  /** Animation duration in milliseconds */
   animationDuration?: number;
 }
 
 /**
- * Return value of the `useModalClose` hook.
+ * Return type of the `useAnimatedClose` hook.
  */
-interface UseModalCloseReturns {
-  /** Whether the modal is currently closing */
+export interface IUseAnimatedCloseReturn {
+  /** Whether the component is in closing animation state */
   isClosing: boolean;
-  /** Function to close the modal with animation */
+  /** Trigger animated close */
   handleCloseWithAnimation: () => void;
 }
 
 /**
- * React hook that manages the closing behavior of a modal with animation
- * support.
+ * Hook for animated closing of modals, panels, drawers, etc.
  *
  * Handles:
- * - Animated closing sequence with configurable duration
- * - ESC key press to close the modal (unless blocked)
- * - Prevention of multiple concurrent close attempts
- * - Cleanup of pending timeouts on unmount
- *
- * @example
- * const { isClosing, handleCloseWithAnimation } = useModalClose({
- *   onClose: () => setIsOpen(false),
- *   isBlocked: isFormDirty,
- *   animationDuration: 300
- * });
+ * - Animated closing with configurable duration
+ * - ESC key support (unless blocked)
+ * - Prevents multiple close attempts
+ * - Cleanup of timeouts
  */
-export const useModalClose = ({
+export const useAnimatedClose = ({
   onClose,
   isBlocked = false,
   animationDuration = 300,
-}: UseModalCloseProps): UseModalCloseReturns => {
+}: IUseAnimatedCloseProps): IUseAnimatedCloseReturn => {
   const [isClosing, setIsClosing] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
 
   const handleCloseWithAnimation = useCallback(() => {
     if (isClosing || isBlocked) return;
     setIsClosing(true);
-    timeoutRef.current = setTimeout(() => onClose(), animationDuration);
+    timeoutRef.current = setTimeout(() => {
+      setIsClosing(false);
+      onClose();
+    }, animationDuration);
   }, [animationDuration, isBlocked, isClosing, onClose]);
 
+  // ESC key listener
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && !isBlocked) {
@@ -65,6 +61,7 @@ export const useModalClose = ({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleCloseWithAnimation, isBlocked]);
 
+  // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);

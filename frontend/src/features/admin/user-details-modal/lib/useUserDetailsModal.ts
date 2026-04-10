@@ -6,9 +6,9 @@ import {
   useGetStorageStatsQuery,
   useGetUserQuery,
 } from "@/entities/user";
+import { useAnimatedClose } from "@/shared/hooks";
 
 import type { IModalContentProps, UserDetailsModalActionsType } from "./types";
-import { useModalClose } from "./useModalClose";
 
 /**
  * Props for the `useUserDetailsModal` hook.
@@ -42,7 +42,7 @@ export function useUserDetailsModal({
     skip: !userId,
   });
 
-  const { isClosing, handleCloseWithAnimation } = useModalClose({
+  const { isClosing, handleCloseWithAnimation } = useAnimatedClose({
     onClose,
     isBlocked: isConfirmOpen,
   });
