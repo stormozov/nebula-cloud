@@ -8,6 +8,8 @@ export interface IListStates {
   error?: string | null | unknown;
   /** Optional message to display when the file list is empty. */
   emptyMessage?: string;
+  /** Optional flag indicating whether to hide the empty state. */
+  hideEmptyState?: boolean;
 }
 
 /**

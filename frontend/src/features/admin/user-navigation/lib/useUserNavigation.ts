@@ -1,10 +1,12 @@
 import { useCallback, useMemo } from "react";
 
+import type { SelectUser } from "@/widgets/admin-user-manager";
+
 /**
  * Interface defining the props for the `useUserNavigation` hook.
  */
 export interface IUseUserNavigationProps {
-  currentUserId: number;
+  currentUserId: SelectUser;
   allUserIds: number[];
   hasPaginationMore: boolean;
   onNavigate: (userId: number) => void;
@@ -22,7 +24,7 @@ export const useUserNavigation = ({
   onLoadMore,
 }: IUseUserNavigationProps) => {
   const currentIndex = useMemo(() => {
-    return allUserIds.indexOf(currentUserId);
+    return allUserIds.indexOf(currentUserId ?? 0);
   }, [currentUserId, allUserIds]);
   const hasPrev = currentIndex > 0;
   const hasNext = currentIndex < allUserIds.length - 1 || hasPaginationMore;

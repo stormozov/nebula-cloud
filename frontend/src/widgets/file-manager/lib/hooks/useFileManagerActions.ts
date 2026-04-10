@@ -25,6 +25,8 @@ interface UseFileManagerActionsParams {
    * @param type - The type of modal to close.
    */
   closeModal: (type: ModalType) => void;
+  /** Function to reset the pagination state. */
+  resetPagination: () => void;
 }
 
 /**
@@ -63,6 +65,7 @@ interface IUseFileManagerActionsReturns {
 export const useFileManagerActions = ({
   selectedFile,
   closeModal,
+  resetPagination,
 }: UseFileManagerActionsParams): IUseFileManagerActionsReturns => {
   const [deleteFile, { isLoading: isDeleting }] = useDeleteFileMutation();
   const [renameFile, { isLoading: isRenaming }] = useRenameFileMutation();
@@ -72,16 +75,21 @@ export const useFileManagerActions = ({
     useGeneratePublicLinkMutation();
   const [deletePublicLink, { isLoading: isDeletingLink }] =
     useDeletePublicLinkMutation();
+  
+  // ---------------------------------------------------------------------------
+  // HANDLERS
+  // ---------------------------------------------------------------------------
 
   const handleDeleteConfirm = useCallback(async (): Promise<void> => {
     if (!selectedFile) return;
     try {
+      resetPagination();
       await deleteFile(selectedFile.id).unwrap();
       closeModal("delete");
     } catch (err) {
       console.error("Failed to delete file:", err);
     }
-  }, [selectedFile, deleteFile, closeModal]);
+  }, [selectedFile, deleteFile, closeModal, resetPagination]);
 
   const handleRenameSubmit = useCallback(
     async (newName: string): Promise<void> => {
@@ -153,6 +161,10 @@ export const useFileManagerActions = ({
     },
     [],
   );
+
+  // ---------------------------------------------------------------------------
+  // RETURNS
+  // ---------------------------------------------------------------------------
 
   return {
     isDeleting,

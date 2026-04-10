@@ -1,9 +1,4 @@
-import {
-  type IUserDetailsModalProps,
-  UserDetailsModal,
-  UserList,
-  UserSearchInput,
-} from "@/features/admin";
+import { UserDetailsModal, UserList, UserSearchInput } from "@/features/admin";
 import { Button, ModalConfirm } from "@/shared/ui";
 
 import { useUserManager } from "../lib/useUserManager";
@@ -59,11 +54,7 @@ export function UserManagementWidget() {
         </div>
       )}
 
-      {selected.userId && (
-        <UserDetailsModal
-          modalProps={userDetailsModal as IUserDetailsModalProps["modalProps"]}
-        />
-      )}
+      {selected.userId && <UserDetailsModal modalProps={userDetailsModal} />}
 
       <ModalConfirm
         isOpen={confirmModal.isOpen}

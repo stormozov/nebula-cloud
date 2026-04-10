@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { IFile } from "@/entities/file";
 import { useGetFilesQuery } from "@/entities/file";
@@ -27,6 +27,10 @@ interface IUseFileManagerPaginationReturns {
   error: unknown;
   /** Indicates whether more pages of data are available. */
   hasNextPage: boolean;
+  /** Indicates whether the data is fully loaded. */
+  isDataReady: boolean;
+  /** Number of files on the current page. */
+  currentPageFilesCount: number;
   /** Function to load the next page of files. */
   loadMore: () => void;
   /** Function to reset the pagination state. */
@@ -46,67 +50,74 @@ export const useFileManagerPagination = ({
   searchTerm,
 }: IUseFileManagerPaginationParams): IUseFileManagerPaginationReturns => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [loadedFiles, setLoadedFiles] = useState<IFile[]>([]);
+  const [pendingRefetch, setPendingRefetch] = useState(false);
 
-  const queryParams = {
-    page: currentPage,
-    search: searchTerm || undefined,
-    ...(userId ? { userId } : {}),
-  };
+  const prevArgsRef = useRef({ userId, searchTerm });
 
-  const { data, isLoading, error, isFetching } = useGetFilesQuery(queryParams);
+  const queryParams = useMemo(
+    () => ({
+      page: currentPage,
+      search: searchTerm || undefined,
+      ...(userId ? { userId } : {}),
+    }),
+    [currentPage, searchTerm, userId],
+  );
 
+  const { data, isLoading, error, isFetching, refetch } =
+    useGetFilesQuery(queryParams);
+
+  const files = data?.results ?? [];
   const hasNextPage = !!data?.next;
+  const isDataReady = !!data?.results;
+  const currentPageFilesCount = data?.results?.length ?? 0;
+  const isInitialLoading = isLoading && currentPage === 1;
 
   // ---------------------------------------------------------------------------
   // HANDLERS
   // ---------------------------------------------------------------------------
 
-  const loadMore = useCallback(() => {
-    setCurrentPage((prev) => prev + 1);
-  }, []);
+  const loadMore = useCallback(() => setCurrentPage((prev) => prev + 1), []);
 
   const resetPagination = useCallback(() => {
     setCurrentPage(1);
-    setLoadedFiles([]);
+    setPendingRefetch(true);
   }, []);
 
   // ---------------------------------------------------------------------------
   // EFFECTS
   // ---------------------------------------------------------------------------
 
-  // Update the list of files when the data changes.
   useEffect(() => {
-    if (!data) return;
-
-    if (currentPage === 1) {
+    if (pendingRefetch && currentPage === 1) {
+      refetch();
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setLoadedFiles(data.results);
-    } else {
-      setLoadedFiles((prev) => {
-        const existingIds = new Set(prev.map((f) => f.id));
-        const newFiles = data.results.filter((f) => !existingIds.has(f.id));
-        return [...prev, ...newFiles];
-      });
+      setPendingRefetch(false);
     }
-  }, [data, currentPage]);
+  }, [pendingRefetch, currentPage, refetch]);
 
-  // Reset pagination when the userId or search query is changed
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    resetPagination();
-  }, [resetPagination]);
+    if (
+      prevArgsRef.current.userId !== userId ||
+      prevArgsRef.current.searchTerm !== searchTerm
+    ) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setCurrentPage(1);
+      prevArgsRef.current = { userId, searchTerm };
+    }
+  }, [userId, searchTerm]);
 
   // ---------------------------------------------------------------------------
   // RETURNS
   // ---------------------------------------------------------------------------
 
   return {
-    files: loadedFiles,
-    isLoading,
+    files,
+    isLoading: isInitialLoading,
     isFetching,
     error,
     hasNextPage,
+    isDataReady,
+    currentPageFilesCount,
     loadMore,
     resetPagination,
   };

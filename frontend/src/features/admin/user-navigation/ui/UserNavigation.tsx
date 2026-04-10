@@ -1,4 +1,5 @@
 import { Button } from "@/shared/ui";
+import type { SelectUser } from "@/widgets/admin-user-manager";
 
 import { useKeyboardNavigation } from "../lib/useKeyboardNavigation";
 import { useUserNavigation } from "../lib/useUserNavigation";
@@ -9,7 +10,7 @@ import "./UserNavigation.scss";
  * Interface defining the props for the `UserNavigation` component.
  */
 export interface IUserNavigationProps {
-  currentUserId: number;
+  currentUserId: SelectUser;
   allUserIds: number[];
   hasPaginationMore: boolean;
   onNavigate: (userId: number) => void;

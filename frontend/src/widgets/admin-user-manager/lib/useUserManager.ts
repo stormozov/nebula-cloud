@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { type IUserListResponse, useGetUsersQuery } from "@/entities/user";
+import { useGetUsersQuery } from "@/entities/user";
 import { useUserSearch } from "@/features/admin";
 import { useBodyScrollLock } from "@/shared/hooks";
 import { useModalConfirm } from "@/shared/ui";
@@ -11,50 +11,65 @@ import type { IUseUserManagerReturns, SelectUser } from "./types";
  * Hooks for managing users list and user details.
  */
 export const useUserManager = (): IUseUserManagerReturns => {
+  // -- States -----------------------------------------------------------------
   const [selectedUserId, setSelectedUserId] = useState<SelectUser>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [loadedUsers, setLoadedUsers] = useState<IUserListResponse[]>([]);
+  const [pageState, setPageState] = useState(1);
   const [pendingAutoNavigateAfterLoad, setPendingAutoNavigateAfterLoad] =
     useState(false);
+  const [pendingRefetch, setPendingRefetch] = useState(false);
+  const [deletedUserIds, setDeletedUserIds] = useState(new Set<number>());
 
+  // -- Hooks ------------------------------------------------------------------
   useBodyScrollLock(!!selectedUserId);
-  const { searchTerm, setSearchTerm, debouncedSearchTerm } = useUserSearch();
 
-  const {
-    data: users,
-    isLoading: usersLoading,
-    error: usersError,
-  } = useGetUsersQuery({
-    page: currentPage,
-    search: debouncedSearchTerm || undefined,
-  });
+  const { searchTerm, setSearchTerm, debouncedSearchTerm } = useUserSearch();
 
   const { dialog, requestConfirm, handleConfirm, handleCancel } =
     useModalConfirm();
 
-  const allUserIds = loadedUsers.map((user) => user.id) ?? [];
+  // -- API --------------------------------------------------------------------
+  const effectivePage = useMemo(() => {
+    return debouncedSearchTerm ? 1 : pageState;
+  }, [debouncedSearchTerm, pageState]);
+
+  const queryArgs = useMemo(
+    () => ({
+      page: effectivePage,
+      search: debouncedSearchTerm || undefined,
+    }),
+    [effectivePage, debouncedSearchTerm],
+  );
+
+  const {
+    data: usersData,
+    isLoading: usersLoading,
+    error: usersError,
+    refetch,
+  } = useGetUsersQuery(queryArgs);
+
+  // -- Consts -----------------------------------------------------------------
+  const allUsers = useMemo(
+    () => usersData?.results.filter((u) => !deletedUserIds.has(u.id)) ?? [],
+    [usersData, deletedUserIds],
+  );
+  const totalCount = usersData?.count ?? 0;
+  const hasMore = usersData?.next != null;
+
+  const allUserIds = useMemo(() => allUsers.map((u) => u.id), [allUsers]);
 
   // ---------------------------------------------------------------------------
   // HANDLERS
   // ---------------------------------------------------------------------------
 
-  const handleLoadMore = (shouldAutoNavigate: boolean = false) => {
-    setPendingAutoNavigateAfterLoad(shouldAutoNavigate);
-    setCurrentPage((prev) => prev + 1);
-  };
-
-  const handleSearchChange = (value: string) => {
-    setSearchTerm(value);
-    setCurrentPage(1);
-    setSelectedUserId(null);
-    setPendingAutoNavigateAfterLoad(false);
-  };
+  const handleLoadMore = useCallback(() => {
+    if (!hasMore || debouncedSearchTerm) return;
+    setPageState((prev) => prev + 1);
+  }, [hasMore, debouncedSearchTerm]);
 
   const handleRemoveUserLocally = useCallback(
     (userId: number) => {
-      setLoadedUsers((prev) => prev.filter((user) => user.id !== userId));
       if (selectedUserId === userId) setSelectedUserId(null);
-      setCurrentPage(1);
+      setDeletedUserIds((prev) => new Set(prev).add(userId));
     },
     [selectedUserId],
   );
@@ -63,48 +78,48 @@ export const useUserManager = (): IUseUserManagerReturns => {
   // EFFECTS
   // ---------------------------------------------------------------------------
 
+  // The effect for executing a refetch after currentPage has actually become 1
   useEffect(() => {
-    if (!users) return;
-
-    if (currentPage === 1) {
-      setTimeout(() => {
-        setLoadedUsers(users.results);
-        setPendingAutoNavigateAfterLoad(false);
-      }, 0);
-    } else {
-      setTimeout(() => {
-        setLoadedUsers((prev) => {
-          const existingIds = new Set(prev.map((user) => user.id));
-          const newUsers = users.results.filter(
-            (user) => !existingIds.has(user.id),
-          );
-          if (pendingAutoNavigateAfterLoad && newUsers.length > 0) {
-            setTimeout(() => {
-              setSelectedUserId(newUsers[0].id);
-              setPendingAutoNavigateAfterLoad(false);
-            }, 0);
-          }
-          return [...prev, ...newUsers];
-        });
-      }, 0);
+    if (pendingRefetch && pageState === 1) {
+      refetch();
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setPendingRefetch(false);
     }
-  }, [users, currentPage, pendingAutoNavigateAfterLoad]);
+  }, [pendingRefetch, pageState, refetch]);
+
+  // Resetting the page when the search changes
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPageState(1);
+    setSelectedUserId(null);
+    setPendingAutoNavigateAfterLoad(false);
+    setPendingRefetch(false);
+  }, []);
+
+  // Automatically select the first user after the page loads
+  useEffect(() => {
+    if (!pendingAutoNavigateAfterLoad || allUsers.length === 0) return;
+    const lastUser = allUsers[allUsers.length - 1];
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSelectedUserId(lastUser.id);
+    setPendingAutoNavigateAfterLoad(false);
+  }, [allUsers, pendingAutoNavigateAfterLoad]);
 
   // ---------------------------------------------------------------------------
-  // RENDER
+  // RETURNS
   // ---------------------------------------------------------------------------
 
   return {
     // -- Data for users list --------------------------------------------------
     usersList: {
-      items: loadedUsers,
+      items: allUsers,
       allIds: allUserIds,
-      totalCount: users?.count ?? 0,
-      hasMore: users?.next != null,
+      totalCount,
+      hasMore,
       states: {
         isLoading: usersLoading,
         error: usersError,
-        emptyMessage: "Пользователи не найдены",
+        emptyMessage: "Пользователи не найдены",
       },
     },
 
@@ -125,7 +140,7 @@ export const useUserManager = (): IUseUserManagerReturns => {
       term: searchTerm,
       debouncedTerm: debouncedSearchTerm,
       setTerm: setSearchTerm,
-      onSearchChange: handleSearchChange,
+      onSearchChange: (value: string) => setSearchTerm(value),
     },
 
     // -- Confirm modal --------------------------------------------------------
@@ -142,7 +157,7 @@ export const useUserManager = (): IUseUserManagerReturns => {
     userDetailsModal: {
       userId: selectedUserId,
       allUserIds,
-      hasPaginationMore: users?.next != null,
+      hasPaginationMore: hasMore,
       isConfirmOpen: dialog.isOpen,
       onLoadMore: handleLoadMore,
       onNavigate: setSelectedUserId,

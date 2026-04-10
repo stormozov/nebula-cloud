@@ -40,7 +40,8 @@ interface IListStateProps {
  * </ListState>
  */
 export function ListState({ children, states, renders }: IListStateProps) {
-  const { isLoading, error, emptyMessage, itemsCount } = states || {};
+  const { isLoading, error, emptyMessage, itemsCount, hideEmptyState } =
+    states || {};
   const { renderLoading, renderError, renderEmpty } = renders || {};
 
   if (isLoading) {
@@ -48,11 +49,7 @@ export function ListState({ children, states, renders }: IListStateProps) {
       <div className="list-state list-state--loading" aria-live="polite">
         {renderLoading?.() ?? (
           <div className="list-state__default-block">
-            <Icon
-              name="cloudLoading"
-              size={160}
-              className="list-state__icon"
-            />
+            <Icon name="cloudLoading" size={160} className="list-state__icon" />
             <p>Загрузка...</p>
           </div>
         )}
@@ -65,11 +62,7 @@ export function ListState({ children, states, renders }: IListStateProps) {
       <div className="list-state list-state--error" role="alert">
         {renderError?.(error) ?? (
           <div className="list-state__default-block">
-            <Icon
-              name="cloudWarning"
-              size={160}
-              className="list-state__icon"
-            />
+            <Icon name="cloudWarning" size={160} className="list-state__icon" />
             <p>Произошла ошибка</p>
             <p>{error}</p>
           </div>
@@ -79,15 +72,12 @@ export function ListState({ children, states, renders }: IListStateProps) {
   }
 
   if (itemsCount === 0) {
+    if (hideEmptyState) return null;
     return (
       <div className="list-state list-state--empty">
         {renderEmpty?.(emptyMessage || "Ничего не найдено") ?? (
           <div className="list-state__default-block">
-            <Icon
-              name="cloudBad"
-              size={160}
-              className="list-state__icon"
-            />
+            <Icon name="cloudBad" size={160} className="list-state__icon" />
             <p>{emptyMessage}</p>
           </div>
         )}

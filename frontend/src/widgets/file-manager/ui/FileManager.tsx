@@ -54,6 +54,8 @@ export function FileManager({
     isFetching,
     error,
     hasNextPage,
+    isDataReady,
+    currentPageFilesCount,
     loadMore,
     resetPagination,
   } = useFileManagerPagination({
@@ -71,7 +73,7 @@ export function FileManager({
     updateSelectedFile,
   } = useFileManagerModals();
 
-  const {
+const {
     isDeleting,
     isRenaming,
     isUpdatingComment,
@@ -87,16 +89,24 @@ export function FileManager({
   } = useFileManagerActions({
     selectedFile,
     closeModal,
+    resetPagination,
   });
 
   // Listen for upload completion to reset pagination
   const isUploadQueueCompleted = useAppSelector(selectIsQueueCompleted);
 
+  const isDropzoneVisible =
+    !isAdmin &&
+    !debouncedSearchTerm &&
+    currentPageFilesCount === 0 &&
+    !error &&
+    !isLoading &&
+    !isFetching &&
+    isDataReady;
+
   // ---------------------------------------------------------------------------
   // HANDLERS
   // ---------------------------------------------------------------------------
-
-  // -- View handlers ----------------------------------------------------------
 
   const handleView = useCallback(
     (file: IFile): void => {
@@ -106,8 +116,6 @@ export function FileManager({
     },
     [setSelectedImageFile, openModal],
   );
-
-  // -- Search handlers --------------------------------------------------------
 
   const handleSearchChange = useCallback(
     (value: string) => {
@@ -125,9 +133,10 @@ export function FileManager({
     () => ({
       files: files || [],
       states: {
-        isLoading: isLoading || isFetching,
+        isLoading: isLoading,
         error: getErrorMessage(error),
         emptyMessage: "Нет загруженных файлов",
+        hideEmptyState: isDropzoneVisible,
       },
       handlers: {
         onView: handleView,
@@ -143,8 +152,8 @@ export function FileManager({
     [
       files,
       isLoading,
-      isFetching,
       error,
+      isDropzoneVisible,
       handleView,
       handleDownloadFile,
       openModal,
@@ -193,14 +202,7 @@ export function FileManager({
       </header>
 
       <FileManagerDropzone
-        isVisible={
-          !isAdmin &&
-          !debouncedSearchTerm &&
-          files.length === 0 &&
-          !error &&
-          !isLoading &&
-          !isFetching
-        }
+        isVisible={isDropzoneVisible}
       />
 
       <FileManagerContent

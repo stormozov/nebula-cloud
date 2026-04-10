@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
-import { fileApi, uploadFile as uploadFileToApi } from "@/entities/file";
+import { uploadFile as uploadFileToApi } from "@/entities/file";
 import {
   selectActiveUpload,
   updateProgress,
@@ -68,8 +68,6 @@ export const useFileUploadProcessor = (): void => {
             uploadedFileId: result.id,
           }),
         );
-
-        dispatch(fileApi.util.invalidateTags(["File"]));
 
         fileStorage.remove(activeUpload.id);
       } catch (err) {

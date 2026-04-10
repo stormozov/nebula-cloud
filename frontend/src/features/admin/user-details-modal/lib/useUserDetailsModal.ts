@@ -31,11 +31,14 @@ export function useUserDetailsModal({
   onUserDeleted,
   isConfirmOpen = false,
 }: UseUserDetailsModalProps) {
+  const currentUser = useAppSelector(selectUser);
+
   const [action, setAction] = useState<UserDetailsModalActionsType>("none");
 
-  const currentUser = useAppSelector(selectUser);
-  const { data: user, isLoading } = useGetUserQuery(userId, { skip: !userId });
-  const { data: storageStats } = useGetStorageStatsQuery(userId, {
+  const { data: user, isLoading } = useGetUserQuery(userId || 0, {
+    skip: !userId,
+  });
+  const { data: storageStats } = useGetStorageStatsQuery(userId || 0, {
     skip: !userId,
   });
 
@@ -52,7 +55,7 @@ export function useUserDetailsModal({
       if (close) handleCloseWithAnimation();
       if (message) console.log(message);
     },
-    [handleInlineFormClose, handleCloseWithAnimation, onUserDeleted, user],
+    [handleInlineFormClose, user, onUserDeleted, handleCloseWithAnimation],
   );
 
   if (!user) return {};
