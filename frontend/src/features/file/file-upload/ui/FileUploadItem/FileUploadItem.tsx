@@ -100,15 +100,12 @@ export function FileUploadItem({
       {/* Progress Bar (only for uploading/pending) */}
       {(status === "uploading" || status === "pending") && (
         <div className="file-upload-item__progress">
-          <div
-            className="file-upload-item__progress-bar"
-            style={{ width: `${progress}%` }}
-            role="progressbar"
-            aria-valuenow={progress}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-label={`Прогресс загрузки: ${progress}%`}
-          />
+          <div className="file-upload-item__progress-bar">
+            <div
+              className="file-upload-item__progress-fill"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
           {status === "uploading" && (
             <span className="file-upload-item__progress-text">{progress}%</span>
           )}

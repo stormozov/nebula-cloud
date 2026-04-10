@@ -54,7 +54,7 @@ export const fileUploadSlice = createSlice({
       const ids = uploadIds || files.map(() => crypto.randomUUID());
 
       const newUploads: IUploadFile[] = files.map((file, index) => ({
-        id: ids[index], // ← Используем ID из компонента
+        id: ids[index],
         file: {
           name: file.name,
           size: file.size,

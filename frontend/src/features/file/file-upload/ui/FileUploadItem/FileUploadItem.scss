@@ -132,30 +132,21 @@
 
   &__progress-bar {
     flex: 1;
-
     height: 6px;
-
-    background-color: var(--color-bg-tertiary);
+    background-color: var(--color-bg-primary);
     border-radius: 3px;
-
     overflow: hidden;
+  }
+
+  &__progress-fill {
+    height: 100%;
+    background-color: var(--color-primary);
+    border-radius: 3px;
     transition: width 0.3s ease;
-
-    &::after {
-      content: "";
-
-      display: block;
-
-      height: 100%;
-
-      background-color: var(--color-primary);
-      border-radius: 3px;
-    }
   }
 
   &__progress-text {
     min-width: 35px;
-
     font-size: 12px;
     font-weight: 600;
     color: var(--color-text-secondary);
@@ -247,11 +238,5 @@
         color: var(--color-error);
       }
     }
-  }
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
   }
 }
