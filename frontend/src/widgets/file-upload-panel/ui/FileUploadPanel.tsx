@@ -6,6 +6,7 @@ import {
   clearCompleted,
   type IUploadFile,
   removeFile,
+  retryUpload,
   selectCanClosePanel,
   selectIsPanelVisible,
   selectIsQueueCompleted,
@@ -54,6 +55,7 @@ export function FileUploadPanel() {
    * For failed uploads, user needs to re-select the file.
    */
   const handleRetry = (uploadId: string): void => {
+    dispatch(retryUpload({ uploadId }));
     console.warn("Retry upload:", uploadId);
   };
 

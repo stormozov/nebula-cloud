@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import { uploadFile as uploadFileToApi } from "@/entities/file";
 import {
   selectActiveUpload,
+  setNeedsReupload,
   updateProgress,
   updateStatus,
 } from "@/entities/file-upload";
@@ -47,6 +48,7 @@ export const useFileUploadProcessor = (): void => {
           error: "Файл не найден в памяти",
         }),
       );
+      dispatch(setNeedsReupload({ uploadId: activeUpload.id }));
       processedUploads.current.delete(activeUpload.id);
       return;
     }

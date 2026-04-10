@@ -3,7 +3,8 @@
 // =============================================================================
 
 .file-upload-item {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 12px;
 
@@ -30,11 +31,11 @@
 
   &--uploading {
     background-color: var(--color-primary-light);
-    border-color: var(--color-primary-light-border);
+    border-color: var(--color-primary-light);
     border-left: 3px solid var(--color-primary);
 
     .file-upload-item__action-btn {
-      border-color: var(--color-primary-light-border);
+      border-color: var(--color-error-light-border);
     }
   }
 
@@ -66,13 +67,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
-
-    width: 32px;
-    height: 32px;
+    grid-row: span 2;
 
     font-size: 18px;
-    font-weight: bold;
   }
 
   &__icon--uploading {
@@ -94,10 +91,6 @@
     font-size: 14px;
     font-weight: 500;
     color: var(--color-text-primary);
-    text-overflow: ellipsis;
-    white-space: nowrap;
-
-    overflow: hidden;
   }
 
   &__meta {
@@ -125,9 +118,10 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    flex-shrink: 0;
+    grid-row: 2;
+    grid-column: 2;
 
-    width: 150px;
+    width: 100%;
   }
 
   &__progress-bar {
@@ -158,10 +152,8 @@
   // ---------------------------------------------------------------------------
 
   &__error {
-    flex-basis: 100%;
-
-    padding: 4px 8px;
-    margin-top: 4px;
+    grid-row: 2;
+    grid-column: 2;
 
     background-color: var(--color-error-light);
     border-radius: 4px;
@@ -176,9 +168,12 @@
 
   &__actions {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 4px;
-    flex-shrink: 0;
+    justify-content: center;
+    gap: 6px;
+    grid-row: span 2;
+    grid-column: 3;
   }
 
   &__action-btn {

@@ -1,6 +1,6 @@
 import fileUploadConfig from "@/shared/configs/file-upload.json";
 import { Button, Icon } from "@/shared/ui";
-import { formatFileSize } from "@/shared/utils";
+import { formatFileSize, truncateWithMiddleEllipsis } from "@/shared/utils";
 
 import type { IFileUploadItemProps } from "../../lib/types";
 
@@ -32,6 +32,10 @@ export function FileUploadItem({
   const formattedSize = formatFileSize(fileSize, 0);
 
   const STATUS_LABELS: Record<string, string> = fileUploadConfig.status_labels;
+
+  // ---------------------------------------------------------------------------
+  // HANDLERS
+  // ---------------------------------------------------------------------------
 
   /**
    * Handle cancel button click.
@@ -66,28 +70,34 @@ export function FileUploadItem({
    */
   const getStatusClass = (): string => `file-upload-item--${status}`;
 
-  return (
-    <li className={`file-upload-item ${getStatusClass()}`}>
-      {/* Status Icon */}
-      <div className="file-upload-item__status">
-        {status === "pending" && (
-          <span className="file-upload-item__icon--pending">⏳</span>
-        )}
-        {status === "uploading" && (
+  // ---------------------------------------------------------------------------
+  // RENDERS
+  // ---------------------------------------------------------------------------
+
+  const renderStatusIcon = () => {
+    switch (status) {
+      case "uploading":
+        return (
           <Icon
             name="retry"
             color="primary"
             className="file-upload-item__icon--uploading"
           />
-        )}
-        {status === "success" && <Icon name="check" color="success" />}
-        {status === "error" && <Icon name="close" color="error" />}
-      </div>
+        );
+      case "success":
+        return <Icon name="check" color="success" />;
+      case "error":
+        return <Icon name="close" color="error" />;
+      default:
+        return null;
+    }
+  };
 
-      {/* File Info */}
-      <div className="file-upload-item__info">
+  const renderInfoBlock = () => {
+    return (
+      <>
         <div className="file-upload-item__name" title={fileName}>
-          {fileName}
+          {truncateWithMiddleEllipsis(fileName, 35)}
         </div>
         <div className="file-upload-item__meta">
           <span className="file-upload-item__size">{formattedSize}</span>
@@ -95,85 +105,95 @@ export function FileUploadItem({
             {getStatusLabel()}
           </span>
         </div>
-      </div>
+      </>
+    );
+  };
 
-      {/* Progress Bar (only for uploading/pending) */}
-      {(status === "uploading" || status === "pending") && (
-        <div className="file-upload-item__progress">
-          <div className="file-upload-item__progress-bar">
-            <div
-              className="file-upload-item__progress-fill"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-          {status === "uploading" && (
-            <span className="file-upload-item__progress-text">{progress}%</span>
-          )}
+  const renderProgressBar = () => {
+    if (status !== "uploading") return null;
+    return (
+      <div className="file-upload-item__progress">
+        <div className="file-upload-item__progress-bar">
+          <div
+            className="file-upload-item__progress-fill"
+            style={{ width: `${progress}%` }}
+          />
         </div>
-      )}
-
-      {/* Error Message (only for error status) */}
-      {status === "error" && error && (
-        <div className="file-upload-item__error" role="alert">
-          {error}
-        </div>
-      )}
-
-      {/* Action Buttons */}
-      <div className="file-upload-item__actions">
         {status === "uploading" && (
-          <Button
-            type="button"
-            className="file-upload-item__action-btn file-upload-item__action-btn--cancel"
-            onClick={handleCancel}
-            disabled={disabled}
-            title="Отменить загрузку"
-            aria-label="Отменить загрузку"
-          >
-            <Icon name="close" color="error" />
-          </Button>
-        )}
-
-        {status === "error" && (
-          <>
-            <Button
-              type="button"
-              className="file-upload-item__action-btn file-upload-item__action-btn--retry"
-              onClick={handleRetry}
-              disabled={disabled || needsReupload}
-              title="Повторить загрузку"
-              aria-label="Повторить загрузку"
-            >
-              <Icon name="retry" color="primary" />
-            </Button>
-            <Button
-              type="button"
-              className="file-upload-item__action-btn file-upload-item__action-btn--remove"
-              onClick={handleRemove}
-              disabled={disabled}
-              title="Удалить из списка"
-              aria-label="Удалить из списка"
-            >
-              <Icon name="trash" color="error" />
-            </Button>
-          </>
-        )}
-
-        {status === "success" && (
-          <Button
-            type="button"
-            variant="outline"
-            size="small"
-            className="file-upload-item__action-btn file-upload-item__action-btn--remove"
-            onClick={handleRemove}
-            disabled={disabled}
-            title="Удалить из списка"
-            aria-label="Удалить из списка"
-          >
-            <Icon name="trash" color="error" />
-          </Button>
+          <span className="file-upload-item__progress-text">{progress}%</span>
         )}
       </div>
+    );
+  };
+
+  const renderError = () => {
+    if (status !== "error") return null;
+    return (
+      <div className="file-upload-item__error" role="alert">
+        {error}
+      </div>
+    );
+  };
+
+  const renderRemoveButton = () => {
+    return (
+      <Button
+        type="button"
+        variant="outline"
+        size="small"
+        className="file-upload-item__action-btn file-upload-item__action-btn--remove"
+        onClick={handleRemove}
+        disabled={disabled}
+        title="Удалить из списка"
+        aria-label="Удалить из списка"
+      >
+        <Icon name="trash" color="error" />
+      </Button>
+    );
+  };
+
+  const renderActionButtons = () => {
+    if (status === "uploading") {
+      return (
+        <Button
+          type="button"
+          className="file-upload-item__action-btn file-upload-item__action-btn--cancel"
+          onClick={handleCancel}
+          disabled={disabled}
+          title="Отменить загрузку"
+          aria-label="Отменить загрузку"
+        >
+          <Icon name="close" color="error" />
+        </Button>
+      );
+    }
+    if (status === "error") {
+      return (
+        <>
+          <Button
+            type="button"
+            className="file-upload-item__action-btn file-upload-item__action-btn--retry"
+            onClick={handleRetry}
+            disabled={disabled || needsReupload}
+            title="Повторить загрузку"
+            aria-label="Повторить загрузку"
+          >
+            <Icon name="retry" color="primary" />
+          </Button>
+          {renderRemoveButton()}
+        </>
+      );
+    }
+    if (status === "success") return renderRemoveButton();
+  };
+
+  return (
+    <li className={`file-upload-item ${getStatusClass()}`}>
+      <div className="file-upload-item__status">{renderStatusIcon()}</div>
+      <div className="file-upload-item__info">{renderInfoBlock()}</div>
+      {renderProgressBar()}
+      {renderError()}
+      <div className="file-upload-item__actions">{renderActionButtons()}</div>
     </li>
   );
 }
