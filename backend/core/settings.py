@@ -19,6 +19,7 @@ from pathlib import Path
 import environ
 
 from core.logging_config import get_logging_config
+from core.utils import get_flat_allowed_extensions
 
 # Build paths inside the project
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -216,35 +217,9 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 # File upload settings
 MAX_UPLOAD_SIZE = 100 * 1024 * 1024  # 100 MB
-ALLOWED_FILE_EXTENSIONS = [
-    "pdf",
-    "doc",
-    "docx",
-    "xls",
-    "xlsx",
-    "ppt",
-    "pptx",
-    "jpg",
-    "jpeg",
-    "png",
-    "gif",
-    "bmp",
-    "svg",
-    "txt",
-    "rtf",
-    "csv",
-    "mp3",
-    "wav",
-    "mp4",
-    "avi",
-    "mov",
-    "mkv",
-    "zip",
-    "rar",
-    "7z",
-    "tar",
-    "gz",
-]
+ALLOWED_FILE_EXTENSIONS = get_flat_allowed_extensions(
+    BASE_DIR / "core" / "configs" / "file-extensions.json"
+)
 
 # Storage settings
 STORAGE_BASE_PATH = os.getenv("STORAGE_BASE_PATH", "storage")

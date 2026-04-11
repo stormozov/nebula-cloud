@@ -2,6 +2,9 @@
 Common utility functions for Django applications.
 """
 
+import json
+from pathlib import Path
+
 PUBLIC_URL_LEN = 21
 
 # ==================================================================================================
@@ -37,3 +40,10 @@ def format_size(size_bytes: int) -> str:
         for i, unit in enumerate(units)
         if (size_bytes < 1024 ** (i + 1)) or (i == len(units) - 1)
     )
+
+
+def get_flat_allowed_extensions(file_path: Path) -> set[str]:
+    """Reads a JSON file and returns a set of all allowed file extensions."""
+    with open(file_path, encoding="utf-8") as f:
+        data = json.load(f)
+    return {ext for extensions in data.values() for ext in extensions}
