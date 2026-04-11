@@ -149,7 +149,16 @@ export function DropdownMenu<T>(props: IDropdownMenuProps<T>) {
   return (
     <div className="dropdown-menu">
       <div ref={triggerRef} className="dropdown-menu__trigger-wrapper">
-        <Button {...triggerButtonProps} onClick={toggle} />
+        <Button
+          {...triggerButtonProps}
+          onClick={toggle}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.stopPropagation();
+            }
+            triggerButtonProps?.onKeyDown?.(e);
+          }}
+        />
       </div>
       {renderMenu()}
     </div>

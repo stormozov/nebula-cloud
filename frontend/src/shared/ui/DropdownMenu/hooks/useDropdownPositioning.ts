@@ -55,17 +55,26 @@ export function useDropdownPositioning({
       const margin = 8;
 
       if (position) {
+        // Fixed positioning: viewport coords (clientX/Y), viewport clamps only
         let left = position.x;
         let top = position.y;
 
-        // Horizontal correction
-        if (left + menuWidth > viewportWidth)
+        // Horizontal: clamp to viewport edges
+        if (left + menuWidth > viewportWidth - margin) {
           left = viewportWidth - menuWidth - margin;
+        }
         if (left < margin) left = margin;
 
-        // Vertical correction
-        if (top + menuHeight > viewportHeight)
-          top = viewportHeight - menuHeight - margin;
+        // Vertical: soft flip only if really no space (90% viewport used)
+        const spaceBelow = viewportHeight - position.y;
+        if (spaceBelow < menuHeight * 0.8) {
+          const spaceAbove = position.y;
+          if (spaceAbove > menuHeight) {
+            top = position.y - menuHeight; // Flip up
+          } else if (spaceBelow < menuHeight * 0.3) {
+            top = viewportHeight - menuHeight - margin; // Bottom clamp only if very tight
+          }
+        }
         if (top < margin) top = margin;
 
         setMenuStyle({
@@ -195,13 +204,18 @@ export function useDropdownPositioning({
       if (isOpen) tryCompute();
     };
     window.addEventListener("resize", handleWindowChange);
-    window.addEventListener("scroll", handleWindowChange);
+    // NO scroll listener for position mode - keeps stable at click position
+    if (!position) {
+      window.addEventListener("scroll", handleWindowChange);
+    }
 
     return () => {
       if (rafId) cancelAnimationFrame(rafId);
       if (resizeObserver) resizeObserver.disconnect();
       window.removeEventListener("resize", handleWindowChange);
-      window.removeEventListener("scroll", handleWindowChange);
+      if (!position) {
+        window.removeEventListener("scroll", handleWindowChange);
+      }
     };
   }, [isOpen, position, placement, triggerRef, menuRef]);
 

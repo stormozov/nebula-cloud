@@ -31,8 +31,10 @@ export function useDropdownKeyboard<T>({
   // Reset focus when menu opens/closes
   useEffect(() => {
     if (isOpen) {
-      setTimeout(() => setFocusedIndex(0), 0);
-      actionRefs.current[0]?.focus();
+      setTimeout(() => {
+        setFocusedIndex(0);
+        actionRefs.current[0]?.focus({ preventScroll: true });
+      }, 0);
     } else {
       setTimeout(() => setFocusedIndex(-1), 0);
     }
