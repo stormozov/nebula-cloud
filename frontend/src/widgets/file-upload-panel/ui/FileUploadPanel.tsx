@@ -1,22 +1,10 @@
 import classNames from "classnames";
 
-import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
-import {
-  cancelUpload,
-  clearCompleted,
-  type IUploadFile,
-  removeFile,
-  retryUpload,
-  selectCanClosePanel,
-  selectIsPanelVisible,
-  selectIsQueueCompleted,
-  selectUploadQueue,
-  selectUploadStats,
-  setPanelVisible,
-} from "@/entities/file-upload";
+import type { IUploadFile } from "@/entities/file-upload";
 import { FileUploadItem } from "@/features/file/file-upload";
-import { useAnimatedClose } from "@/shared/hooks";
 import { Button, Icon } from "@/shared/ui";
+
+import { useFileUploadPanel } from "../lib/useFileUploadPanel";
 
 import "./FileUploadPanel.scss";
 
@@ -27,37 +15,18 @@ import "./FileUploadPanel.scss";
  * Positioned in bottom-right corner, appears automatically when uploads start.
  */
 export function FileUploadPanel() {
-  const dispatch = useAppDispatch();
-  const queue = useAppSelector(selectUploadQueue);
-  const isPanelVisible = useAppSelector(selectIsPanelVisible);
-  const isQueueCompleted = useAppSelector(selectIsQueueCompleted);
-  const canClosePanel = useAppSelector(selectCanClosePanel);
-  const stats = useAppSelector(selectUploadStats);
-
-  const { isClosing, handleCloseWithAnimation } = useAnimatedClose({
-    onClose: () => {
-      dispatch(setPanelVisible(false));
-      dispatch(clearCompleted());
-    },
-    isBlocked: !canClosePanel,
-    animationDuration: 300,
-  });
-
-  /**
-   * Handle cancel upload button click.
-   */
-  const handleCancel = (uploadId: string): void => {
-    dispatch(cancelUpload({ uploadId }));
-  };
-
-  const handleRetry = (uploadId: string): void => {
-    dispatch(retryUpload({ uploadId }));
-    console.warn("Retry upload:", uploadId);
-  };
-
-  const handleRemove = (uploadId: string): void => {
-    dispatch(removeFile({ uploadId }));
-  };
+  const {
+    queue,
+    isPanelVisible,
+    isQueueCompleted,
+    stats,
+    isClosing,
+    canClosePanel,
+    handleCloseWithAnimation,
+    handleCancel,
+    handleRetry,
+    handleRemove,
+  } = useFileUploadPanel();
 
   const {
     success: completedCount,
@@ -65,25 +34,22 @@ export function FileUploadPanel() {
     uploading: uploadingCount,
   } = stats;
 
-  /**
-   * Get panel title based on queue state.
-   */
   const getPanelTitle = (): string => {
     if (uploadingCount > 0) return `Загрузка (${uploadingCount})`;
     if (isQueueCompleted) return `Готово (${completedCount}/${queue.length})`;
     return `Файлы (${queue.length})`;
   };
 
+  const panelClasses = classNames("file-upload-panel", {
+    "file-upload-panel--visible": isPanelVisible,
+    "file-upload-panel--closing": isClosing,
+  });
+
   // Don't render if panel is hidden and queue is empty
   if (!isPanelVisible && queue.length === 0 && !isClosing) return null;
 
   return (
-    <div
-      className={classNames("file-upload-panel", {
-        "file-upload-panel--visible": isPanelVisible,
-        "file-upload-panel--closing": isClosing,
-      })}
-    >
+    <div className={panelClasses}>
       {/* Header */}
       <header className="file-upload-panel__header">
         <div className="file-upload-panel__title">
@@ -94,6 +60,7 @@ export function FileUploadPanel() {
           type="button"
           variant="ghost"
           className="file-upload-panel__close-btn"
+          icon={{ name: "close" }}
           onClick={handleCloseWithAnimation}
           disabled={!canClosePanel}
           title={
@@ -102,9 +69,7 @@ export function FileUploadPanel() {
               : "Нельзя закрыть во время загрузки"
           }
           aria-label="Закрыть панель загрузок"
-        >
-          ✕
-        </Button>
+        />
       </header>
 
       {/* Upload Queue List */}
