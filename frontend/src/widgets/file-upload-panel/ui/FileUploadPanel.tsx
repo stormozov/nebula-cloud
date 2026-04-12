@@ -1,4 +1,6 @@
 import classNames from "classnames";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
 
 import type { IUploadFile } from "@/entities/file-upload";
 import { FileUploadItem } from "@/features/file/file-upload";
@@ -33,6 +35,10 @@ export function FileUploadPanel() {
     error: failedCount,
     uploading: uploadingCount,
   } = stats;
+
+  useEffect(() => {
+    if (isQueueCompleted) toast.success("Файлы успешно загружены");
+  }, [isQueueCompleted]);
 
   const getPanelTitle = (): string => {
     if (uploadingCount > 0) return `Загрузка (${uploadingCount})`;
@@ -106,10 +112,10 @@ export function FileUploadPanel() {
             type="button"
             variant="outline"
             size="small"
+            icon={{ name: "trash" }}
             className="file-upload-panel__clear-btn"
             onClick={handleCloseWithAnimation}
           >
-            <Icon name="trash" />
             Очистить
           </Button>
         </footer>

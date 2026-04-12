@@ -1,3 +1,5 @@
+import { toast } from "react-toastify";
+
 import { useUpdateUserMutation } from "@/entities/user";
 import { Button, type ModalConfirmDialogRequest } from "@/shared/ui";
 
@@ -24,7 +26,6 @@ interface ToggleActiveButtonProps {
  *   onSuccess={() => console.log("Status updated")}
  * />
  */
-
 export function ToggleActiveButton({
   userId,
   isActive,
@@ -46,8 +47,11 @@ export function ToggleActiveButton({
             data: { isActive: !isActive },
           }).unwrap();
           onSuccess?.();
-        } catch (err) {
-          console.error("Failed to toggle active status:", err);
+          toast.success(`Статус пользователя ${userId} успешно изменен`, {
+            position: "top-center",
+          });
+        } catch {
+          toast.error("Не удалось изменить статус пользователя");
         }
       },
     );

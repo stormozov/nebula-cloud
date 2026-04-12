@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 import {
   type UserDetailsResponse,
@@ -86,6 +87,9 @@ export const useEditUserForm = ({
     try {
       await updateUser({ id: user.id, data: changedFields }).unwrap();
       onSuccess?.();
+      toast.success(`Данные пользователя ${user.id} успешно обновлены`, {
+        position: "top-center",
+      });
     } catch (err) {
       console.error("Failed to update user:", err);
     }

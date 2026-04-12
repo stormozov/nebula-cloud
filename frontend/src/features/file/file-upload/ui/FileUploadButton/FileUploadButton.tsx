@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import { useCallback, useRef } from "react";
+import { toast } from "react-toastify";
 
 import { useAppDispatch } from "@/app/store/hooks";
 import { addFiles, generateUploadId } from "@/entities/file-upload";
@@ -62,16 +63,9 @@ export function FileUploadButton({
       const validationResult = validateFileBatch(fileArray);
 
       if (validationResult.invalidFiles.length > 0) {
-        validationResult.invalidFiles.forEach(({ file, error }) => {
-          console.error(`❌ Файл "${file.name}": ${error}`);
+        validationResult.invalidFiles.forEach(({ error }) => {
+          toast.error(`${error}`);
         });
-
-        if (validationResult.validFiles.length > 0) {
-          console.warn(
-            `📦 Загружаются ${validationResult.validFiles.length}`,
-            `из ${fileArray.length} файлов`,
-          );
-        }
       }
 
       if (validationResult.validFiles.length === 0) {

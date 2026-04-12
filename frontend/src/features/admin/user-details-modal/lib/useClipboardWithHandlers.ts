@@ -1,3 +1,5 @@
+import { toast } from "react-toastify";
+
 import { copyToClipboard } from "@/shared/utils";
 
 /**
@@ -23,15 +25,18 @@ export const useClipboardWithHandlers =
         const success = await copyToClipboard(copyValue);
 
         if (success) {
-          console.log(
-            `✔ Поле "${title}" со значением "${copyValue}"`,
-            "скопировано в буфер обмена",
+          toast.success(
+            `Поле "${title}" со значением "${copyValue}" 
+            скопировано в буфер обмена`,
+            {
+              autoClose: 2000,
+            },
           );
         } else {
-          console.warn(`⚠️ Не удалось скопировать поле "${title}"`);
+          toast.warning(`Не удалось скопировать поле "${title}"`);
         }
       } else {
-        console.warn(`⚠️ Поле "${title}" не содержит текста для копирования`);
+        toast.warning(`Поле "${title}" не содержит текста для копирования`);
       }
     };
 
@@ -45,9 +50,11 @@ export const useClipboardWithHandlers =
       const success = await copyToClipboard(combined);
 
       if (success) {
-        console.log(`✔ Блок "${blockTitle}" скопирован в буфер обмена`);
+        toast.success(`Блок "${blockTitle}" скопирован в буфер обмена`, {
+          autoClose: 2000,
+        });
       } else {
-        console.warn(`⚠️ Не удалось скопировать блок "${blockTitle}"`);
+        toast.warning(`Не удалось скопировать блок "${blockTitle}"`);
       }
     };
 

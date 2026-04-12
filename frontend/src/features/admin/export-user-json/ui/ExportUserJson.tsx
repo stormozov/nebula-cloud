@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import { toast } from "react-toastify";
 
 import { useExportUserDataMutation } from "@/entities/user";
 import { Button, type IButtonProps } from "@/shared/ui";
@@ -28,11 +29,16 @@ export function ExportUserJson({
   const [exportUserData, { isLoading }] = useExportUserDataMutation();
 
   const handleExportUserData = async () => {
-    const response = await exportUserData(userId).unwrap();
-    const blob = new Blob([JSON.stringify(response, null, 2)], {
-      type: "application/json",
-    });
-    downloadFile(blob, `user_${userId}_data.json`);
+    try {
+      const response = await exportUserData(userId).unwrap();
+      const blob = new Blob([JSON.stringify(response, null, 2)], {
+        type: "application/json",
+      });
+      downloadFile(blob, `user_${userId}_data.json`);
+      toast.info("Данные в формате JSON подготовлены к экспорту");
+    } catch {
+      toast.error("Ошибка при экспорте данных пользователя");
+    }
   };
 
   return (

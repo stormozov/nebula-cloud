@@ -1,3 +1,5 @@
+import { toast } from "react-toastify";
+
 import { useToggleAdminMutation } from "@/entities/user";
 import { Button, type ModalConfirmDialogRequest } from "@/shared/ui";
 
@@ -42,8 +44,14 @@ export function ToggleAdminButton({
         try {
           await toggleAdmin({ id: userId, isStaff: !isStaff }).unwrap();
           onSuccess?.();
-        } catch (err) {
-          console.error("Failed to toggle admin status:", err);
+          toast.success(
+            `Роль администратора пользователя ${userId} успешно изменена`,
+            {
+              position: "top-center",
+            }
+          );
+        } catch {
+          toast.error("Не удалось изменить роль администратора");
         }
       },
     );

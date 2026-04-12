@@ -79,7 +79,6 @@ export function RenameFileModal({
 
     setValidationError(null);
     await onSubmit(newFileName.trim());
-    // Modal closes after successful submission (handled by parent)
   };
 
   const handleKeyDown = (

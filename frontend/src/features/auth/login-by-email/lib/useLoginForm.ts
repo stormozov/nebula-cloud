@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { toast } from "react-toastify";
 
 import { useLoginMutation } from "@/entities/user";
 import { hasFieldErrors, parseDjangoApiErrors } from "@/shared/api";
@@ -116,6 +117,10 @@ export const useLoginForm = ({
       try {
         await login(formData).unwrap();
         onSuccess?.();
+        toast.success("Вы успешно вошли в систему", {
+          position: "bottom-center",
+          autoClose: 2000,
+        });
       } catch (error: unknown) {
         let submitError: string | undefined;
 

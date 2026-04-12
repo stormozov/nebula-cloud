@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+import { toast } from "react-toastify";
 
 import type { IFile, IFileRename } from "@/entities/file";
 import {
@@ -86,8 +87,9 @@ export const useFileManagerActions = ({
       resetPagination();
       await deleteFile(selectedFile.id).unwrap();
       closeModal("delete");
-    } catch (err) {
-      console.error("Failed to delete file:", err);
+      toast.success("Файл успешно удален");
+    } catch {
+      toast.error("Не удалось удалить файл");
     }
   }, [selectedFile, deleteFile, closeModal, resetPagination]);
 
@@ -100,8 +102,9 @@ export const useFileManagerActions = ({
           data: camelToSnake({ original_name: newName }) as IFileRename,
         }).unwrap();
         closeModal("rename");
-      } catch (err) {
-        console.error("Failed to rename file:", err);
+        toast.success("Файл успешно переименован");
+      } catch {
+        toast.error("Не удалось переименовать файл");
       }
     },
     [selectedFile, renameFile, closeModal],
@@ -116,8 +119,9 @@ export const useFileManagerActions = ({
           data: { comment: newComment },
         }).unwrap();
         closeModal("comment");
-      } catch (err) {
-        console.error("Failed to update comment:", err);
+        toast.success("Комментарий успешно обновлен");
+      } catch {
+        toast.error("Не удалось обновить комментарии");
       }
     },
     [selectedFile, updateComment, closeModal],
@@ -126,8 +130,9 @@ export const useFileManagerActions = ({
   const handleDownloadFile = useCallback(async (file: IFile): Promise<void> => {
     try {
       await downloadFileFromApi(file.id, file.originalName);
-    } catch (err) {
-      console.error("Download failed:", err);
+      toast.info("Началось скачивание файла");
+    } catch {
+      toast.error("Не удалось скачать файл");
     }
   }, []);
 
@@ -135,8 +140,8 @@ export const useFileManagerActions = ({
     if (!selectedFile) return;
     try {
       await generatePublicLink(selectedFile.id).unwrap();
-    } catch (err) {
-      console.error("Failed to generate link:", err);
+    } catch {
+      toast.error("Не удалось сгенерировать ссылку");
     }
   }, [selectedFile, generatePublicLink]);
 
@@ -145,8 +150,9 @@ export const useFileManagerActions = ({
     try {
       await deletePublicLink(selectedFile.id).unwrap();
       closeModal("link");
-    } catch (err) {
-      console.error("Failed to delete link:", err);
+      toast.success("Публичная ссылка успешно удалена");
+    } catch {
+      toast.error("Не удалось удалить публичную ссылку");
     }
   }, [selectedFile, deletePublicLink, closeModal]);
 
@@ -154,9 +160,9 @@ export const useFileManagerActions = ({
     async (url: string): Promise<void> => {
       try {
         await navigator.clipboard.writeText(url);
-      } catch (err) {
-        console.error("Failed to copy link:", err);
-        alert("Не удалось скопировать ссылку");
+        toast.success("Ссылка скопирована");
+      } catch {
+        toast.error("Не удалось скопировать ссылку");
       }
     },
     [],

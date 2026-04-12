@@ -77,7 +77,6 @@ export function EditCommentModal({
 
     setValidationError(null);
     await onSubmit(comment.trim());
-    // Modal closes after successful submission (handled by parent)
   };
 
   const handleInputChange = (value: string): void => {
