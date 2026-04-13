@@ -1,24 +1,15 @@
-import { Heading, Logo, Navigation, PageLayout } from "@/shared/ui";
+import { Heading, PageLayout } from "@/shared/ui";
 import { UserManagementWidget } from "@/widgets/admin-user-manager";
-import { UserProfileMenu } from "@/widgets/user-profile-menu";
 
 import "./PageAdminDashboard.scss";
 
 /**
- * The main dashboard page component for administrators.
+ * The main administration dashboard page component.
  */
 export default function PageAdminDashboard() {
   return (
     <PageLayout className="page-admin-dashboard">
-      <PageLayout.Header>
-        <PageLayout.Container>
-          <PageLayout.Wrapper align="center" justify="space-between">
-            <Logo />
-            <Navigation />
-            <UserProfileMenu />
-          </PageLayout.Wrapper>
-        </PageLayout.Container>
-      </PageLayout.Header>
+      <PageLayout.Header />
       <PageLayout.Main className="page-admin-dashboard__main">
         <PageLayout.Container>
           <PageLayout.Wrapper

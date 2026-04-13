@@ -1,28 +1,22 @@
-import { LogoutButton } from "@/features/auth";
 import { useGlobalDragDrop } from "@/features/file/file-upload";
-import { Logo, Navigation, PageLayout } from "@/shared/ui";
-
-import "./PageClientDisk.scss";
+import { PageLayout } from "@/shared/ui";
 import { FileManager } from "@/widgets/file-manager";
 
+import "./PageClientDisk.scss";
+
 /**
- * Page client disk component.
+ * The main client disk page component.
+ *
+ * This component serves as the entry point for the client's disk interface,
+ * enabling drag-and-drop functionality across the page and rendering the file
+ * manager within a structured layout.
  */
 export default function PageClientDisk() {
   useGlobalDragDrop({ comment: "Загружено через глобальный D&D" });
 
   return (
     <PageLayout className="page-client-disk">
-      <PageLayout.Header>
-        <PageLayout.Container>
-          <PageLayout.Wrapper align="center" justify="space-between">
-            <Logo />
-            <Navigation />
-            <LogoutButton variant="secondary" />
-          </PageLayout.Wrapper>
-        </PageLayout.Container>
-      </PageLayout.Header>
-
+      <PageLayout.Header />
       <PageLayout.Main className="page-client-disk__main">
         <PageLayout.Container>
           <FileManager />
