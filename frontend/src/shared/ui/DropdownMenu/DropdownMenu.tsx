@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { useRef } from "react";
+import { cloneElement, useRef } from "react";
 import { createPortal } from "react-dom";
 
 import { Button, Icon } from "@/shared/ui";
@@ -42,6 +42,7 @@ import "./DropdownMenu.scss";
  */
 export function DropdownMenu<T>(props: IDropdownMenuProps<T>) {
   const {
+    trigger,
     triggerButtonProps,
     actions,
     item,
@@ -120,6 +121,9 @@ export function DropdownMenu<T>(props: IDropdownMenuProps<T>) {
                 "dropdown-menu__item--disabled": disabled,
               })}
               role="menuitem"
+              title={action.arialLabel}
+              aria-label={action.arialLabel}
+              aria-disabled={disabled}
               disabled={disabled}
               onClick={() => {
                 handleSelectAction(action);
@@ -142,25 +146,63 @@ export function DropdownMenu<T>(props: IDropdownMenuProps<T>) {
     );
   };
 
-  // Context menu mode only (without a trigger)
-  if (!triggerButtonProps) return renderMenu();
+  // 1. Context menu (without trigger)
+  if (!trigger && !triggerButtonProps) return renderMenu();
 
-  // Trigger mode
-  return (
-    <div className="dropdown-menu">
-      <div ref={triggerRef} className="dropdown-menu__trigger-wrapper">
-        <Button
-          {...triggerButtonProps}
-          onClick={toggle}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.stopPropagation();
-            }
-            triggerButtonProps?.onKeyDown?.(e);
-          }}
-        />
+  // 2. Trigger via custom ReactElement
+  if (trigger) {
+    const triggerElement = trigger as React.ReactElement<{
+      onClick?: React.MouseEventHandler;
+      onKeyDown?: React.KeyboardEventHandler;
+      "aria-haspopup"?: boolean;
+      "aria-expanded"?: boolean;
+    }>;
+
+    const triggerWithHandlers = cloneElement(triggerElement, {
+      onClick: toggle,
+      onKeyDown: (e: React.KeyboardEvent) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          toggle();
+        }
+        if (typeof triggerElement.props.onKeyDown === "function") {
+          triggerElement.props.onKeyDown(e);
+        }
+      },
+      "aria-haspopup": true,
+      "aria-expanded": isOpen,
+    });
+
+    return (
+      <div className="dropdown-menu">
+        <div ref={triggerRef} className="dropdown-menu__trigger-wrapper">
+          {triggerWithHandlers}
+        </div>
+        {renderMenu()}
       </div>
-      {renderMenu()}
-    </div>
-  );
+    );
+  }
+
+  // 3. Trigger via triggerButtonProps (standard button)
+  if (triggerButtonProps) {
+    return (
+      <div className="dropdown-menu">
+        <div ref={triggerRef} className="dropdown-menu__trigger-wrapper">
+          <Button
+            {...triggerButtonProps}
+            onClick={toggle}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.stopPropagation();
+              }
+              triggerButtonProps.onKeyDown?.(e);
+            }}
+          />
+        </div>
+        {renderMenu()}
+      </div>
+    );
+  }
+
+  return null;
 }

@@ -1,3 +1,4 @@
+import type { ReactElement } from "react";
 import type { Button, IconName } from "@/shared/ui";
 
 /**
@@ -8,6 +9,8 @@ export interface IDropdownMenuActionItem<T> {
   id: string;
   /** Label to display */
   label: string;
+  /** Alternative label for screen readers */
+  arialLabel?: string;
   /** Optional icon */
   icon?: IconName;
   /** Is the action destructive? */
@@ -28,6 +31,8 @@ export type DropdownMenuActionItemPlacement =
   | "top-end";
 
 export interface IDropdownMenuProps<T> {
+  /** The trigger element. */
+  trigger?: ReactElement;
   /**
    * Props for the trigger button. The button will be rendered inside a wrapper
    * that handles positioning reference. Do not provide `onClick` – it will be

@@ -4,6 +4,7 @@ export * from "./file/copy-to-clipboard";
 export * from "./file/download-file";
 export * from "./file/file-extension-utils";
 export * from "./file/file-format";
+export * from "./getInitials";
 export * from "./getPersistedAuthState";
 export * from "./getScrollbarWidth";
 export * from "./isFormValid";

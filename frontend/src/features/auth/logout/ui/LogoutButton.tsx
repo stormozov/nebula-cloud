@@ -1,9 +1,7 @@
-import { useNavigate } from "react-router";
-import { toast } from "react-toastify";
-
-import { useLogoutMutation } from "@/entities/user";
 import type { IButtonProps } from "@/shared/ui";
 import { Button } from "@/shared/ui";
+
+import { useLogout } from "../lib/useLogout";
 
 import "./LogoutButton.scss";
 
@@ -25,22 +23,7 @@ export function LogoutButton({
   className,
   ...restProps
 }: IButtonProps) {
-  const navigate = useNavigate();
-  const [logout, { isLoading }] = useLogoutMutation();
-
-  const handleClick = async (): Promise<void> => {
-    try {
-      await logout().unwrap();
-      toast.info("Вы вышли из аккаунта", {
-        position: "bottom-center",
-        autoClose: 2000,
-        theme: "light",
-      });
-      navigate("/", { replace: true });
-    } catch {
-      navigate("/", { replace: true });
-    }
-  };
+  const { logout, isLoading } = useLogout();
 
   return (
     <Button
@@ -51,7 +34,7 @@ export function LogoutButton({
       fullWidth={fullWidth}
       loading={isLoading}
       className={`logout-button ${className || ""}`}
-      onClick={handleClick}
+      onClick={logout}
       {...restProps}
     >
       Выход
