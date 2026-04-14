@@ -37,6 +37,7 @@ import {
 } from "react-icons/md";
 import { PiPasswordBold, PiWarningDiamondFill } from "react-icons/pi";
 import { RiAdminFill } from "react-icons/ri";
+import { TbError404 } from "react-icons/tb";
 
 import CloudBadIcon from "@/assets/images/icons/CloudBadIcon.svg?react";
 import CloudLoadingIcon from "@/assets/images/icons/CloudLoadingIcon.svg?react";
@@ -85,6 +86,7 @@ export const ICONS = {
   cloudBad: createIconAdapter(CloudBadIcon),
   cloudWarning: createIconAdapter(CloudWarningIcon),
   cloudLoading: createIconAdapter(CloudLoadingIcon),
+  notFound: TbError404,
 
   // ========== User & Admin ==========
   person: FaUser,
