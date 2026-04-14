@@ -79,6 +79,21 @@
     }
   }
 
+  &__loading-state,
+  &__error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 auto;
+
+    height: 100%;
+  }
+
+  &__error-text {
+    color: var(--color-text-secondary);
+  }
+
   &__content {
     flex: 1 1 auto;
     padding-right: 10px;

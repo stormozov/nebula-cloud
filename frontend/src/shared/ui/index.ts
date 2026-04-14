@@ -17,4 +17,5 @@ export * from "./Modal";
 export * from "./ModalConfirm";
 export * from "./Navigation";
 export * from "./PageLoader";
+export * from "./Spinner";
 export * from "./StatusBadge";

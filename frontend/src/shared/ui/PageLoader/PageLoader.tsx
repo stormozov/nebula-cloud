@@ -1,12 +1,6 @@
-import "./PageLoader.scss";
+import { Spinner } from "../Spinner";
 
-/**
- * Props interface for the PageLoader component.
- */
-interface IPageLoaderProps {
-  /** Optional text to display below the loading spinner. */
-  text?: string;
-}
+import "./PageLoader.scss";
 
 /**
  * A loading indicator component that displays a spinner and optional loading
@@ -15,11 +9,10 @@ interface IPageLoaderProps {
  * Used to indicate that a page or section is currently loading.
  * The component renders a spinner and, if specified, a text message below it.
  */
-export function PageLoader({ text = "Загрузка..." }: IPageLoaderProps) {
+export function PageLoader() {
   return (
     <div className="page-loader">
-      <div className="page-loader__spinner" />
-      {text && <p className="page-loader__text">{text}</p>}
+      <Spinner size="xlarge" text="Загрузка..." />
     </div>
   );
 }

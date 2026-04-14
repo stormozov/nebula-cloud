@@ -58,18 +58,22 @@ export function useUserDetailsModal({
     [handleInlineFormClose, user, onUserDeleted, handleCloseWithAnimation],
   );
 
-  if (!user) return {};
+  const isCurrentUser = Boolean(
+    currentUser?.id && user?.id && currentUser.id === user.id,
+  );
 
   // Creating props for child components
-  const actionsProps = {
-    user,
-    action,
-    isCurrentUser: currentUser?.id === user?.id,
-    setAction,
-    requestConfirm,
-    onSuccess: handleActionSuccess,
-    onClose: handleInlineFormClose,
-  };
+  const actionsProps = user
+    ? {
+        user,
+        action,
+        isCurrentUser,
+        setAction,
+        requestConfirm,
+        onSuccess: handleActionSuccess,
+        onClose: handleInlineFormClose,
+      }
+    : undefined;
 
   return {
     user,
