@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useGetUsersQuery } from "@/entities/user";
 import { useUserSearch } from "@/features/admin";
 import { useBodyScrollLock } from "@/shared/hooks";
-import { useModalConfirm } from "@/shared/ui";
+import { ListSkeleton, useModalConfirm } from "@/shared/ui";
 
 import type { IUseUserManagerReturns, SelectUser } from "./types";
 
@@ -121,6 +121,9 @@ export const useUserManager = (): IUseUserManagerReturns => {
         error: usersError,
         emptyMessage: "Пользователи не найдены",
       },
+      renders: {
+        renderLoading: () => <ListSkeleton />,
+      }
     },
 
     // -- Selected user --------------------------------------------------------

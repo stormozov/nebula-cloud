@@ -1,3 +1,5 @@
+import { toast } from "react-toastify";
+
 import type { IUserListResponse, UserListItemCopyField } from "@/entities/user";
 import { copyUserField } from "@/entities/user/model/utils";
 import {
@@ -42,8 +44,8 @@ export function UserList({
     await copyUserField(
       user,
       field,
-      (message) => console.log(message),
-      () => console.log("Не удалось скопировать поле"),
+      (message) => toast.success(message, { autoClose: 1500 }),
+      () => toast.error("Не удалось скопировать поле", { autoClose: 1500 }),
     );
   };
 

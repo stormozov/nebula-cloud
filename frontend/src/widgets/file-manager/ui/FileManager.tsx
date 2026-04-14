@@ -11,6 +11,7 @@ import { PublicLinkModal } from "@/features/file/file-public-link";
 import { RenameFileModal } from "@/features/file/file-rename";
 import { useFileSearch } from "@/features/file/file-search";
 import fileListConfig from "@/shared/configs/file-list.json";
+import { ListSkeleton } from "@/shared/ui";
 import { getErrorMessage, isImageFile } from "@/shared/utils";
 
 import { useFileManagerActions } from "../lib/hooks/useFileManagerActions";
@@ -73,7 +74,7 @@ export function FileManager({
     updateSelectedFile,
   } = useFileManagerModals();
 
-const {
+  const {
     isDeleting,
     isRenaming,
     isUpdatingComment,
@@ -138,6 +139,9 @@ const {
         emptyMessage: "Нет загруженных файлов",
         hideEmptyState: isDropzoneVisible,
       },
+      renders: {
+        renderLoading: () => <ListSkeleton />,
+      },
       handlers: {
         onView: handleView,
         onDownload: handleDownloadFile,
@@ -201,9 +205,7 @@ const {
         />
       </header>
 
-      <FileManagerDropzone
-        isVisible={isDropzoneVisible}
-      />
+      <FileManagerDropzone isVisible={isDropzoneVisible} />
 
       <FileManagerContent
         hasNextPage={hasNextPage}

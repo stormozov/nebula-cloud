@@ -46,6 +46,7 @@ export function UserManagementWidget() {
       <UserList
         users={usersList.items}
         states={usersList.states}
+        renders={usersList.renders}
         onSelectUser={selected.setUserId}
       />
 
