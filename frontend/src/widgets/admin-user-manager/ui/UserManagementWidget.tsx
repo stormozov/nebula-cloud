@@ -1,10 +1,13 @@
 import { UserDetailsModal, UserList, UserSearchInput } from "@/features/admin";
-import { Button, ModalConfirm } from "@/shared/ui";
+import { Button, Heading, ModalConfirm } from "@/shared/ui";
 
 import { useUserManager } from "../lib/useUserManager";
 
 import "./UserManagementWidget.scss";
 
+/**
+ * A widget component for managing users in the admin dashboard.
+ */
 export function UserManagementWidget() {
   const {
     usersList,
@@ -18,6 +21,14 @@ export function UserManagementWidget() {
   return (
     <div className="users-management w-full">
       <header className="users-management__header">
+        <Heading level={2} noMargin className="users-management__header-title">
+          Управление пользователями
+        </Heading>
+
+        <div className="users-management__count">
+          <sup>({usersList.totalCount} пользователей)</sup>
+        </div>
+
         <UserSearchInput
           buttonProps={{
             children: "Поиск",
@@ -30,9 +41,6 @@ export function UserManagementWidget() {
             onChange: search.setTerm,
           }}
         />
-        <div className="users-management__count">
-          Всего пользователей: {usersList.totalCount}
-        </div>
       </header>
 
       <UserList
