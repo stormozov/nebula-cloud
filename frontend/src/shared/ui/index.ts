@@ -15,4 +15,5 @@ export * from "./layouts";
 export * from "./Modal";
 export * from "./ModalConfirm";
 export * from "./Navigation";
+export * from "./PageLoader";
 export * from "./StatusBadge";
