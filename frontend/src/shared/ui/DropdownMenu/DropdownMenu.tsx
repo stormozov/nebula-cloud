@@ -97,18 +97,19 @@ export function DropdownMenu<T>(props: IDropdownMenuProps<T>) {
         className="dropdown-menu__menu"
         style={menuStyle}
         role="menu"
+        tabIndex={-1}
         onKeyDown={handleKeyDown}
         onContextMenu={(e) => {
           e.stopPropagation();
           e.preventDefault();
         }}
-        tabIndex={focusedIndex}
       >
         {actions.map((action, idx) => {
           const disabled =
             typeof action.disabled === "function"
               ? action.disabled(item)
               : action.disabled;
+
           return (
             <button
               key={action.id}
@@ -125,6 +126,7 @@ export function DropdownMenu<T>(props: IDropdownMenuProps<T>) {
               aria-label={action.arialLabel}
               aria-disabled={disabled}
               disabled={disabled}
+              tabIndex={focusedIndex === idx ? 0 : -1}
               onClick={() => {
                 handleSelectAction(action);
                 close();

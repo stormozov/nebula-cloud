@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 
 import type { IDropdownMenuActionItem } from "../types";
 
@@ -6,10 +6,15 @@ import type { IDropdownMenuActionItem } from "../types";
  * Properties for the `useDropdownKeyboard` hook.
  */
 interface UseDropdownKeyboardOptions<T> {
+  /** Whether the dropdown menu is open */
   isOpen: boolean;
+  /** Dropdown menu actions */
   actions: IDropdownMenuActionItem<T>[];
+  /** Item associated with the dropdown */
   item: T;
+  /** Callback to close the dropdown */
   onClose: () => void;
+  /** Callback to handle action selection */
   onSelect: (action: IDropdownMenuActionItem<T>) => void;
 }
 
@@ -28,54 +33,115 @@ export function useDropdownKeyboard<T>({
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const actionRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  // Reset focus when menu opens/closes
-  useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => {
-        setFocusedIndex(0);
-        actionRefs.current[0]?.focus({ preventScroll: true });
-      }, 0);
-    } else {
-      setTimeout(() => setFocusedIndex(-1), 0);
+  const getFirstEnabledIndex = useCallback(() => {
+    return actions.findIndex((action) => {
+      const disabled =
+        typeof action.disabled === "function"
+          ? action.disabled(item)
+          : action.disabled;
+      return !disabled;
+    });
+  }, [actions, item]);
+
+  useLayoutEffect(() => {
+    if (!isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setFocusedIndex(-1);
+      return;
     }
-  }, [isOpen]);
+
+    const firstEnabled = getFirstEnabledIndex();
+    if (firstEnabled === -1) return; // нет активных пунктов
+
+    setFocusedIndex(firstEnabled);
+
+    const tryFocus = () => {
+      const el = actionRefs.current[firstEnabled];
+      if (el) {
+        el.focus({ preventScroll: true });
+      } else {
+        requestAnimationFrame(tryFocus);
+      }
+    };
+    requestAnimationFrame(tryFocus);
+  }, [isOpen, getFirstEnabledIndex]);
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
       if (!isOpen) return;
 
       switch (event.key) {
-        case "ArrowDown":
+        case "ArrowDown": {
           event.preventDefault();
-          setFocusedIndex((prev) => {
-            const next = (prev + 1) % actions.length;
-            actionRefs.current[next]?.focus();
-            return next;
-          });
+
+          let next = (focusedIndex + 1) % actions.length;
+          let attempts = 0;
+
+          while (attempts < actions.length) {
+            const action = actions[next];
+            const disabled =
+              typeof action.disabled === "function"
+                ? action.disabled(item)
+                : action.disabled;
+
+            if (!disabled) break;
+
+            next = (next + 1) % actions.length;
+            attempts++;
+          }
+
+          if (attempts < actions.length) {
+            setFocusedIndex(next);
+            actionRefs.current[next]?.focus({ preventScroll: true });
+          }
+
           break;
-        case "ArrowUp":
+        }
+        case "ArrowUp": {
           event.preventDefault();
-          setFocusedIndex((prev) => {
-            const next = (prev - 1 + actions.length) % actions.length;
-            actionRefs.current[next]?.focus();
-            return next;
-          });
+
+          let next = (focusedIndex - 1 + actions.length) % actions.length;
+          let attempts = 0;
+
+          while (attempts < actions.length) {
+            const action = actions[next];
+            const disabled =
+              typeof action.disabled === "function"
+                ? action.disabled(item)
+                : action.disabled;
+
+            if (!disabled) break;
+
+            next = (next - 1 + actions.length) % actions.length;
+            attempts++;
+          }
+
+          if (attempts < actions.length) {
+            setFocusedIndex(next);
+            actionRefs.current[next]?.focus({ preventScroll: true });
+          }
+
           break;
+        }
         case "Enter":
-        case " ":
+        case " ": {
           event.preventDefault();
+
           if (focusedIndex >= 0) {
             const action = actions[focusedIndex];
             const disabled =
               typeof action.disabled === "function"
                 ? action.disabled(item)
                 : action.disabled;
+
             if (!disabled) {
               onSelect(action);
               onClose();
             }
           }
+
           break;
+        }
         default:
           break;
       }
