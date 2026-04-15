@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 
 import type { IFile } from "@/entities/file";
-import type { IContextMenuState, IDropdownMenuActionItem } from "@/shared/ui";
+import type { DropdownMenuItem, IContextMenuState } from "@/shared/ui";
 
 import type { IFileHandlersProps } from "../../lib/types";
 
@@ -16,7 +16,7 @@ const initialContextMenuState: IContextMenuState = {
 interface IUseFileRowInteractionsProps {
   file: IFile;
   handlers: IFileHandlersProps;
-  actions: IDropdownMenuActionItem<IFile>[];
+  actions: DropdownMenuItem<IFile>[];
   disabled?: boolean;
   onSelect?: (file: IFile) => void;
 }

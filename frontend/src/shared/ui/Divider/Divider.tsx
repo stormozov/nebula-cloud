@@ -4,6 +4,7 @@ import "./Divider.scss";
  * Props interface for the Divider component.
  */
 interface DividerProps {
+  /** Vertical spacing between the divider and the adjacent elements. */
   gap?: number | string;
 }
 
@@ -11,11 +12,13 @@ interface DividerProps {
  * A horizontal rule (divider) component with customizable vertical spacing.
  *
  * @example
- * <Hr gap={20} />
+ * <Divider gap={20} />
  *
  * @example
- * <Hr gap="1rem" />
+ * <Divider gap="1rem" />
  */
 export function Divider({ gap = 0 }: DividerProps) {
-  return <div className="hr" style={{ margin: `${gap} 0` }}></div>;
+  return (
+    <hr className="divider" style={{ marginTop: gap, marginBottom: gap }}></hr>
+  );
 }

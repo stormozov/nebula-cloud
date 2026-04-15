@@ -2,14 +2,14 @@
 // Normalize CSS
 // =============================================================================
 
-// 1. Box sizing для всех элементов
+// Box sizing для всех элементов
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
 
-// 2. Reset margin and padding for all elements
+// Reset margin and padding for all elements
 * {
   margin: 0;
   padding: 0;
@@ -17,7 +17,7 @@
   scrollbar-color: var(--color-scrollbar-thumb) var(--color-scrollbar-track);
 }
 
-// 3. Base styles for html
+// Base styles for html
 html {
   font-size: 16px;
   -webkit-text-size-adjust: 100%;
@@ -25,7 +25,7 @@ html {
   tab-size: 4;
 }
 
-// 4. Base styles for body
+// Base styles for body
 body {
   min-height: 100vh;
 
@@ -41,7 +41,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-// 5. Media
+// Media
 img,
 picture,
 video,
@@ -52,7 +52,7 @@ svg {
   height: auto;
 }
 
-// 6. Forms and inputs
+// Forms and inputs
 input,
 button,
 textarea,
@@ -73,27 +73,27 @@ button {
   }
 }
 
-// 7. Link
+// Link
 a {
   color: inherit;
   text-decoration: none;
   transition: 0.3s;
 }
 
-// 8. List
+// List
 ul,
 ol {
   list-style: none;
 }
 
-// 9. Tables
+// Tables
 table {
   width: 100%;
   border-collapse: collapse;
   border-spacing: 0;
 }
 
-// 10. Titles
+// Titles
 h1,
 h2,
 h3,
@@ -104,40 +104,33 @@ h6 {
   line-height: 1.25;
 }
 
-// 11. Paragraph
+// Paragraph
 p {
   &:where(:not(:last-child)) {
     margin-bottom: 1rem;
   }
 }
 
-// 12. Code
+// Code
 code,
 pre {
   font-family: "Fira Code", "Consolas", "Monaco", monospace;
   font-size: 0.875rem;
 }
 
-// 13. Horizontal line
-hr {
-  margin: 1.5rem 0;
-  border: none;
-  border-top: 1px solid var(--color-border-primary);
-}
-
-// 14. Highlight
+// Highlight
 ::selection {
   background-color: var(--color-selection-bg);
   color: var(--color-selection-text);
 }
 
-// 15. Focus
+// Focus
 :focus-visible {
   outline: 2px solid var(--color-primary-focus);
   outline-offset: 2px;
 }
 
-// 16. Scrollbar (webkit)
+// Scrollbar (webkit)
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -155,14 +148,14 @@ hr {
   }
 }
 
-// 17. Adaptive styles
+// Adaptive styles
 @media (max-width: 768px) {
   html {
     font-size: 14px;
   }
 }
 
-// 18. Reducing animations for users with preference
+// Reducing animations for users with preference
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -173,7 +166,7 @@ hr {
   }
 }
 
-// 19. Full width
+// Full width
 .full-width {
   width: 100%;
 }

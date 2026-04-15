@@ -1,10 +1,9 @@
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router";
 
 import { selectUser } from "@/entities/user";
-import { useLogout } from "@/features/auth";
-import type { IDropdownMenuActionItem } from "@/shared/ui";
 import { Avatar, DropdownMenu } from "@/shared/ui";
+
+import { useProfileMenuActions } from "../lib/useProfileMenuActions";
 
 import "./UserProfileMenu.scss";
 
@@ -16,37 +15,10 @@ import "./UserProfileMenu.scss";
  */
 export function UserProfileMenu() {
   const user = useSelector(selectUser);
-  const navigate = useNavigate();
-  const { logout, isLoading: isLogoutLoading } = useLogout();
+
+  const actions = useProfileMenuActions();
 
   if (!user) return null;
-
-  const actions: IDropdownMenuActionItem<null>[] = [
-    {
-      id: "profile",
-      label: "Профиль",
-      arialLabel: "Недоступно",
-      icon: "lock",
-      disabled: true,
-      onClick: () => navigate("/profile"),
-    },
-    {
-      id: "settings",
-      label: "Настройки",
-      arialLabel: "Недоступно",
-      icon: "lock",
-      disabled: true,
-      onClick: () => navigate("/settings"),
-    },
-    {
-      id: "logout",
-      label: "Выйти",
-      icon: "logout",
-      isDanger: true,
-      onClick: logout,
-      disabled: isLogoutLoading,
-    },
-  ];
 
   const trigger = (
     <button
@@ -70,7 +42,7 @@ export function UserProfileMenu() {
     <div className="user-profile-menu">
       <DropdownMenu
         trigger={trigger}
-        actions={actions}
+        items={actions}
         item={null}
         placement="bottom-end"
       />

@@ -97,9 +97,10 @@ export function UserListItem({
           <StatusBadge isActive={user.isActive} centerX />
         </td>
       </tr>
+
       {actions.length > 0 && (
         <DropdownMenu
-          actions={actions}
+          items={actions}
           item={user}
           position={contextMenu.isOpen ? contextMenu.position : undefined}
           isOpen={contextMenu.isOpen}

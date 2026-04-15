@@ -1,7 +1,7 @@
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
 import type { IFile } from "@/entities/file";
-import type { IDropdownMenuActionItem } from "@/shared/ui/DropdownMenu/types";
+import type { DropdownMenuItem } from "@/shared/ui";
 import { isImageFile } from "@/shared/utils";
 
 import type { IFileHandlersProps } from "./types";
@@ -10,9 +10,11 @@ import type { IFileHandlersProps } from "./types";
  * Props for `useFileActions` hook.
  */
 interface IUseFileActionsProps {
+  /** File to generate actions for */
   file: IFile;
+  /** Handlers for file actions */
   handlers: IFileHandlersProps;
-};
+}
 
 /**
  * Generates action items for a file to be used in `DropdownMenu`.
@@ -22,7 +24,7 @@ interface IUseFileActionsProps {
 export const useFileActions = ({
   file,
   handlers,
-}: IUseFileActionsProps): IDropdownMenuActionItem<IFile>[] => {
+}: IUseFileActionsProps): DropdownMenuItem<IFile>[] => {
   const {
     onView,
     onDownload,
@@ -34,104 +36,81 @@ export const useFileActions = ({
 
   const isViewable = onView && isImageFile(file);
 
-  const viewAction = useMemo<IDropdownMenuActionItem<IFile> | null>(
-    () =>
-      isViewable
-        ? {
-            id: "view",
-            label: "Просмотр",
-            icon: "eye",
-            onClick: onView,
-          }
-        : null,
-    [isViewable, onView],
-  );
+  const addSeparator = useCallback((items: DropdownMenuItem<IFile>[]) => {
+    if (items.length > 0) items.push({ type: "separator" });
+  }, []);
 
-  const downloadAction = useMemo<IDropdownMenuActionItem<IFile> | null>(
-    () =>
-      onDownload
-        ? {
-            id: "download",
-            label: "Скачать",
-            icon: "download",
-            onClick: onDownload,
-          }
-        : null,
-    [onDownload],
-  );
+  const actions = useMemo(() => {
+    const items: DropdownMenuItem<IFile>[] = [];
 
-  const publicLinkAction = useMemo<IDropdownMenuActionItem<IFile> | null>(
-    () =>
-      onPublicLink
-        ? {
-            id: "publicLink",
-            label: "Публичная ссылка",
-            icon: "share",
-            onClick: onPublicLink,
-          }
-        : null,
-    [onPublicLink],
-  );
+    if (isViewable) {
+      items.push({
+        id: "view",
+        label: "Просмотр",
+        icon: "eye",
+        onClick: onView,
+      });
+    }
 
-  const renameAction = useMemo<IDropdownMenuActionItem<IFile> | null>(
-    () =>
-      onRename
-        ? {
-            id: "rename",
-            label: "Переименовать",
-            icon: "pencil",
-            onClick: onRename,
-          }
-        : null,
-    [onRename],
-  );
+    if (onDownload) {
+      items.push({
+        id: "download",
+        label: "Скачать",
+        icon: "download",
+        onClick: onDownload,
+      });
+    }
 
-  const editCommentAction = useMemo<IDropdownMenuActionItem<IFile> | null>(
-    () =>
-      onEditComment
-        ? {
-            id: "editComment",
-            label: "Комментарий",
-            icon: "comment",
-            onClick: onEditComment,
-          }
-        : null,
-    [onEditComment],
-  );
+    if (onPublicLink) {
+      items.push({
+        id: "publicLink",
+        label: "Публичная ссылка",
+        icon: "share",
+        onClick: onPublicLink,
+      });
+    }
 
-  const deleteAction = useMemo<IDropdownMenuActionItem<IFile> | null>(
-    () =>
-      onDelete
-        ? {
-            id: "delete",
-            label: "Удалить",
-            icon: "trash",
-            isDanger: true,
-            onClick: onDelete,
-          }
-        : null,
-    [onDelete],
-  );
+    if (onRename) {
+      items.push({
+        id: "rename",
+        label: "Переименовать",
+        icon: "pencil",
+        onClick: onRename,
+      });
+    }
 
-  return useMemo(
-    () =>
-      [
-        viewAction,
-        downloadAction,
-        publicLinkAction,
-        renameAction,
-        editCommentAction,
-        deleteAction,
-      ].filter(
-        (action): action is IDropdownMenuActionItem<IFile> => action !== null,
-      ),
-    [
-      viewAction,
-      downloadAction,
-      publicLinkAction,
-      renameAction,
-      editCommentAction,
-      deleteAction,
-    ],
-  );
+    if (onEditComment) {
+      items.push({
+        id: "editComment",
+        label: "Комментарий",
+        icon: "comment",
+        onClick: onEditComment,
+      });
+    }
+
+    addSeparator(items);
+
+    if (onDelete) {
+      items.push({
+        id: "delete",
+        label: "Удалить",
+        icon: "trash",
+        isDanger: true,
+        onClick: onDelete,
+      });
+    }
+
+    return items;
+  }, [
+    isViewable,
+    onView,
+    onDownload,
+    onPublicLink,
+    onRename,
+    onEditComment,
+    onDelete,
+    addSeparator,
+  ]);
+
+  return actions;
 };

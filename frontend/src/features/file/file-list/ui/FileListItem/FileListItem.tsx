@@ -88,7 +88,7 @@ export function FileListItemPlain({
                 className: "file-list-item__actions-button",
                 "aria-label": "Действия с файлом",
               }}
-              actions={actions}
+              items={actions}
               item={file}
               placement="bottom-end"
             />
@@ -97,7 +97,7 @@ export function FileListItemPlain({
       </tr>
       {actions.length > 0 && (
         <DropdownMenu
-          actions={actions}
+          items={actions}
           item={file}
           position={contextMenu.isOpen ? contextMenu.position : undefined}
           isOpen={contextMenu.isOpen}

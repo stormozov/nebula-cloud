@@ -1,6 +1,6 @@
-import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 
-import type { IDropdownMenuActionItem } from "../types";
+import type { DropdownMenuItem, IDropdownMenuActionItem } from "../types";
 
 /**
  * Properties for the `useDropdownKeyboard` hook.
@@ -9,7 +9,7 @@ interface UseDropdownKeyboardOptions<T> {
   /** Whether the dropdown menu is open */
   isOpen: boolean;
   /** Dropdown menu actions */
-  actions: IDropdownMenuActionItem<T>[];
+  items: DropdownMenuItem<T>[];
   /** Item associated with the dropdown */
   item: T;
   /** Callback to close the dropdown */
@@ -25,7 +25,7 @@ interface UseDropdownKeyboardOptions<T> {
  */
 export function useDropdownKeyboard<T>({
   isOpen,
-  actions,
+  items,
   item,
   onClose,
   onSelect,
@@ -33,15 +33,24 @@ export function useDropdownKeyboard<T>({
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const actionRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
+  const actionItems = useMemo(
+    () =>
+      items.filter(
+        (it): it is IDropdownMenuActionItem<T> =>
+          (it as IDropdownMenuActionItem<T>).onClick !== undefined,
+      ),
+    [items],
+  );
+
   const getFirstEnabledIndex = useCallback(() => {
-    return actions.findIndex((action) => {
+    return actionItems.findIndex((action) => {
       const disabled =
         typeof action.disabled === "function"
           ? action.disabled(item)
           : action.disabled;
       return !disabled;
     });
-  }, [actions, item]);
+  }, [actionItems, item]);
 
   useLayoutEffect(() => {
     if (!isOpen) {
@@ -51,7 +60,7 @@ export function useDropdownKeyboard<T>({
     }
 
     const firstEnabled = getFirstEnabledIndex();
-    if (firstEnabled === -1) return; // нет активных пунктов
+    if (firstEnabled === -1) return;
 
     setFocusedIndex(firstEnabled);
 
@@ -68,17 +77,17 @@ export function useDropdownKeyboard<T>({
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
-      if (!isOpen) return;
+      if (!isOpen || actionItems.length === 0) return;
 
       switch (event.key) {
         case "ArrowDown": {
           event.preventDefault();
 
-          let next = (focusedIndex + 1) % actions.length;
+          let next = (focusedIndex + 1) % actionItems.length;
           let attempts = 0;
 
-          while (attempts < actions.length) {
-            const action = actions[next];
+          while (attempts < actionItems.length) {
+            const action = actionItems[next];
             const disabled =
               typeof action.disabled === "function"
                 ? action.disabled(item)
@@ -86,11 +95,11 @@ export function useDropdownKeyboard<T>({
 
             if (!disabled) break;
 
-            next = (next + 1) % actions.length;
+            next = (next + 1) % actionItems.length;
             attempts++;
           }
 
-          if (attempts < actions.length) {
+          if (attempts < actionItems.length) {
             setFocusedIndex(next);
             actionRefs.current[next]?.focus({ preventScroll: true });
           }
@@ -100,11 +109,12 @@ export function useDropdownKeyboard<T>({
         case "ArrowUp": {
           event.preventDefault();
 
-          let next = (focusedIndex - 1 + actions.length) % actions.length;
+          let next =
+            (focusedIndex - 1 + actionItems.length) % actionItems.length;
           let attempts = 0;
 
-          while (attempts < actions.length) {
-            const action = actions[next];
+          while (attempts < actionItems.length) {
+            const action = actionItems[next];
             const disabled =
               typeof action.disabled === "function"
                 ? action.disabled(item)
@@ -112,11 +122,11 @@ export function useDropdownKeyboard<T>({
 
             if (!disabled) break;
 
-            next = (next - 1 + actions.length) % actions.length;
+            next = (next - 1 + actionItems.length) % actionItems.length;
             attempts++;
           }
 
-          if (attempts < actions.length) {
+          if (attempts < actionItems.length) {
             setFocusedIndex(next);
             actionRefs.current[next]?.focus({ preventScroll: true });
           }
@@ -128,7 +138,7 @@ export function useDropdownKeyboard<T>({
           event.preventDefault();
 
           if (focusedIndex >= 0) {
-            const action = actions[focusedIndex];
+            const action = actionItems[focusedIndex];
             const disabled =
               typeof action.disabled === "function"
                 ? action.disabled(item)
@@ -142,11 +152,36 @@ export function useDropdownKeyboard<T>({
 
           break;
         }
+        case "Tab": {
+          event.preventDefault();
+          const direction = event.shiftKey ? -1 : 1;
+          let nextIndex = (focusedIndex + direction) % actionItems.length;
+          if (nextIndex < 0) nextIndex = actionItems.length - 1;
+
+          let attempts = 0;
+          while (attempts < actionItems.length) {
+            const action = actionItems[nextIndex];
+            const disabled =
+              typeof action.disabled === "function"
+                ? action.disabled(item)
+                : action.disabled;
+            if (!disabled) break;
+            nextIndex = (nextIndex + direction) % actionItems.length;
+            if (nextIndex < 0) nextIndex = actionItems.length - 1;
+            attempts++;
+          }
+
+          if (attempts < actionItems.length) {
+            setFocusedIndex(nextIndex);
+            actionRefs.current[nextIndex]?.focus({ preventScroll: true });
+          }
+          break;
+        }
         default:
           break;
       }
     },
-    [isOpen, actions, focusedIndex, item, onSelect, onClose],
+    [isOpen, actionItems, focusedIndex, item, onSelect, onClose],
   );
 
   return { focusedIndex, actionRefs, handleKeyDown };

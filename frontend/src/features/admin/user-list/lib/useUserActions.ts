@@ -1,6 +1,8 @@
+import { useCallback, useMemo } from "react";
+
 import type { IUserListResponse, UserListItemCopyField } from "@/entities/user";
 import { useNavigateToUserDisk } from "@/shared/hooks";
-import type { IDropdownMenuActionItem } from "@/shared/ui";
+import type { DropdownMenuItem } from "@/shared/ui";
 
 /**
  * Props for the `useUserActions` hook.
@@ -18,37 +20,50 @@ export interface UseUserActionsProps {
 export const useUserActions = ({
   user,
   onCopyField,
-}: UseUserActionsProps): IDropdownMenuActionItem<IUserListResponse>[] => {
+}: UseUserActionsProps): DropdownMenuItem<IUserListResponse>[] => {
   const { navigateToDisk } = useNavigateToUserDisk({ userId: user.id });
 
-  const actions: IDropdownMenuActionItem<IUserListResponse>[] = [];
+  const addSeparator = useCallback(
+    (items: DropdownMenuItem<IUserListResponse>[]) => {
+      if (items.length > 0) items.push({ type: "separator" });
+    },
+    [],
+  );
 
-  if (onCopyField) {
-    actions.push({
+  const actions = useMemo(() => {
+    const items: DropdownMenuItem<IUserListResponse>[] = [];
+
+    items.push({
       id: "go-to-folder",
       label: `Перейти к диску`,
       icon: "folder",
       onClick: () => navigateToDisk(),
     });
-    actions.push({
-      id: "copy-id",
-      label: `Копировать ID`,
-      icon: "copy",
-      onClick: () => onCopyField(user, "id"),
-    });
-    actions.push({
-      id: "copy-username",
-      label: `Копировать логин`,
-      icon: "copy",
-      onClick: () => onCopyField(user, "username"),
-    });
-    actions.push({
-      id: "copy-email",
-      label: `Копировать email`,
-      icon: "copy",
-      onClick: () => onCopyField(user, "email"),
-    });
-  }
+
+    if (onCopyField) {
+      addSeparator(items);
+      items.push({
+        id: "copy-id",
+        label: `Копировать ID`,
+        icon: "copy",
+        onClick: () => onCopyField(user, "id"),
+      });
+      items.push({
+        id: "copy-username",
+        label: `Копировать логин`,
+        icon: "copy",
+        onClick: () => onCopyField(user, "username"),
+      });
+      items.push({
+        id: "copy-email",
+        label: `Копировать email`,
+        icon: "copy",
+        onClick: () => onCopyField(user, "email"),
+      });
+    }
+
+    return items;
+  }, [navigateToDisk, onCopyField, addSeparator, user]);
 
   return actions;
 };

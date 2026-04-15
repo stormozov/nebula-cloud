@@ -2,7 +2,7 @@ import classNames from "classnames";
 import { cloneElement, useRef } from "react";
 import { createPortal } from "react-dom";
 
-import { Button, Icon } from "@/shared/ui";
+import { Button, Divider, Icon } from "@/shared/ui";
 
 import { useDropdownKeyboard } from "./hooks/useDropdownKeyboard";
 import { useDropdownMenu } from "./hooks/useDropdownMenu";
@@ -22,8 +22,8 @@ import "./DropdownMenu.scss";
  * @example
  * // Trigger mode
  * <DropdownMenu
- *   triggerButtonProps={{ children: 'Actions', variant: 'secondary' }}
- *   actions={[
+ *   triggerButtonProps={{ children: 'items', variant: 'secondary' }}
+ *   items={[
  *     { id: 'edit', label: 'Edit', onClick: handleEdit },
  *     { id: 'delete', label: 'Delete', isDanger: true, onClick: handleDelete }
  *   ]}
@@ -33,7 +33,7 @@ import "./DropdownMenu.scss";
  * @example
  * // Context menu mode (no trigger)
  * <DropdownMenu
- *   actions={contextActions}
+ *   items={contextActions}
  *   item={clickedItem}
  *   position={{ x: 200, y: 300 }}
  *   isOpen={true}
@@ -44,7 +44,7 @@ export function DropdownMenu<T>(props: IDropdownMenuProps<T>) {
   const {
     trigger,
     triggerButtonProps,
-    actions,
+    items,
     item,
     position,
     isOpen: isOpenControlled,
@@ -54,12 +54,13 @@ export function DropdownMenu<T>(props: IDropdownMenuProps<T>) {
     closeOnEscape = true,
   } = props;
 
-  const { isOpen, close, toggle, menuRef } = useDropdownMenu({
-    isOpenControlled,
-    onOpenChange,
-    closeOnClickOutside,
-    closeOnEscape,
-  });
+  const { isOpen, menuRef, close, toggle, closeAndRestoreFocus } =
+    useDropdownMenu({
+      isOpenControlled,
+      closeOnClickOutside,
+      closeOnEscape,
+      onOpenChange,
+    });
 
   const triggerRef = useRef<HTMLDivElement>(null);
   const { menuStyle } = useDropdownPositioning({
@@ -77,16 +78,19 @@ export function DropdownMenu<T>(props: IDropdownMenuProps<T>) {
         : action.disabled;
     if (!disabled) {
       action.onClick(item);
+      closeAndRestoreFocus();
     }
   };
 
   const { focusedIndex, actionRefs, handleKeyDown } = useDropdownKeyboard({
     isOpen,
-    actions,
+    items,
     item,
     onClose: close,
     onSelect: handleSelectAction,
   });
+
+  let actionCounter = 0;
 
   const renderMenu = () => {
     if (!isOpen) return null;
@@ -104,7 +108,18 @@ export function DropdownMenu<T>(props: IDropdownMenuProps<T>) {
           e.preventDefault();
         }}
       >
-        {actions.map((action, idx) => {
+        {items.map((menuItem) => {
+          // If it's a separator
+          if ((menuItem as IDropdownMenuActionItem<T>).onClick === undefined) {
+            const separator = menuItem;
+            return (
+              <Divider key={separator.id ?? `sep-${Math.random()}`} gap={4} />
+            );
+          }
+
+          // If it's an action
+          const action = menuItem as IDropdownMenuActionItem<T>;
+          const currentActionIndex = actionCounter++;
           const disabled =
             typeof action.disabled === "function"
               ? action.disabled(item)
@@ -115,7 +130,7 @@ export function DropdownMenu<T>(props: IDropdownMenuProps<T>) {
               key={action.id}
               type="button"
               ref={(el) => {
-                actionRefs.current[idx] = el;
+                actionRefs.current[currentActionIndex] = el;
               }}
               className={classNames("dropdown-menu__item", {
                 "dropdown-menu__item--danger": action.isDanger,
@@ -126,11 +141,8 @@ export function DropdownMenu<T>(props: IDropdownMenuProps<T>) {
               aria-label={action.arialLabel}
               aria-disabled={disabled}
               disabled={disabled}
-              tabIndex={focusedIndex === idx ? 0 : -1}
-              onClick={() => {
-                handleSelectAction(action);
-                close();
-              }}
+              tabIndex={focusedIndex === currentActionIndex ? 0 : -1}
+              onClick={() => handleSelectAction(action)}
             >
               {action.icon && (
                 <Icon
@@ -148,10 +160,10 @@ export function DropdownMenu<T>(props: IDropdownMenuProps<T>) {
     );
   };
 
-  // 1. Context menu (without trigger)
+  // Context menu (without trigger)
   if (!trigger && !triggerButtonProps) return renderMenu();
 
-  // 2. Trigger via custom ReactElement
+  // Trigger via custom ReactElement
   if (trigger) {
     const triggerElement = trigger as React.ReactElement<{
       onClick?: React.MouseEventHandler;
@@ -185,7 +197,7 @@ export function DropdownMenu<T>(props: IDropdownMenuProps<T>) {
     );
   }
 
-  // 3. Trigger via triggerButtonProps (standard button)
+  // Trigger via triggerButtonProps (standard button)
   if (triggerButtonProps) {
     return (
       <div className="dropdown-menu">
