@@ -49,7 +49,7 @@ export function UserDetailsModalActions({
         </Heading>
 
         {/* Section: Navigate to user disk */}
-        <UserDiskButton userId={user.id} isCurrentUser={isCurrentUser} />
+        <UserDiskButton userId={user.id} />
 
         <Divider />
 

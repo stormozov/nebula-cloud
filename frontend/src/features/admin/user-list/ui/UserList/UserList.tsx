@@ -1,7 +1,7 @@
 import { toast } from "react-toastify";
 
 import type { IUserListResponse, UserListItemCopyField } from "@/entities/user";
-import { copyUserField } from "@/entities/user/model/utils";
+import { copyUserField } from "@/entities/user";
 import {
   type IListStates,
   type IListStatesRenders,

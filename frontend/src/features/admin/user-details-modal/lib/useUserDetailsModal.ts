@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { toast } from "react-toastify";
 
 import { useAppSelector } from "@/app/store/hooks";
 import {
@@ -53,7 +54,7 @@ export function useUserDetailsModal({
       handleInlineFormClose();
       if (message === "delete" && user?.id) onUserDeleted?.(user.id);
       if (close) handleCloseWithAnimation();
-      if (message) console.log(message);
+      if (message) toast.success(message);
     },
     [handleInlineFormClose, user, onUserDeleted, handleCloseWithAnimation],
   );
