@@ -66,7 +66,10 @@ export const Badge = forwardRef<HTMLSpanElement, IBadgeProps>(
     const shouldHide = shouldHideBadge(children, showZero, dot);
     const displayContent = formatDisplayContent(children, maxCount, dot);
 
-    const transform = useViewportBoundary(innerRef, position);
+    const { transform, isPositionReady } = useViewportBoundary(
+      innerRef,
+      position,
+    );
 
     const { handleKeyDown, combinedClickHandler } = useBadgeCopy(
       copyable,
@@ -85,6 +88,7 @@ export const Badge = forwardRef<HTMLSpanElement, IBadgeProps>(
     const commonClassNames = classNames(
       styles.badge,
       isPositioned && styles[`badge--${position}`],
+      isPositioned && isPositionReady && styles["badge--position-ready"],
       styles[`badge--${variant}`],
       {
         [styles["badge--dot"]]: dot,

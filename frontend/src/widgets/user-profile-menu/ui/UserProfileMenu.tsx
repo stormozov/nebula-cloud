@@ -39,7 +39,6 @@ export function UserProfileMenu() {
 
       {user.isStaff && (
         <Badge
-          variant="info-light"
           position="bottom-center"
           className="user-profile-menu__badge"
         >

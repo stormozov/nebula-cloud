@@ -6,6 +6,21 @@ import { getAdjustedAnchorPositionTransform } from "@/shared/utils";
 const VIEWPORT_PADDING = 4;
 
 /**
+ * Interface for the return value of `useViewportBoundary`
+ */
+interface IUseViewportBoundaryReturn {
+  /**
+   * A CSS `transform` string
+   * (e.g., `translate(calc(-50% + 10px), calc(-50% + 5px))`) to apply to
+   * the badge for boundary-safe positioning. Returns an empty string if
+   * no adjustment is needed.
+   */
+  transform: string;
+  /** Whether the badge is positioned within the viewport */
+  isPositionReady: boolean;
+}
+
+/**
  * Custom React hook that calculates and returns a CSS transform string
  * to reposition a badge element when it would otherwise be partially outside
  * the viewport.
@@ -16,11 +31,6 @@ const VIEWPORT_PADDING = 4;
  * @param {AnchorPosition} [position] - Optional position of the badge relative
  * to the anchor element. If not provided, no transformation is applied.
  *
- * @returns {string} A CSS `transform` string
- * (e.g., `translate(calc(-50% + 10px), calc(-50% + 5px))`) to apply to
- * the badge for boundary-safe positioning. Returns an empty string if
- * no adjustment is needed.
- *
  * @example
  * const transform = useViewportBoundary(badgeAnchorRef, "top-right");
  * return <Badge style={{ transform }} />;
@@ -28,13 +38,15 @@ const VIEWPORT_PADDING = 4;
 export const useViewportBoundary = (
   elementRef: React.RefObject<HTMLElement | null>,
   position?: AnchorPosition,
-): string => {
+): IUseViewportBoundaryReturn => {
   const [transform, setTransform] = useState<string>("");
+  const [isPositionReady, setIsPositionReady] = useState(false);
 
   useLayoutEffect(() => {
     if (!position) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setTransform("");
+      setIsPositionReady(true);
       return;
     }
 
@@ -71,5 +83,5 @@ export const useViewportBoundary = (
     };
   }, [elementRef, position]);
 
-  return transform;
+  return { transform, isPositionReady };
 };

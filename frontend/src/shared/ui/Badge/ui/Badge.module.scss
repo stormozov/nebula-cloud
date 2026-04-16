@@ -3,6 +3,7 @@
 // =============================================================================
 
 @use "sass:map";
+@use "sass:string";
 
 $badge-height: 24px;
 $badge-min-width: 20px;
@@ -11,7 +12,10 @@ $badge-font-size: 12px;
 $badge-border-radius: 6px;
 $badge-dot-size: 10px;
 $badge-icon-size: 12px;
-$badge-transition: all 0.2s ease;
+$badge-transition:
+  background-color 0.2s ease,
+  color 0.2s ease,
+  opacity 0.2s ease;
 
 $variants: (
   primary: var(--color-primary),
@@ -75,6 +79,14 @@ $light-variants: (
     position: relative;
   }
 
+  &--position-ready {
+    transition:
+      transform 0.2s ease,
+      background-color 0.2s ease,
+      color 0.2s ease,
+      opacity 0.2s ease;
+  }
+
   // ---------------------------------------------------------------------------
   // Absolute positioning
   // ---------------------------------------------------------------------------
@@ -115,7 +127,7 @@ $light-variants: (
   }
 
   @each $name, $bg in $light-variants {
-    $base-name: str-slice($name, 1, str-length($name) - 6);
+    $base-name: string.slice($name, 1, string.length($name) - 6);
     &--#{$name} {
       background-color: $bg;
       color: var(--color-#{$base-name});
