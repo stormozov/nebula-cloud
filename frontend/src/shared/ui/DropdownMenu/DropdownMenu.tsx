@@ -113,7 +113,7 @@ export function DropdownMenu<T>(props: IDropdownMenuProps<T>) {
           if ((menuItem as IDropdownMenuActionItem<T>).onClick === undefined) {
             const separator = menuItem;
             return (
-              <Divider key={separator.id ?? `sep-${Math.random()}`} gap={4} />
+              <Divider key={separator.id ?? `sep-${Math.random()}`} gap={6} />
             );
           }
 

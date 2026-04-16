@@ -1,6 +1,6 @@
 import { createPortal } from "react-dom";
 
-import { Button, Heading, Icon, Spinner } from "@/shared/ui";
+import { Button, Icon, Spinner } from "@/shared/ui";
 import { truncateWithMiddleEllipsis } from "@/shared/utils";
 
 import type { IImageViewerModalProps } from "./types";
@@ -28,6 +28,7 @@ export function ImageViewerModal({
     <div className="image-viewer-modal__state">
       <Spinner color="tertiary" text="Загрузка изображения..." />
       <Button
+        variant="secondary"
         icon={{ name: "close" }}
         className="image-viewer-modal__loading-close"
         onClick={onClose}
@@ -41,12 +42,17 @@ export function ImageViewerModal({
     <div className="image-viewer-modal__state">
       <Icon
         name="cloudBad"
-        size={60}
+        size={96}
         className="image-viewer-modal__error-icon"
       />
-      <Heading level={3}>Не удалось загрузить изображение</Heading>
-      <p>{error}</p>
-      <Button icon={{ name: "close" }} onClick={onClose}>
+
+      <p className="image-viewer-modal__error-heading">
+        Не удалось загрузить изображение
+      </p>
+
+      {error && <p>{error}</p>}
+
+      <Button variant="secondary" icon={{ name: "close" }} onClick={onClose}>
         Закрыть
       </Button>
     </div>

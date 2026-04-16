@@ -5,6 +5,8 @@
 // ========================== Light theme (default) ============================
 :root,
 [data-theme="light"] {
+  --color-white: #ffffff;
+
   // -------------------------- Text colors ------------------------------------
   --color-text-primary: #1a1a1a;
   --color-text-secondary: #666666;

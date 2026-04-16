@@ -22,13 +22,8 @@
 
   &__container {
     position: relative;
-
     max-width: 90vw;
     max-height: 90vh;
-
-    border-radius: 8px;
-
-    overflow: hidden;
   }
 
   // ------------------------------ States -------------------------------------
@@ -38,13 +33,30 @@
 
   &__state {
     padding: 2rem;
-    background-color: var(--color-bg-primary);
+
+    background-color: #2f2f2fcc;
+    border: 1px solid #444444;
+    border-radius: 8px;
+
     text-align: center;
-    color: var(--color-text-tertiary);
+
+    overflow: hidden;
+
+    .spinner {
+      color: var(--color-white)
+    }
   }
 
   &__error-icon {
     display: inline-block;
+    color: var(--color-warning);
+  }
+
+  &__error-heading {
+    margin: 0.5rem 0 1.5rem;
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: var(--color-white);
   }
 
   &__loading-close {
