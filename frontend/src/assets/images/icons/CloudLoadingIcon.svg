@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" x="0" y="0"
+  viewBox="0 0 32 32" style="enable-background:new 0 0 512 512" xml:space="preserve">
+  <g>
+    <g>
+      <path
+        d="M4 11.5a8.5 8.5 0 0 1 15.862-4.252 5.501 5.501 0 0 1 7.091 4.527 6.002 6.002 0 0 1-2 11.149 9 9 0 1 0-17.906 0A6.001 6.001 0 0 1 4.056 12.48 8.577 8.577 0 0 1 4 11.5z"
+        opacity="1" data-original="#000000"></path>
+      <path class="loading-spinner" fill-rule="evenodd"
+        d="M16 15a7 7 0 1 0 0 14 7 7 0 0 0 0-14zm0 3a1 1 0 1 0 0 2 2 2 0 1 1-2 2 1 1 0 1 0-2 0 4 4 0 1 0 4-4z"
+        clip-rule="evenodd" opacity="1" data-original="#000000"></path>
+    </g>
+  </g>
+</svg>

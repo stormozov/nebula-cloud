@@ -1,9 +1,10 @@
 import classNames from "classnames";
 import { useCallback, useRef } from "react";
+import { toast } from "react-toastify";
 
 import { useAppDispatch } from "@/app/store/hooks";
 import { addFiles, generateUploadId } from "@/entities/file-upload";
-import { Button, Icon } from "@/shared/ui";
+import { Button } from "@/shared/ui";
 
 import { fileStorage } from "../../lib/fileStorage";
 import type { IFileUploadButtonProps } from "../../lib/types";
@@ -62,16 +63,9 @@ export function FileUploadButton({
       const validationResult = validateFileBatch(fileArray);
 
       if (validationResult.invalidFiles.length > 0) {
-        validationResult.invalidFiles.forEach(({ file, error }) => {
-          console.error(`❌ Файл "${file.name}": ${error}`);
+        validationResult.invalidFiles.forEach(({ error }) => {
+          toast.error(`${error}`);
         });
-
-        if (validationResult.validFiles.length > 0) {
-          console.warn(
-            `📦 Загружаются ${validationResult.validFiles.length}`,
-            `из ${fileArray.length} файлов`,
-          );
-        }
       }
 
       if (validationResult.validFiles.length === 0) {
@@ -127,13 +121,13 @@ export function FileUploadButton({
         type="button"
         variant={variant}
         size={size}
-        fullWidth={fullWidth}
+        icon={{ name: "upload" }}
         className={classNames("file-upload-button__btn", className)}
-        onClick={handleClick}
+        fullWidth={fullWidth}
         disabled={disabled}
+        onClick={handleClick}
         {...restProps}
       >
-        <Icon name="upload" />
         {children}
       </Button>
     </div>

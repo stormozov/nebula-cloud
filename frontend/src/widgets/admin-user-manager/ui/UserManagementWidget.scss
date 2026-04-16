@@ -3,21 +3,24 @@
 // =============================================================================
 
 .users-management {
+  display: grid;
+  gap: 24px;
+
   &__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    margin-bottom: 0.75rem;
+
+    padding-bottom: 16px;
+
+    border-bottom: 1px solid var(--color-border-secondary);
   }
 
   &__count {
+    flex: 1;
     font-size: 0.875rem;
     color: var(--color-text-secondary);
-  }
-
-  &__search {
-    flex: 1;
   }
 
   &__load-more {

@@ -2,11 +2,8 @@
 export * from "./api/adminApi";
 export * from "./api/userApi";
 
-// Selectors
+// MODELS
 export * from "./model/selectors";
-
-// Slice
 export * from "./model/slice";
-
-// Types
 export type * from "./model/types";
+export * from "./model/utils";

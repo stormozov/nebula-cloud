@@ -112,6 +112,29 @@ export const fileApi = createApi({
         const queryString = queryParams.toString();
         return `/storage/files/${queryString ? `?${queryString}` : ""}`;
       },
+      serializeQueryArgs: ({ endpointName, queryArgs }) => {
+        const { userId, search } = queryArgs ?? {};
+        return `${endpointName}-${userId ?? ""}-${search ?? ""}`;
+      },
+      merge: (currentCache, newItems, { arg }) => {
+        if (arg.page === 1 || !currentCache) return newItems;
+
+        newItems.results.forEach((newFile) => {
+          const existingIndex = currentCache.results.findIndex(
+            (f) => f.id === newFile.id,
+          );
+          if (existingIndex !== -1) {
+            currentCache.results[existingIndex] = newFile;
+          } else {
+            currentCache.results.push(newFile);
+          }
+        });
+
+        currentCache.next = newItems.next;
+      },
+      forceRefetch: ({ currentArg, previousArg }) => {
+        return currentArg?.page !== previousArg?.page;
+      },
       providesTags: (result) =>
         result
           ? [

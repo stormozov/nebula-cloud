@@ -1,0 +1,69 @@
+// =============================================================================
+// Styles module for Spinner component
+// =============================================================================
+
+.spinner {
+  // --------------------------- Basic variables -------------------------------
+  --spinner-size: 2.5rem; // 40px
+  --spinner-border-width: 0.25rem; // 4px
+  --spinner-gap: 1rem; // 16px
+  --spinner-text-size: 0.875rem;
+  --spinner-text-color: var(--color-text-secondary);
+  --spinner-color: var(--color-primary);
+  --spinner-track-color: rgba(0, 0, 0, 0.1);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spinner-gap);
+  font-size: 1rem;
+
+  &__circle {
+    width: var(--spinner-size);
+    height: var(--spinner-size);
+
+    border: var(--spinner-border-width) solid var(--spinner-track-color);
+    border-left-color: var(--spinner-color);
+    border-radius: 50%;
+
+    color: var(--spinner-text-color);
+
+    animation: spin 1s linear infinite;
+
+    // --------------------------- Size modifiers ------------------------------
+    &--small {
+      --spinner-size: 1.5rem; // 24px
+    }
+
+    &--medium {
+      --spinner-size: 2rem; // 32px
+    }
+
+    &--large {
+      --spinner-size: 3rem; // 48px
+    }
+
+    &--xlarge {
+      --spinner-size: 4rem; // 64px
+    }
+
+    // --------------------------- Color modifiers -----------------------------
+    &--primary {
+      --spinner-color: var(--color-primary);
+    }
+
+    &--secondary {
+      --spinner-color: var(--color-text-secondary);
+    }
+
+    &--tertiary {
+      --spinner-color: var(--color-error);
+    }
+  }
+
+  &__text {
+    font-size: var(--spinner-text-size);
+    animation: fadeIn 2s linear infinite;
+  }
+}

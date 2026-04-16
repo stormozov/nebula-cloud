@@ -1,5 +1,7 @@
+import { toast } from "react-toastify";
+
 import { useDeleteUserMutation } from "@/entities/user";
-import { Button, Icon, type ModalConfirmDialogRequest } from "@/shared/ui";
+import { Button, type ModalConfirmDialogRequest } from "@/shared/ui";
 
 /**
  * Props interface for the DeleteUserButton component.
@@ -40,8 +42,9 @@ export function DeleteUserButton({
         try {
           const response = await deleteUser(userId).unwrap();
           onSuccess?.(response.detail);
-        } catch (err) {
-          console.error("Failed to delete user:", err);
+          toast.success(`Пользователь (ID: ${userId}) успешно удален`);
+        } catch {
+          toast.error("Не удалось удалить пользователя");
         }
       },
     );
@@ -50,12 +53,12 @@ export function DeleteUserButton({
   return (
     <Button
       variant="danger"
+      icon={{ name: disabled ? "lock" : "deleteUser" }}
       fullWidth={fullWidth}
       loading={isLoading}
       disabled={disabled}
       onClick={handleDelete}
     >
-      {disabled ? <Icon name="lock" /> : <Icon name="deleteUser" />}
       Удалить
     </Button>
   );

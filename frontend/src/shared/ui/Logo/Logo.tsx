@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import { Link } from "react-router";
 
 import { Icon } from "../Icon";
 
@@ -9,6 +10,7 @@ import "./Logo.scss";
  * for div elements.
  */
 interface ILogoProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Additional class names */
   className?: string;
 }
 
@@ -17,9 +19,11 @@ interface ILogoProps extends React.HTMLAttributes<HTMLDivElement> {
  */
 export function Logo({ ...props }: ILogoProps) {
   return (
-    <div {...props} className={classNames("logo", props.className)}>
-      <Icon name="cloud" size={30} color="primary" className="logo__icon" />
-      <p>Nebula Cloud</p>
-    </div>
+    <Link to="/">
+      <div {...props} className={classNames("logo", props.className)}>
+        <Icon name="cloud" size={30} color="primary" className="logo__icon" />
+        <p>Nebula Cloud</p>
+      </div>
+    </Link>
   );
 }

@@ -83,59 +83,62 @@ export default function PagePublicFile() {
 
   return (
     <PageLayout className="page-public-file">
-      <div className="page-public-file__card">
-        <div className="page-public-file__icon">
-          <FileIcon filename={file.originalName} size={80} />
-        </div>
+      <PageLayout.Header />
+      <PageLayout.Main className="page-public-file__main">
+        <div className="page-public-file__card">
+          <div className="page-public-file__icon">
+            <FileIcon filename={file.originalName} size={80} />
+          </div>
 
-        <div className="page-public-file__info">
-          <h1 className="page-public-file__name" title={file.originalName}>
-            {file.originalName}
-          </h1>
+          <div className="page-public-file__info">
+            <h1 className="page-public-file__name" title={file.originalName}>
+              {file.originalName}
+            </h1>
 
-          {file.comment && (
-            <p className="page-public-file__comment">{file.comment}</p>
+            {file.comment && (
+              <p className="page-public-file__comment">{file.comment}</p>
+            )}
+
+            <dl className="page-public-file__meta">
+              <div>
+                <dt>Размер:</dt>
+                <dd>{formatFileSize(file.size)}</dd>
+              </div>
+              <div>
+                <dt>Загружен:</dt>
+                <dd>{formatDate(file.uploadedAt)}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className="page-public-file__actions">
+            <Button
+              variant="primary"
+              size="large"
+              onClick={handleDownload}
+              loading={isDownloading}
+              fullWidth
+            >
+              <FaDownload />
+              {isDownloading ? "Скачивание..." : "Скачать файл"}
+            </Button>
+          </div>
+
+          {downloadError && (
+            <div className="page-public-file__download-error">
+              <p className="page-public-file__download-error-text">
+                {downloadError}
+              </p>
+            </div>
           )}
 
-          <dl className="page-public-file__meta">
-            <div>
-              <dt>Размер:</dt>
-              <dd>{formatFileSize(file.size)}</dd>
-            </div>
-            <div>
-              <dt>Загружен:</dt>
-              <dd>{formatDate(file.uploadedAt)}</dd>
-            </div>
-          </dl>
+          <p className="page-public-file__hint">
+            Файл будет скачан с оригинальным именем:
+            <br />
+            <strong>{file.originalName}</strong>
+          </p>
         </div>
-
-        <div className="page-public-file__actions">
-          <Button
-            variant="primary"
-            size="large"
-            onClick={handleDownload}
-            loading={isDownloading}
-            fullWidth
-          >
-            <FaDownload />
-            {isDownloading ? "Скачивание..." : "Скачать файл"}
-          </Button>
-        </div>
-
-        {downloadError && (
-          <div className="page-public-file__download-error">
-            <p className="page-public-file__download-error-text">
-              {downloadError}
-            </p>
-          </div>
-        )}
-
-        <p className="page-public-file__hint">
-          Файл будет скачан с оригинальным именем:
-          <br />
-          <strong>{file.originalName}</strong>
-        </p>
-      </div>
+      </PageLayout.Main>
     </PageLayout>
   );
 }

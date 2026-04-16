@@ -10,12 +10,9 @@ import "./PageAuth.scss";
 export default function PageAuth() {
   const handleAuthSuccess = (): void => {
     // Navigation is handled inside the form hooks
-    // This callback can be used for additional logic if needed
   };
 
   const handleAuthError = (error: string): void => {
-    // Error is displayed in the form
-    // This callback can be used for logging or analytics
     console.error("Auth error:", error);
   };
 

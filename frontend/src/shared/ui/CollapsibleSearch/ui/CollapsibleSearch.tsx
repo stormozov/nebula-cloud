@@ -6,8 +6,7 @@ import {
   Button,
   ControlledInput,
   type IButtonProps,
-  type IControlledInputProps,
-  Icon,
+  type IControlledInputProps
 } from "@/shared/ui";
 
 import "./CollapsibleSearch.scss";
@@ -41,20 +40,24 @@ export const CollapsibleSearch = ({
   const [isOpen, setIsOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  const handleClose = () => {
+    setIsOpen(false);
+    buttonRef.current?.focus();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Escape") handleClose();
+  };
 
   useClickOutside(containerRef, () => {
-    if (value === "") setIsOpen(false);
+    if (value === "") handleClose();
   });
 
   useEffect(() => {
-    if (isOpen) {
-      inputRef.current?.focus();
-    }
+    if (isOpen) inputRef.current?.focus();
   }, [isOpen]);
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Escape") setIsOpen(false);
-  };
 
   return (
     <div
@@ -68,14 +71,17 @@ export const CollapsibleSearch = ({
       )}
     >
       <Button
+        ref={buttonRef}
         variant="secondary"
         className="collapsible-search__button"
         onClick={() => setIsOpen(true)}
         title="Поиск"
         aria-label="Поиск"
+        icon={{ name: "search" }}
+        aria-hidden={isOpen}
+        tabIndex={isOpen ? -1 : undefined}
         {...buttonProps}
       >
-        <Icon name="search" />
         {buttonProps.children}
       </Button>
       <ControlledInput
@@ -83,6 +89,8 @@ export const CollapsibleSearch = ({
         value={value}
         className="collapsible-search__input"
         placeholder={placeholder}
+        aria-hidden={!isOpen}
+        tabIndex={isOpen ? undefined : -1}
         autoComplete="off"
         onChange={onChange}
         onKeyDown={handleKeyDown}

@@ -1,5 +1,10 @@
 import type { UserDetailsResponse } from "@/entities/user";
-import { Button, ControlledInput, Heading, Icon, PageWrapper } from "@/shared/ui";
+import {
+  Button,
+  ControlledInput,
+  Heading,
+  PageWrapper
+} from "@/shared/ui";
 
 import { useEditUserForm } from "../lib/useEditUserForm";
 
@@ -62,12 +67,10 @@ export function EditUserForm({
       />
 
       <PageWrapper className="edit-user-form__buttons" justify="end">
-        <Button variant="secondary" onClick={onCancel}>
-          <Icon name="close" />
+        <Button variant="secondary" icon={{ name: "close" }} onClick={onCancel}>
           Отмена
         </Button>
-        <Button type="submit" loading={isLoading}>
-          <Icon name="save" />
+        <Button type="submit" icon={{ name: "save" }} loading={isLoading}>
           Сохранить
         </Button>
       </PageWrapper>

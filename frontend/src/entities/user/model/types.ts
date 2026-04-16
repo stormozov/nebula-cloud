@@ -125,3 +125,8 @@ export interface IStorageStatsResponse {
 export interface IAdminApiResponse {
   detail: string;
 }
+
+/**
+ * User fields for filtering and sorting.
+ */
+export type UserListItemCopyField = "id" | "username" | "email";

@@ -1,9 +1,10 @@
 import { useEffect, useRef } from "react";
 
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
-import { fileApi, uploadFile as uploadFileToApi } from "@/entities/file";
+import { uploadFile as uploadFileToApi } from "@/entities/file";
 import {
   selectActiveUpload,
+  setNeedsReupload,
   updateProgress,
   updateStatus,
 } from "@/entities/file-upload";
@@ -47,6 +48,7 @@ export const useFileUploadProcessor = (): void => {
           error: "Файл не найден в памяти",
         }),
       );
+      dispatch(setNeedsReupload({ uploadId: activeUpload.id }));
       processedUploads.current.delete(activeUpload.id);
       return;
     }
@@ -68,8 +70,6 @@ export const useFileUploadProcessor = (): void => {
             uploadedFileId: result.id,
           }),
         );
-
-        dispatch(fileApi.util.invalidateTags(["File"]));
 
         fileStorage.remove(activeUpload.id);
       } catch (err) {

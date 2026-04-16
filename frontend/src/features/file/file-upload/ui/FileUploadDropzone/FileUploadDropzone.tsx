@@ -3,13 +3,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useAppDispatch } from "@/app/store/hooks";
 import { addFiles, generateUploadId } from "@/entities/file-upload";
+import { Icon } from "@/shared/ui";
 
 import { fileStorage } from "../../lib/fileStorage";
 import type { IFileUploadDropzoneProps } from "../../lib/types";
 import { validateFileBatch } from "../../lib/validateFile";
 import { FileUploadButton } from "../FileUploadButton/FileUploadButton";
 
-import { Icon } from "@/shared/ui";
 import "./FileUploadDropzone.scss";
 
 /**

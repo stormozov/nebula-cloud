@@ -1,5 +1,6 @@
 import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 import { useResetPasswordMutation } from "@/entities/user";
 
@@ -39,6 +40,9 @@ export const useResetPasswordForm = ({
       const newData = { id: userId, newPassword: newPassword };
       const response = await resetPassword(newData).unwrap();
       onSuccess?.(response.detail);
+      toast.success(`Пароль пользователя ${userId} успешно изменен`, {
+        position: "top-center",
+      });
     } catch (err) {
       const error = err as FetchBaseQueryError;
       if (error.data && typeof error.data === "object") {

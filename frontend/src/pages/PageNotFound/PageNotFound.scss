@@ -1,0 +1,38 @@
+// =============================================================================
+// Styles module for PageNotFound component
+// =============================================================================
+
+.page-not-found {
+  &__main {
+    display: grid;
+    align-items: center;
+    padding: 24px 0;
+    min-height: calc(100vh - 60px);
+  }
+
+  &__content-card {
+    display: grid;
+    justify-items: center;
+
+    margin: 0 auto;
+
+    max-width: 480px;
+    width: 100%;
+
+    text-align: center;
+  }
+
+  &__icon-wrapper {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  &__icon-404 {
+    margin-left: -64px;
+    transform: skew(-10deg) rotate(-10deg);
+  }
+
+  &__subtitle {
+    color: var(--color-text-secondary);
+  }
+}

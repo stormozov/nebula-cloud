@@ -1,12 +1,13 @@
 import classNames from "classnames";
 
 import type { IStorageStatsResponse, IUser } from "@/entities/user";
-import { Button, Heading, Icon } from "@/shared/ui";
+import { Button, CopyIcon, Heading } from "@/shared/ui";
 
 import type { IUserDetailsInfoItem } from "../../lib/types";
 import { useBlockHover } from "../../lib/useBlockHover";
 import { useClipboardWithHandlers } from "../../lib/useClipboardWithHandlers";
 import { useUserBlocksData } from "../../lib/useUserBlocksData";
+import { UserCopyableInfoRow } from "../UserCopyableInfoRow/UserCopyableInfoRow";
 
 import "./UserDetailsModalInfo.scss";
 
@@ -60,32 +61,22 @@ export function UserDetailsModalInfo({
           <Button
             variant="text"
             className="user-details-modal-info__copy-block-btn"
-            onClick={() => handleCopyBlock(title, copyValues)}
             aria-label={`Скопировать все поля блока "${title}"`}
+            onClick={() => handleCopyBlock(title, copyValues)}
           >
-            <Icon name="copy" />
+            <CopyIcon />
           </Button>
         </header>
         <div className="user-details-modal-info__items">
           {items.map((info) => (
-            <button
+            <UserCopyableInfoRow
               key={info.title}
-              type="button"
-              className="user-details-modal-info__item w-full"
-              title={info.originalValue}
-              aria-label={`Скопировать ${info.title}`}
-              onClick={() => handleRowClick(info.copyValue, info.title)}
-            >
-              <p className="user-details-modal-info__label">{info.title}:</p>
-              <span className="user-details-modal-info__value">
-                {info.value}
-              </span>
-              <Icon
-                name="copy"
-                color="text-tertiary"
-                className="user-details-modal-info__copy-decor-icon"
-              />
-            </button>
+              label={info.title}
+              value={info.value}
+              originalValue={info.originalValue}
+              copyValue={info.copyValue}
+              onCopy={handleRowClick}
+            />
           ))}
         </div>
       </section>

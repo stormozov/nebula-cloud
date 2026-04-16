@@ -1,5 +1,7 @@
+import { toast } from "react-toastify";
+
 import { useUpdateUserMutation } from "@/entities/user";
-import { Button, Icon, type ModalConfirmDialogRequest } from "@/shared/ui";
+import { Button, type ModalConfirmDialogRequest } from "@/shared/ui";
 
 /**
  * Props interface for the ToggleActiveButton component.
@@ -24,7 +26,6 @@ interface ToggleActiveButtonProps {
  *   onSuccess={() => console.log("Status updated")}
  * />
  */
-
 export function ToggleActiveButton({
   userId,
   isActive,
@@ -46,8 +47,11 @@ export function ToggleActiveButton({
             data: { isActive: !isActive },
           }).unwrap();
           onSuccess?.();
-        } catch (err) {
-          console.error("Failed to toggle active status:", err);
+          toast.success(`Статус пользователя ${userId} успешно изменен`, {
+            position: "top-center",
+          });
+        } catch {
+          toast.error("Не удалось изменить статус пользователя");
         }
       },
     );
@@ -56,23 +60,16 @@ export function ToggleActiveButton({
   return (
     <Button
       variant={isActive ? "danger" : "primary"}
+      icon={{
+        name: isActive ? (disabled ? "lock" : "lightbulbOff") : "lightbulbOn",
+      }}
       title={disabled ? "Вы не можете деактивировать пользователя" : ""}
       fullWidth={fullWidth}
       loading={isLoading}
       disabled={disabled}
       onClick={handleToggle}
     >
-      {isActive ? (
-        <>
-          {disabled ? <Icon name="lock" /> : <Icon name="lightbulbOff" />}
-          Деактивировать
-        </>
-      ) : (
-        <>
-          {disabled ? <Icon name="lock" /> : <Icon name="lightbulbOn" />}
-          Активировать
-        </>
-      )}
+      {isActive ? "Деактивировать" : "Активировать"}
     </Button>
   );
 }

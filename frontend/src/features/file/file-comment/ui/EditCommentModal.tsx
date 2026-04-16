@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import type { IFile } from "@/entities/file";
-import { Button, ControlledTextarea, Icon } from "@/shared/ui";
+import { Button, ControlledTextarea } from "@/shared/ui";
 import { Modal } from "@/shared/ui/Modal";
 
 import "./EditCommentModal.scss";
@@ -77,7 +77,6 @@ export function EditCommentModal({
 
     setValidationError(null);
     await onSubmit(comment.trim());
-    // Modal closes after successful submission (handled by parent)
   };
 
   const handleInputChange = (value: string): void => {
@@ -102,18 +101,18 @@ export function EditCommentModal({
         <>
           <Button
             variant="secondary"
-            onClick={handleClose}
+            icon={{ name: "close" }}
             disabled={isSubmitting}
+            onClick={handleClose}
           >
-            <Icon name="close" />
             Отмена
           </Button>
           <Button
             variant="primary"
-            onClick={handleSubmit}
+            icon={{ name: "save" }}
             loading={isSubmitting}
+            onClick={handleSubmit}
           >
-            <Icon name="save" />
             Сохранить
           </Button>
         </>

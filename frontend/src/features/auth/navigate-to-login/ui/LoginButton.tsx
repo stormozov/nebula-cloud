@@ -2,7 +2,7 @@ import classNames from "classnames";
 import { useNavigate } from "react-router";
 
 import type { IButtonProps } from "@/shared/ui";
-import { Button, Icon } from "@/shared/ui";
+import { Button } from "@/shared/ui";
 
 import "./LoginButton.scss";
 
@@ -34,12 +34,12 @@ export function LoginButton({
       type="button"
       variant={variant}
       size={size}
+      icon={{ name: "login" }}
       fullWidth={fullWidth}
       className={classNames("login-button", className)}
       onClick={handleClick}
       {...restProps}
     >
-      <Icon name="login" />
       {children}
     </Button>
   );

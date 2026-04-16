@@ -1,0 +1,16 @@
+// =============================================================================
+// Styles module for PageLoader component
+// =============================================================================
+
+.page-loader {
+  position: relative;
+  z-index: 9999;
+
+  height: 100vh;
+
+  background-color: var(--color-bg-primary);
+
+  .spinner {
+    height: 100vh;
+  }
+}
