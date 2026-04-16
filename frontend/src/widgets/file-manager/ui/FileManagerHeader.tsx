@@ -1,6 +1,6 @@
 import { FileSearchInput } from "@/features/file/file-search";
 import { FileUploadButton } from "@/features/file/file-upload";
-import { BackButton, Heading, Icon, PageWrapper } from "@/shared/ui";
+import { BackButton, Badge, Heading, PageWrapper } from "@/shared/ui";
 
 /**
  * Props for the FileManagerHeader component.
@@ -60,13 +60,9 @@ export function FileManagerHeader({
         <BackButton />
         <Heading level={2} noMargin className="file-manager__header-title">
           Файлы пользователя{" "}
-          <sup
-            className="file-manager__header-title-badge"
-            title={`ID пользователя: ${userId}`}
-          >
-            <Icon name="person" />
+          <Badge variant="info-light" icon="person" superscript copyable>
             {userId}
-          </sup>
+          </Badge>
         </Heading>
       </PageWrapper>
       <FileSearchInput

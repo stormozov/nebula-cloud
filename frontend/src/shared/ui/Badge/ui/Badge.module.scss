@@ -1,0 +1,179 @@
+// =============================================================================
+// Styles module for Badge component
+// =============================================================================
+
+@use "sass:map";
+
+$badge-height: 24px;
+$badge-min-width: 20px;
+$badge-padding-inline: 8px;
+$badge-font-size: 12px;
+$badge-border-radius: 6px;
+$badge-dot-size: 10px;
+$badge-icon-size: 12px;
+$badge-transition: all 0.2s ease;
+
+$variants: (
+  primary: var(--color-primary),
+  success: var(--color-success),
+  warning: var(--color-warning),
+  error: var(--color-error),
+  info: var(--color-info),
+);
+
+$light-variants: (
+  primary-light: var(--color-primary-light),
+  success-light: var(--color-success-light),
+  warning-light: var(--color-warning-light),
+  error-light: var(--color-error-light),
+  info-light: var(--color-info-light),
+);
+
+@mixin absolute-position($top: null, $right: null, $bottom: null, $left: null) {
+  position: absolute;
+  @if $top != null {
+    top: $top;
+  }
+  @if $right != null {
+    right: $right;
+  }
+  @if $bottom != null {
+    bottom: $bottom;
+  }
+  @if $left != null {
+    left: $left;
+  }
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+
+  min-width: $badge-min-width;
+  height: $badge-height;
+  padding: 0 $badge-padding-inline;
+
+  background-color: var(--color-primary);
+  border-radius: $badge-border-radius;
+
+  font-size: $badge-font-size;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--color-text-inverse);
+  white-space: nowrap;
+
+  pointer-events: none;
+  transition: $badge-transition;
+
+  // ---------------------------------------------------------------------------
+  // Relative positioning
+  // ---------------------------------------------------------------------------
+
+  &--relative {
+    position: relative;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Absolute positioning
+  // ---------------------------------------------------------------------------
+
+  &--top-left {
+    @include absolute-position($top: 0, $left: 0);
+  }
+  &--top-center {
+    @include absolute-position($top: 0, $left: 50%);
+  }
+  &--top-right {
+    @include absolute-position($top: 0, $right: 0);
+  }
+  &--bottom-left {
+    @include absolute-position($bottom: 0, $left: 0);
+  }
+  &--bottom-center {
+    @include absolute-position($bottom: 0, $left: 50%);
+  }
+  &--bottom-right {
+    @include absolute-position($bottom: 0, $right: 0);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Color variants
+  // ---------------------------------------------------------------------------
+
+  &--default {
+    background-color: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+  }
+
+  @each $name, $color in $variants {
+    &--#{$name} {
+      background-color: $color;
+      color: var(--color-text-inverse);
+    }
+  }
+
+  @each $name, $bg in $light-variants {
+    $base-name: str-slice($name, 1, str-length($name) - 6);
+    &--#{$name} {
+      background-color: $bg;
+      color: var(--color-#{$base-name});
+      border: 1px solid var(--color-#{$base-name}-light-border, transparent);
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Modifiers
+  // ---------------------------------------------------------------------------
+
+  &--superscript {
+    vertical-align: super;
+    font-size: 0.75rem;
+    height: 1.725em;
+    min-width: auto;
+    padding: 0 0.8em;
+  }
+
+  &--dot {
+    min-width: $badge-dot-size;
+    height: $badge-dot-size;
+    padding: 0;
+    border-radius: 50%;
+  }
+
+  &--copyable {
+    pointer-events: auto;
+    cursor: pointer;
+    user-select: none;
+    transition: opacity 0.15s;
+
+    &:hover {
+      opacity: 0.85;
+    }
+
+    &:active {
+      opacity: 0.7;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Inner elements
+  // ---------------------------------------------------------------------------
+
+  &__icon {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 2px;
+
+    svg {
+      width: $badge-icon-size;
+      height: $badge-icon-size;
+      fill: currentColor;
+    }
+  }
+
+  &__content {
+    display: inline-block;
+  }
+}

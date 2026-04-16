@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 
 import { selectUser } from "@/entities/user";
-import { Avatar, DropdownMenu } from "@/shared/ui";
+import { Avatar, Badge, DropdownMenu } from "@/shared/ui";
 
 import { useProfileMenuActions } from "../lib/useProfileMenuActions";
 
@@ -32,9 +32,20 @@ export function UserProfileMenu() {
         size="sm"
         className="user-profile-menu__avatar"
       />
+
       <span className="user-profile-menu__name">
         {user.fullName || user.username}
       </span>
+
+      {user.isStaff && (
+        <Badge
+          variant="info-light"
+          position="bottom-center"
+          className="user-profile-menu__badge"
+        >
+          Админ
+        </Badge>
+      )}
     </button>
   );
 

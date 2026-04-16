@@ -25,22 +25,6 @@
     margin-bottom: 16px;
   }
 
-  &__header-title {
-    &-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-
-      padding: 5px 10px;
-
-      background-color: var(--color-info-light);
-      border-radius: 6px;
-
-      font-size: 0.75rem;
-      color: var(--color-info);
-    }
-  }
-
   &__load-more {
     margin-top: 1.125rem;
     text-align: center;

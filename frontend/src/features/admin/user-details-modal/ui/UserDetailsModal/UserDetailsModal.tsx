@@ -4,7 +4,14 @@ import { createPortal } from "react-dom";
 
 import { type IModalContentProps, UserNavigation } from "@/features/admin";
 import { useBodyScrollLock, useFocusTrap } from "@/shared/hooks";
-import { Button, Heading, Icon, PageWrapper, Spinner } from "@/shared/ui";
+import {
+  Badge,
+  Button,
+  Heading,
+  Icon,
+  PageWrapper,
+  Spinner,
+} from "@/shared/ui";
 
 import { useUserDetailsModal } from "../../lib/useUserDetailsModal";
 import { UserDetailsModalActions } from "../UserDetailsModalActions/UserDetailsModalActions";
@@ -107,17 +114,14 @@ export function UserDetailsModal({ modalProps }: IUserDetailsModalProps) {
             >
               <Heading level={3} className="user-details-modal__header-title">
                 <Icon name="person" color="primary" />
+
                 {isLoading && "Загрузка данных..."}
                 {hasError && "Пользователь не найден"}
                 {isSuccess &&
                   `Детали пользователя ${user.username || user.fullName}`}
+
                 {isSuccess && isCurrentUser && (
-                  <sup
-                    title="Текущий пользователь"
-                    className="user-details-modal__header-title-badge"
-                  >
-                    Вы
-                  </sup>
+                  <Badge variant="info-light" superscript>Вы</Badge>
                 )}
               </Heading>
               <PageWrapper>

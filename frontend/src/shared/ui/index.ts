@@ -1,4 +1,5 @@
 export * from "./Avatar";
+export * from "./Badge";
 export * from "./buttons";
 export * from "./CollapsibleSearch";
 export * from "./CopyIcon";

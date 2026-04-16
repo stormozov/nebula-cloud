@@ -4,6 +4,7 @@
 
 .user-profile-menu {
   &__trigger {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 8px;

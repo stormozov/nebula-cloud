@@ -1,5 +1,5 @@
 import { UserDetailsModal, UserList, UserSearchInput } from "@/features/admin";
-import { Button, Heading, ModalConfirm } from "@/shared/ui";
+import { Badge, Button, Heading, ModalConfirm } from "@/shared/ui";
 
 import { useUserManager } from "../lib/useUserManager";
 
@@ -26,7 +26,7 @@ export function UserManagementWidget() {
         </Heading>
 
         <div className="users-management__count">
-          <sup>({usersList.totalCount} пользователей)</sup>
+          <Badge icon="person" superscript>{usersList.totalCount} пользователей</Badge>
         </div>
 
         <UserSearchInput
