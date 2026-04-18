@@ -5,7 +5,7 @@ import type { DropdownMenuItem, IContextMenuState } from "@/shared/ui";
 
 import type { IFileHandlersProps } from "../../lib/types";
 
-const initialContextMenuState: IContextMenuState = {
+const INIT_CONTEXT_STATE: IContextMenuState = {
   isOpen: false,
   position: { x: 0, y: 0 },
 };
@@ -14,10 +14,15 @@ const initialContextMenuState: IContextMenuState = {
  * Properties for the `useFileRowInteractions` hook.
  */
 interface IUseFileRowInteractionsProps {
+  /** The file to be interacted with */
   file: IFile;
+  /** Handlers for file actions */
   handlers: IFileHandlersProps;
+  /** Actions to be displayed in the context menu */
   actions: DropdownMenuItem<IFile>[];
+  /** Whether the row is disabled */
   disabled?: boolean;
+  /** Callback to be called when the row is selected */
   onSelect?: (file: IFile) => void;
 }
 
@@ -32,7 +37,7 @@ export const useFileRowInteractions = ({
   onSelect,
 }: IUseFileRowInteractionsProps) => {
   const [contextMenu, setContextMenu] = useState<IContextMenuState>(
-    initialContextMenuState,
+    INIT_CONTEXT_STATE,
   );
 
   const handleRowClick = useCallback(() => {
@@ -44,31 +49,27 @@ export const useFileRowInteractions = ({
       event.preventDefault();
       onSelect?.(file);
       handlers.onView?.(file);
-    }
-
-    if (event.key === "Delete") {
-      event.preventDefault();
-      handlers.onDelete?.(file);
-    }
-
-    if (event.key === "r" || event.key === "F2") {
-      event.preventDefault();
-      handlers.onRename?.(file);
-    }
-
-    if (event.key === "c") {
-      event.preventDefault();
-      handlers.onEditComment?.(file);
-    }
-
-    if (event.key === "l") {
-      event.preventDefault();
-      handlers.onPublicLink?.(file);
-    }
-
-    if (event.key === "v") {
+    } else if (
+      (event.ctrlKey && event.key === "s") ||
+      (event.metaKey && event.key === "s")
+    ) {
       event.preventDefault();
       handlers.onDownload?.(file);
+    } else if (event.key === "Delete" || event.key === "Backspace") {
+      event.preventDefault();
+      handlers.onDelete?.(file);
+    } else if (event.shiftKey && event.key === "F2") {
+      event.preventDefault();
+      handlers.onEditComment?.(file);
+    } else if (event.key === "F2") {
+      event.preventDefault();
+      handlers.onRename?.(file);
+    } else if (
+      (event.ctrlKey && event.key === "l") ||
+      (event.metaKey && event.key === "l")
+    ) {
+      event.preventDefault();
+      handlers.onPublicLink?.(file);
     }
   };
 
