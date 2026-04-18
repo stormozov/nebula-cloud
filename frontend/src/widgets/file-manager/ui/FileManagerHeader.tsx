@@ -1,5 +1,6 @@
 import { FileSearchInput } from "@/features/file/file-search";
 import { FileUploadButton } from "@/features/file/file-upload";
+import { HelpKeyboardShortcutsButton } from "@/features/help";
 import { BackButton, Badge, Heading, PageWrapper } from "@/shared/ui";
 
 /**
@@ -40,7 +41,7 @@ export function FileManagerHeader({
         <Heading level={2} noMargin className="file-manager__header-title">
           Ваш диск
         </Heading>
-        <PageWrapper>
+        <PageWrapper align="center">
           <FileSearchInput
             inputProps={{
               value: searchTerm,
@@ -48,6 +49,7 @@ export function FileManagerHeader({
               onChange: onSearchChange,
             }}
           />
+          <HelpKeyboardShortcutsButton buttonProps={{ variant: "secondary" }} />
           <FileUploadButton>Загрузить файл</FileUploadButton>
         </PageWrapper>
       </>
@@ -65,17 +67,22 @@ export function FileManagerHeader({
           </Badge>
         </Heading>
       </PageWrapper>
-      <FileSearchInput
-        buttonProps={{
-          children: "Поиск",
-          size: "small",
-        }}
-        inputProps={{
-          value: searchTerm,
-          placeholder: "Поиск по названию и дате загрузки",
-          onChange: onSearchChange,
-        }}
-      />
+      <PageWrapper align="center">
+        <FileSearchInput
+          buttonProps={{
+            children: "Поиск",
+            size: "small",
+          }}
+          inputProps={{
+            value: searchTerm,
+            placeholder: "Поиск по названию и дате загрузки",
+            onChange: onSearchChange,
+          }}
+        />
+        <HelpKeyboardShortcutsButton
+          buttonProps={{ variant: "secondary", size: "small" }}
+        />
+      </PageWrapper>
     </>
   );
 }

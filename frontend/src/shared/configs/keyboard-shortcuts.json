@@ -1,0 +1,24 @@
+{
+  "file-manager": {
+    "view": [
+      { "key": "Enter", "description": "Открыть предпросмотр файла" },
+      { "key": "Space", "description": "Открыть предпросмотр файла" }
+    ],
+    "download": [
+      { "key": "CTRL + S", "description": "Сохранить файл как" }
+    ],
+    "delete": [
+      { "key": "Delete", "description": "Удалить файл" },
+      { "key": "Backspace", "description": "Удалить файл" }
+    ],
+    "rename": [
+      { "key": "F2", "description": "Переименовать файл" }
+    ],
+    "comment": [
+      { "key": "SHIFT + F2", "description": "Переименовать комментарий" }
+    ],
+    "publicLink": [
+      { "key": "CTRL + L", "description": "Получить публичную ссылку" }
+    ]
+  }
+}
