@@ -22,6 +22,7 @@ import {
   FaFileExport,
   FaLinkSlash,
   FaPencil,
+  FaQuestion,
   FaShareNodes,
   FaTrashCan,
   FaUser,
@@ -87,6 +88,7 @@ export const ICONS = {
   cloudWarning: createIconAdapter(CloudWarningIcon),
   cloudLoading: createIconAdapter(CloudLoadingIcon),
   notFound: TbError404,
+  question: FaQuestion,
 
   // ========== User & Admin ==========
   person: FaUser,

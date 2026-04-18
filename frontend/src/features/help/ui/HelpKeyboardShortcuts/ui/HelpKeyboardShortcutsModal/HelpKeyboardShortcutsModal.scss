@@ -1,0 +1,16 @@
+// =============================================================================
+// Styles for the HelpKeyboardShortcutsModal component
+// =============================================================================
+
+.help-keyboard-shortcuts-modal {
+  max-width: 1024px;
+
+  &__description {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+  }
+
+  .help-keyboard-shortcuts-list {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  }
+}

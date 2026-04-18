@@ -74,6 +74,16 @@ export const routesConfig = createBrowserRouter([
         ),
       },
 
+      // Protected route: Test page (admin only)
+      {
+        path: "/test/",
+        element: (
+          <AuthGuard accessLevel="admin">
+            {lazyWithSuspense(() => import("@/pages/PageTest/PageTest"))}
+          </AuthGuard>
+        ),
+      },
+
       // Public route: Public file metadata preview
       {
         path: "/public/:token/",
