@@ -19,6 +19,7 @@ export const StorageProgressBar = ({
   totalFormatted,
   percent,
   showLabels = true,
+  compact = false,
   variant = "default",
   className,
 }: IStorageProgressBarProps) => {
@@ -38,6 +39,7 @@ export const StorageProgressBar = ({
     {
       "storage-progress-bar--warning": isWarning && !isCritical,
       "storage-progress-bar--critical": isCritical,
+      "storage-progress-bar--compact": compact,
     },
     className,
   );
@@ -68,7 +70,7 @@ export const StorageProgressBar = ({
         />
       </div>
 
-      {variant === "default" && showLabels && (
+      {!compact && showLabels && (
         <div className="storage-progress-bar__extra">
           <p className="storage-progress-bar__busyness">{busynessText}</p>
           <span className="storage-progress-bar__percent">

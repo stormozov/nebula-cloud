@@ -56,4 +56,11 @@
   &--compact &__track {
     height: 4px;
   }
+
+  &--bordered {
+    padding: 16px;
+
+    border: 1px solid var(--color-border-secondary);
+    border-radius: 8px;
+  }
 }

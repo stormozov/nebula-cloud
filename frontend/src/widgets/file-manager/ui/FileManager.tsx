@@ -145,7 +145,7 @@ export function FileManager({
         usedFormatted={usedFormatted}
         totalFormatted={limitFormatted}
         percent={percent}
-        showLabels
+        variant="bordered"
       />
     );
   }, [isStorageLoading, used, limit, usedFormatted, limitFormatted, percent]);

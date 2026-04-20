@@ -12,19 +12,15 @@ export interface IStorageProgressBarProps {
   totalFormatted: string;
   /** The usage percentage as a numeric value between 0 and 100+. */
   percent: number;
+  /** Visual style variant for the progress bar. */
+  variant?: "default" | "bordered";
   /**
    * Optional flag to control the visibility of the label section showing
    * `usedFormatted` and `totalFormatted`.
    */
   showLabels?: boolean;
-  /**
-   * Visual style variant for the progress bar.
-   * - `"default"`: Shows labels, progress track, and additional info
-   * (status text and percentage).
-   * - `"compact"`: Minimalist style, typically hiding extra text and focusing
-   * on the bar itself.
-   */
-  variant?: "default" | "compact";
+  /** Optional flag to enable compact mode */
+  compact?: boolean;
   /** Optional CSS class name to be applied to the root element  */
   className?: string;
 }
