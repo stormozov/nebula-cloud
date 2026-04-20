@@ -3,7 +3,7 @@ Module for custom user model.
 """
 
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import RegexValidator
+from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -44,6 +44,13 @@ class UserAccount(AbstractUser):
     last_name = models.CharField(
         _("фамилия"),
         max_length=150,
+    )
+
+    storage_limit = models.BigIntegerField(
+        default=52_428_800,
+        verbose_name="Лимит хранилища в байтах",
+        help_text="Максимальный объём файлов пользователя в байтах",
+        validators=[MinValueValidator(0)],
     )
 
     objects = UserAccountManager()

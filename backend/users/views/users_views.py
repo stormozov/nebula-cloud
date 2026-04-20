@@ -302,6 +302,9 @@ class CurrentUserView(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewse
             "file_count": storage_stats["file_count"],
             "total_size": storage_stats["total_size"],
             "total_size_formatted": storage_stats["total_size_formatted"],
+            "storage_limit": storage_stats["storage_limit"],
+            "storage_limit_formatted": storage_stats["storage_limit_formatted"],
+            "usage_percent": storage_stats["usage_percent"],
             "storage_path": user.storage_path,
         }
 
