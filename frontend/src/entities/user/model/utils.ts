@@ -1,6 +1,8 @@
 import { copyToClipboardWithFeedback } from "@/shared/utils";
 
 import type {
+  IStorageStats,
+  IStorageStatsResponse,
   IUserListResponse,
   IUserRegister,
   UserListItemCopyField,
@@ -61,3 +63,18 @@ export const copyUserField = async (
     () => onError?.(),
   );
 };
+
+/**
+ * Type guard function that checks if the provided data is of type
+ * `IStorageStatsResponse`.
+ *
+ * @param data - The object to be checked, which can be either `IStorageStats`
+ * or `IStorageStatsResponse`.
+ * @returns A boolean indicating whether the data has both `user` and `storage`
+ * properties, thus confirming it is of type `IStorageStatsResponse`.
+ */
+export function isAdminResponse(
+  data: IStorageStats | IStorageStatsResponse,
+): data is IStorageStatsResponse {
+  return "user" in data && "storage" in data;
+}

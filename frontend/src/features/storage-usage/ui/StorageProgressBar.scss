@@ -1,0 +1,59 @@
+// =============================================================================
+// Styles for StorageProgressBar component
+// =============================================================================
+
+.storage-progress-bar {
+  width: 100%;
+
+  &__labels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    font-size: 0.875rem;
+  }
+
+  &__track {
+    height: 6px;
+    background-color: var(--color-bg-tertiary);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  &__fill {
+    height: 100%;
+    background-color: var(--color-primary);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+  }
+
+  &--warning &__fill {
+    background-color: var(--color-warning);
+  }
+
+  &--critical &__fill {
+    background-color: var(--color-error);
+  }
+
+  &__extra {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 4px;
+  }
+
+  &__busyness {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+  }
+
+  &__percent {
+    display: inline-block;
+    font-size: 0.75rem;
+    text-align: right;
+    color: var(--color-text-secondary);
+  }
+
+  &--compact &__track {
+    height: 4px;
+  }
+}

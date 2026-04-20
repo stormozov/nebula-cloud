@@ -5,6 +5,8 @@ import { getRefreshTokenFromPersist } from "@/shared/utils";
 
 import { logout, setAuthData } from "../model/slice";
 import type {
+  IStorageStats,
+  IStorageStatsResponse,
   IToken,
   IUser,
   IUserAuthResponse,
@@ -19,7 +21,7 @@ import { transformDataToApi } from "../model/utils";
 export const userApi = createApi({
   reducerPath: "userApi",
   baseQuery: baseQueryWithAuthErrorHandling,
-  tagTypes: ["User"],
+  tagTypes: ["User", "UserStorage"],
   endpoints: (build) => ({
     /**
      * Fetches the current authenticated user's data.
@@ -125,6 +127,26 @@ export const userApi = createApi({
         body: { refresh: getRefreshTokenFromPersist() },
       }),
     }),
+
+    /**
+     * Fetches storage summary for current user or specified user (admin only).
+     *
+     * @param userId - If provided (admin), fetches stats for that user;
+     * otherwise current user.
+     */
+    getStorageSummary: build.query<
+      IStorageStats | IStorageStatsResponse,
+      number | undefined
+    >({
+      query: (userId) =>
+        userId !== undefined
+          ? `/admin/users/${userId}/storage-stats/`
+          : "/users/me/storage-summary/",
+      providesTags: (_result, _error, userId) =>
+        userId !== undefined
+          ? [{ type: "User" as const, id: userId }]
+          : [{ type: "UserStorage" as const }],
+    }),
   }),
 });
 
@@ -134,4 +156,5 @@ export const {
   useRegisterMutation,
   useLogoutMutation,
   useRefreshMutation,
+  useGetStorageSummaryQuery,
 } = userApi;

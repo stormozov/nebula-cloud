@@ -10,6 +10,7 @@ import type { IFileListProps } from "@/features/file/file-list";
 import { PublicLinkModal } from "@/features/file/file-public-link";
 import { RenameFileModal } from "@/features/file/file-rename";
 import { useFileSearch } from "@/features/file/file-search";
+import { StorageProgressBar, useStorageUsage } from "@/features/storage-usage";
 import fileListConfig from "@/shared/configs/file-list.json";
 import { ListSkeleton } from "@/shared/ui";
 import { getErrorMessage, isImageFile } from "@/shared/utils";
@@ -93,6 +94,15 @@ export function FileManager({
     resetPagination,
   });
 
+  const {
+    used,
+    limit,
+    usedFormatted,
+    limitFormatted,
+    percent,
+    isLoading: isStorageLoading,
+  } = useStorageUsage(isAdmin ? userId : undefined);
+
   // Listen for upload completion to reset pagination
   const isUploadQueueCompleted = useAppSelector(selectIsQueueCompleted);
 
@@ -125,6 +135,20 @@ export function FileManager({
     },
     [setSearchTerm, resetPagination],
   );
+
+  const storageWidget = useMemo(() => {
+    if (isStorageLoading) return null;
+    return (
+      <StorageProgressBar
+        used={used}
+        total={limit}
+        usedFormatted={usedFormatted}
+        totalFormatted={limitFormatted}
+        percent={percent}
+        showLabels
+      />
+    );
+  }, [isStorageLoading, used, limit, usedFormatted, limitFormatted, percent]);
 
   // ---------------------------------------------------------------------------
   // PREPARE DATA FOR LIST
@@ -196,14 +220,13 @@ export function FileManager({
 
   return (
     <div className="file-manager">
-      <header className="file-manager__header">
-        <FileManagerHeader
-          isAdmin={isAdmin}
-          userId={userId}
-          searchTerm={searchTerm}
-          onSearchChange={handleSearchChange}
-        />
-      </header>
+      <FileManagerHeader
+        isAdmin={isAdmin}
+        userId={userId}
+        storageWidget={storageWidget}
+        searchTerm={searchTerm}
+        onSearchChange={handleSearchChange}
+      />
 
       <FileManagerDropzone isVisible={isDropzoneVisible} />
 
