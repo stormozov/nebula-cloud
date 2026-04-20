@@ -1,4 +1,4 @@
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useRef, useState } from "react";
 
 import type { IUserListResponse, UserListItemCopyField } from "@/entities/user";
 
@@ -42,6 +42,8 @@ export function UserListItem({
   onSelectUser,
   onCopyField,
 }: IUserListItemProps) {
+  const trRef = useRef<HTMLTableRowElement>(null);
+
   const [contextMenu, setContextMenu] =
     useState<IContextMenuState>(initContextMenuState);
 
@@ -67,10 +69,28 @@ export function UserListItem({
     setContextMenu((prev) => ({ ...prev, isOpen: false }));
   }, []);
 
+  const handleKeyboardContextMenu = useCallback(() => {
+    if (actions.length === 0 || !trRef.current) return;
+
+    const rect = trRef.current.getBoundingClientRect();
+    const position = {
+      x: rect.right,
+      y: rect.top + rect.height / 2,
+    };
+
+    setContextMenu({
+      isOpen: true,
+      position,
+    });
+  }, [actions.length]);
+
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTableRowElement>) => {
-    if (event.key === "Enter" || event.key === " ") {
+    if (event.key === " ") {
       event.preventDefault();
       onSelectUser(user.id);
+    } else if (event.key === "Enter") {
+      event.preventDefault();
+      handleKeyboardContextMenu();
     }
   };
 
@@ -78,6 +98,7 @@ export function UserListItem({
     <>
       {/** biome-ignore lint/a11y/useSemanticElements: <tr> */}
       <tr
+        ref={trRef}
         className="users-list__body-row"
         role="button"
         title={`Открыть информацию о пользователе ${user.username}`}

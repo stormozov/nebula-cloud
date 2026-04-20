@@ -26,7 +26,9 @@ export function UserManagementWidget() {
         </Heading>
 
         <div className="users-management__count">
-          <Badge icon="person" superscript>{usersList.totalCount} пользователей</Badge>
+          <Badge icon="person" superscript>
+            {usersList.totalCount} пользователей
+          </Badge>
         </div>
 
         <UserSearchInput
