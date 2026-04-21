@@ -52,7 +52,7 @@ export const CollapsibleSearch = ({
   };
 
   useClickOutside(containerRef, () => {
-    if (value === "") handleClose();
+    if (isOpen && value === "") handleClose();
   });
 
   useEffect(() => {
