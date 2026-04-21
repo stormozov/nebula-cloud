@@ -132,7 +132,7 @@ export function DropdownMenu<T>(props: IDropdownMenuProps<T>) {
               ref={(el) => {
                 actionRefs.current[currentActionIndex] = el;
               }}
-              className={classNames("dropdown-menu__item", {
+              className={classNames("dropdown-menu__item", action.classNames, {
                 "dropdown-menu__item--danger": action.isDanger,
                 "dropdown-menu__item--disabled": disabled,
               })}

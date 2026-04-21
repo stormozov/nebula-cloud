@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 
 import { selectUser } from "@/entities/user";
-import { Avatar, Badge, DropdownMenu } from "@/shared/ui";
+import { Avatar, Badge, Button, DropdownMenu } from "@/shared/ui";
 
 import { useProfileMenuActions } from "../lib/useProfileMenuActions";
 
@@ -18,34 +18,31 @@ export function UserProfileMenu() {
 
   const actions = useProfileMenuActions();
 
+  const fullName = user?.fullName || user?.username;
+
   if (!user) return null;
 
   const trigger = (
-    <button
+    <Button
       type="button"
       className="user-profile-menu__trigger"
       aria-label="Меню пользователя"
     >
       <Avatar
         src=""
-        alt={user.fullName || user.username}
+        alt={fullName || "Аватар пользователя"}
         size="sm"
         className="user-profile-menu__avatar"
       />
 
-      <span className="user-profile-menu__name">
-        {user.fullName || user.username}
-      </span>
+      <span className="user-profile-menu__name">{fullName}</span>
 
       {user.isStaff && (
-        <Badge
-          position="bottom-center"
-          className="user-profile-menu__badge"
-        >
+        <Badge position="bottom-center" className="user-profile-menu__badge">
           Админ
         </Badge>
       )}
-    </button>
+    </Button>
   );
 
   return (

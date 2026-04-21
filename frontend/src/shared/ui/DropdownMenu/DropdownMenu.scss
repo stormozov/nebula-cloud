@@ -44,6 +44,11 @@
     cursor: pointer;
     transition: background-color 0.2s;
 
+    &.is-active {
+      color: var(--color-info);
+      opacity: 1;
+    }
+
     &:hover:not(&--disabled) {
       background-color: var(--color-bg-secondary);
       outline-color: var(--color-info-light);

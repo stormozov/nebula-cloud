@@ -32,28 +32,31 @@ export const ListSkeleton = memo(function ListSkeleton({
   return (
     // biome-ignore lint/a11y/useSemanticElements: <role status needs for screen readers>
     <div
-      className={`users-list ${className}`.trim()}
+      className={`list-skeleton ${className}`.trim()}
       role="status"
       aria-busy="true"
       aria-label="Загрузка данных таблицы"
     >
-      <table className="users-list__table">
-        <thead className="users-list__header">
-          <tr className="users-list__header-row">
+      <table className="list-skeleton__table">
+        <thead className="list-skeleton__header">
+          <tr className="list-skeleton__header-row">
             {headerKeys.map((key) => (
-              <th key={key} className="users-list__header-cell">
-                <div className="users-list-cell-skeleton" aria-hidden="true" />
+              <th key={key} className="list-skeleton__header-cell">
+                <div
+                  className="list-skeleton__cell-skeleton"
+                  aria-hidden="true"
+                />
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="users-list__body">
+        <tbody className="list-skeleton__body">
           {gridRows.map(({ rowKey, cellKeys }) => (
-            <tr key={rowKey} className="users-list__body-row">
+            <tr key={rowKey} className="list-skeleton__body-row">
               {cellKeys.map((key) => (
-                <td key={key} className="users-list__body-cell">
+                <td key={key} className="list-skeleton__body-cell">
                   <div
-                    className="users-list-cell-skeleton"
+                    className="list-skeleton__cell-skeleton"
                     aria-hidden="true"
                   />
                 </td>

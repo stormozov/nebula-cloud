@@ -50,7 +50,7 @@
   &--primary {
     background-color: var(--color-primary);
     border-color: var(--color-primary);
-    color: var(--color-text-inverse);
+    color: var(--color-white);
 
     &:hover:not(:disabled) {
       background-color: var(--color-primary-hover);

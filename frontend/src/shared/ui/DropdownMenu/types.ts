@@ -14,6 +14,8 @@ export interface IDropdownMenuActionItem<T> {
   arialLabel?: string;
   /** Optional icon */
   icon?: IconName;
+  /** Custom class names */
+  classNames?: string;
   /** Is the action destructive? */
   isDanger?: boolean;
   /** Disabled state (boolean or function) */
