@@ -6,7 +6,7 @@ All actions in this module require authentication and appropriate permissions.
 from datetime import datetime
 
 from django.db.models import Q
-from django.http import FileResponse
+from django.http import FileResponse, JsonResponse
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound, ValidationError
@@ -23,7 +23,6 @@ from storage.serializers import (
     FileUploadSerializer,
 )
 from storage.services.services import create_file_with_limit_check
-from users.models import UserAccount
 
 
 class FileViewSet(viewsets.ModelViewSet):
@@ -207,11 +206,12 @@ class FileViewSet(viewsets.ModelViewSet):
             return Response(response_serializer.data, status=status.HTTP_201_CREATED)
         except ValidationError as e:
             file_logger.warning(
-                "File upload failed (validation error): user=%s, IP=%s",
+                "File upload failed (validation error): user=%s, IP=%s, error=%s",
                 self._get_user_email_for_log(),
                 get_client_ip(request),
+                str(e),
             )
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": e.detail}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             file_logger.error(
                 "File upload failed: user=%s, IP=%s",
@@ -323,7 +323,7 @@ class FileViewSet(viewsets.ModelViewSet):
                 self._get_user_email_for_log(),
                 get_client_ip(request),
             )
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": e.detail}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             file_logger.error(
                 "File upload failed: user=%s, IP=%s",

@@ -29,7 +29,7 @@ def create_file_with_limit_check(
 
         if current_total + file_size > user_locked.storage_limit:
             raise ValidationError(
-                "Превышен лимит хранилища. Освободите место или обратитесь к администратору.",
+                detail="Превышен лимит хранилища. Освободите место.",
                 code="storage_limit_exceeded",
             )
 
