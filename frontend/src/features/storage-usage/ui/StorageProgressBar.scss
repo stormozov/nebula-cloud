@@ -16,14 +16,33 @@
     height: 6px;
     background-color: var(--color-bg-tertiary);
     border-radius: 4px;
-    overflow: hidden;
   }
 
   &__fill {
+    position: relative;
     height: 100%;
     background-color: var(--color-primary);
     border-radius: 4px;
     transition: width 0.3s ease;
+
+    &::before {
+      content: "";
+
+      position: absolute;
+      top: 50%;
+      right: 0;
+
+      display: block;
+
+      width: 6px;
+      height: 14px;
+
+      background-color: inherit;
+      outline: 3px solid var(--color-bg-primary);
+      border-radius: 0 1px 6px 0;
+
+      transform: translate(50%, -50%) rotate(-45deg);
+    }
   }
 
   &--warning &__fill {
