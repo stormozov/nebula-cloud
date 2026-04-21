@@ -1,3 +1,5 @@
+import type React from "react";
+
 import { FileSearchInput } from "@/features/file/file-search";
 import { FileUploadButton } from "@/features/file/file-upload";
 import { HelpKeyboardShortcutsButton } from "@/features/help";
@@ -15,6 +17,8 @@ interface FileManagerHeaderProps {
    * Optional user ID to display in the header when viewing another user's files.
    */
   userId?: number;
+  /** Optional storage widget to display in the header. */
+  storageWidget?: React.ReactNode;
   /** Current search term entered by the user. */
   searchTerm: string;
   /**
@@ -33,56 +37,73 @@ export function FileManagerHeader({
   isAdmin,
   userId,
   searchTerm,
+  storageWidget,
   onSearchChange,
 }: FileManagerHeaderProps) {
   if (!isAdmin) {
     return (
-      <>
-        <Heading level={2} noMargin className="file-manager__header-title">
-          Ваш диск
-        </Heading>
+      <header className="file-manager__header">
+        <PageWrapper
+          align="center"
+          justify="space-between"
+          className="file-manager__header-top"
+        >
+          <Heading level={2} noMargin className="file-manager__header-title">
+            Ваш диск
+          </Heading>
+          <PageWrapper align="center">
+            <FileSearchInput
+              inputProps={{
+                value: searchTerm,
+                placeholder: "Поиск по названию и дате загрузки",
+                onChange: onSearchChange,
+              }}
+            />
+            <HelpKeyboardShortcutsButton
+              buttonProps={{ variant: "secondary" }}
+            />
+            <FileUploadButton>Загрузить файл</FileUploadButton>
+          </PageWrapper>
+        </PageWrapper>
+        {storageWidget}
+      </header>
+    );
+  }
+
+  return (
+    <header className="file-manager__header">
+      <PageWrapper
+        align="center"
+        justify="space-between"
+        className="file-manager__header-top"
+      >
+        <PageWrapper>
+          <BackButton />
+          <Heading level={2} noMargin className="file-manager__header-title">
+            Файлы пользователя{" "}
+            <Badge variant="info-light" icon="person" superscript copyable>
+              {userId}
+            </Badge>
+          </Heading>
+        </PageWrapper>
         <PageWrapper align="center">
           <FileSearchInput
+            buttonProps={{
+              children: "Поиск",
+              size: "small",
+            }}
             inputProps={{
               value: searchTerm,
               placeholder: "Поиск по названию и дате загрузки",
               onChange: onSearchChange,
             }}
           />
-          <HelpKeyboardShortcutsButton buttonProps={{ variant: "secondary" }} />
-          <FileUploadButton>Загрузить файл</FileUploadButton>
+          <HelpKeyboardShortcutsButton
+            buttonProps={{ variant: "secondary", size: "small" }}
+          />
         </PageWrapper>
-      </>
-    );
-  }
-
-  return (
-    <>
-      <PageWrapper>
-        <BackButton />
-        <Heading level={2} noMargin className="file-manager__header-title">
-          Файлы пользователя{" "}
-          <Badge variant="info-light" icon="person" superscript copyable>
-            {userId}
-          </Badge>
-        </Heading>
       </PageWrapper>
-      <PageWrapper align="center">
-        <FileSearchInput
-          buttonProps={{
-            children: "Поиск",
-            size: "small",
-          }}
-          inputProps={{
-            value: searchTerm,
-            placeholder: "Поиск по названию и дате загрузки",
-            onChange: onSearchChange,
-          }}
-        />
-        <HelpKeyboardShortcutsButton
-          buttonProps={{ variant: "secondary", size: "small" }}
-        />
-      </PageWrapper>
-    </>
+      {storageWidget}
+    </header>
   );
 }

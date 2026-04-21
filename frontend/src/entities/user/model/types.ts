@@ -75,6 +75,9 @@ export interface IStorageStats {
   fileCount: number;
   totalSize: number;
   totalSizeFormatted: string;
+  storageLimit: number;
+  storageLimitFormatted: string;
+  usagePercent: number;
 }
 
 /**
@@ -111,11 +114,8 @@ export interface IStorageStatsResponse {
     username: string;
     email: string;
   };
-  storage: {
+  storage: IStorageStats & {
     path: string;
-    fileCount: number;
-    totalSize: number;
-    totalSizeFormatted: string;
   };
 }
 

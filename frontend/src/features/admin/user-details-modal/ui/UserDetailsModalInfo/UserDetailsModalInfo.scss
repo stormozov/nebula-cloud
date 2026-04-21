@@ -46,26 +46,16 @@
   &__item {
     position: relative;
 
-    display: block;
-
     padding: 6px 28px 6px 12px;
 
     background-color: var(--color-bg-primary);
     border: 2px solid transparent;
     border-radius: 6px;
+  }
 
-    text-align: left;
-
-    cursor: pointer;
-    transition: all 0.2s;
-
-    &:hover {
-      border-color: var(--color-border-tertiary);
-
-      .user-details-modal-info__copy-decor-icon {
-        opacity: 1;
-      }
-    }
+  &__storage-progress {
+    padding-right: 12px;
+    cursor: default;
   }
 
   &__value {

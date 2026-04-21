@@ -1,0 +1,2 @@
+export const STORAGE_WARNING_THRESHOLD = 0.8; // 80%
+export const STORAGE_CRITICAL_THRESHOLD = 0.9; // 90%

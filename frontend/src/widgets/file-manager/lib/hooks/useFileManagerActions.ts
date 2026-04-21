@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { toast } from "react-toastify";
 
+import { useAppDispatch } from "@/app/store/hooks";
 import type { IFile, IFileRename } from "@/entities/file";
 import {
   downloadFileFromApi,
@@ -10,6 +11,7 @@ import {
   useRenameFileMutation,
   useUpdateCommentMutation,
 } from "@/entities/file";
+import { userApi } from "@/entities/user";
 import { camelToSnake } from "@/shared/utils";
 
 import type { ModalType } from "./useFileManagerModals";
@@ -68,6 +70,8 @@ export const useFileManagerActions = ({
   closeModal,
   resetPagination,
 }: UseFileManagerActionsParams): IUseFileManagerActionsReturns => {
+  const dispatch = useAppDispatch();
+
   const [deleteFile, { isLoading: isDeleting }] = useDeleteFileMutation();
   const [renameFile, { isLoading: isRenaming }] = useRenameFileMutation();
   const [updateComment, { isLoading: isUpdatingComment }] =
@@ -76,7 +80,7 @@ export const useFileManagerActions = ({
     useGeneratePublicLinkMutation();
   const [deletePublicLink, { isLoading: isDeletingLink }] =
     useDeletePublicLinkMutation();
-  
+
   // ---------------------------------------------------------------------------
   // HANDLERS
   // ---------------------------------------------------------------------------
@@ -87,11 +91,12 @@ export const useFileManagerActions = ({
       resetPagination();
       await deleteFile(selectedFile.id).unwrap();
       closeModal("delete");
+      dispatch(userApi.util.invalidateTags(["UserStorage"]));
       toast.success("Файл успешно удален");
     } catch {
       toast.error("Не удалось удалить файл");
     }
-  }, [selectedFile, deleteFile, closeModal, resetPagination]);
+  }, [selectedFile, deleteFile, closeModal, resetPagination, dispatch]);
 
   const handleRenameSubmit = useCallback(
     async (newName: string): Promise<void> => {

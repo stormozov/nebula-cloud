@@ -6,10 +6,10 @@ All actions in this module require authentication and appropriate permissions.
 from datetime import datetime
 
 from django.db.models import Q
-from django.http import FileResponse
+from django.http import FileResponse, JsonResponse
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.response import Response
 
 from core.utils import get_client_ip
@@ -22,6 +22,7 @@ from storage.serializers import (
     FileSerializer,
     FileUploadSerializer,
 )
+from storage.services.services import create_file_with_limit_check
 
 
 class FileViewSet(viewsets.ModelViewSet):
@@ -182,35 +183,42 @@ class FileViewSet(viewsets.ModelViewSet):
 
         Expects multipart/form-data with 'file' and optional 'comment' fields.
         Uses FileUploadSerializer to extract metadata from uploaded file.
+        Checks storage limit before saving.
         """
 
         serializer = self.get_serializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
 
         try:
-            file_obj = serializer.save(owner=request.user)
+            file_obj = create_file_with_limit_check(
+                user=request.user, upload_serializer=serializer, request=request
+            )
 
             file_logger.info(
-                "File uploaded: name=%s, size=%d bytes, user=%s, IP=%s",
+                "File uploaded: id=%d, name=%s, user=%s, IP=%s",
+                file_obj.id,
                 file_obj.original_name,
-                file_obj.size,
                 self._get_user_email_for_log(),
                 get_client_ip(request),
             )
 
             response_serializer = FileSerializer(file_obj, context={"request": request})
             return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+        except ValidationError as e:
+            file_logger.warning(
+                "File upload failed (validation error): user=%s, IP=%s, error=%s",
+                self._get_user_email_for_log(),
+                get_client_ip(request),
+                str(e),
+            )
+            return Response({"detail": e.detail}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             file_logger.error(
-                "File upload failed: user=%s, error=%s, IP=%s",
+                "File upload failed: user=%s, IP=%s",
                 self._get_user_email_for_log(),
-                str(e),
                 get_client_ip(request),
             )
-            return Response(
-                {"detail": "Не удалось загрузить файл. Попробуйте позже."},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
+            return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def update(self, request, *args, **kwargs):
         """Fully update a file's metadata."""
@@ -288,35 +296,41 @@ class FileViewSet(viewsets.ModelViewSet):
 
         Alternative endpoint to standard create with explicit upload semantics.
         Functionally equivalent to create() but provides clearer API documentation.
+        Checks storage limit before saving.
         """
 
         serializer = self.get_serializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
 
         try:
-            file_obj = serializer.save(owner=request.user)
+            file_obj = create_file_with_limit_check(
+                user=request.user, upload_serializer=serializer, request=request
+            )
 
             file_logger.info(
-                "File uploaded (via upload action): name=%s, size=%d bytes, user=%s, IP=%s",
+                "File uploaded: id=%d, name=%s, user=%s, IP=%s",
+                file_obj.id,
                 file_obj.original_name,
-                file_obj.size,
                 self._get_user_email_for_log(),
                 get_client_ip(request),
             )
 
             response_serializer = FileSerializer(file_obj, context={"request": request})
             return Response(response_serializer.data, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            file_logger.error(
-                "File upload failed (via upload action): user=%s, error=%s, IP=%s",
+        except ValidationError as e:
+            file_logger.warning(
+                "File upload failed (validation error): user=%s, IP=%s",
                 self._get_user_email_for_log(),
-                str(e),
                 get_client_ip(request),
             )
-            return Response(
-                {"detail": "Не удалось загрузить файл. Попробуйте позже."},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            return Response({"detail": e.detail}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            file_logger.error(
+                "File upload failed: user=%s, IP=%s",
+                self._get_user_email_for_log(),
+                get_client_ip(request),
             )
+            return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @action(detail=True, methods=["get"], url_path="download")
     def download(self, request, *args, **kwargs):

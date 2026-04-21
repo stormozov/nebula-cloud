@@ -2,6 +2,8 @@ import { useState } from "react";
 
 import { CopyIcon } from "@/shared/ui";
 
+import "./UserCopyableInfoRow.scss";
+
 /**
  * Props for the `CopyableInfoRow` component.
  */
@@ -39,7 +41,7 @@ export function UserCopyableInfoRow({
   return (
     <button
       type="button"
-      className="user-details-modal-info__item w-full"
+      className="user-details-modal-info-copyable-row w-full"
       title={originalValue}
       aria-label={`Скопировать ${label}`}
       onClick={handleClick}

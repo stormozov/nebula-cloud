@@ -4,6 +4,7 @@ import axios from "axios";
 import {
   API_BASE_URL,
   baseQueryWithAuthErrorHandling,
+  extractApiErrorMessage,
   fetchWithAuth,
   getRefreshedToken,
 } from "@/shared/api";
@@ -82,7 +83,7 @@ uploadAxios.interceptors.response.use(
 export const fileApi = createApi({
   reducerPath: "fileApi",
   baseQuery: baseQueryWithAuthErrorHandling,
-  tagTypes: ["File"],
+  tagTypes: ["File", "UserStorage"],
   endpoints: (build) => ({
     /**
      * Fetches the list of all files from the storage.
@@ -176,7 +177,7 @@ export const fileApi = createApi({
         url: `/storage/files/${id}/`,
         method: "DELETE",
       }),
-      invalidatesTags: ["File"],
+      invalidatesTags: ["File", "UserStorage"],
     }),
 
     /**
@@ -320,21 +321,31 @@ export const uploadFile = async (
     formData.append("comment", data.comment);
   }
 
-  const response = await uploadAxios.post<IFile>("/storage/files/", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-    onUploadProgress: (progressEvent) => {
-      if (progressEvent.total && onProgress) {
-        const percent = Math.round(
-          (progressEvent.loaded * 100) / progressEvent.total,
-        );
-        onProgress(percent);
-      }
-    },
-  });
+  try {
+    const response = await uploadAxios.post<IFile>(
+      "/storage/files/",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        onUploadProgress: (progressEvent) => {
+          if (progressEvent.total && onProgress) {
+            const percent = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total,
+            );
+            onProgress(percent);
+          }
+        },
+      },
+    );
 
-  return response.data;
+    return response.data;
+  } catch (error: unknown) {
+    const errorMessage = extractApiErrorMessage(error);
+    if (errorMessage) throw new Error(errorMessage);
+    throw error;
+  }
 };
 
 /**

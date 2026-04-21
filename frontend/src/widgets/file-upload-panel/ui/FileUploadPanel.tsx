@@ -37,8 +37,21 @@ export function FileUploadPanel() {
   } = stats;
 
   useEffect(() => {
-    if (isQueueCompleted) toast.success("Файлы успешно загружены");
-  }, [isQueueCompleted]);
+    if (isQueueCompleted) {
+      if (failedCount > 0) {
+        const storageError = queue.find((upload) => 
+          upload.error?.includes('Превышен лимит хранилища')
+        );
+        if (storageError) {
+          toast.error(storageError.error || 'Ошибка загрузки');
+        } else {
+          toast.error(`Ошибки загрузки файлов (${failedCount})`);
+        }
+      } else {
+        toast.success("Файлы успешно загружены");
+      }
+    }
+  }, [isQueueCompleted, failedCount, queue]);
 
   const getPanelTitle = (): string => {
     if (uploadingCount > 0) return `Загрузка (${uploadingCount})`;
