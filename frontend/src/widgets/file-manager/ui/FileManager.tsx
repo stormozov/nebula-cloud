@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo } from "react";
 
-import { useAppSelector } from "@/app/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import type { IFile } from "@/entities/file";
 import { selectIsQueueCompleted } from "@/entities/file-upload";
+import { userApi } from "@/entities/user";
 import { EditCommentModal } from "@/features/file/file-comment";
 import { DeleteFileModal } from "@/features/file/file-delete";
 import { ImageViewerModal } from "@/features/file/file-image-preview";
@@ -48,6 +49,8 @@ export function FileManager({
   isAdmin = false,
   onFileSelect,
 }: IFileManagerProps) {
+  const dispatch = useAppDispatch();
+
   const { searchTerm, setSearchTerm, debouncedSearchTerm } = useFileSearch();
 
   const {
@@ -210,9 +213,10 @@ export function FileManager({
   // Reset pagination when uploads complete (new files at top of page 1)
   useEffect(() => {
     if (!isUploadQueueCompleted) return;
+    dispatch(userApi.util.invalidateTags(["UserStorage"]));
     window.scrollTo({ top: 0, behavior: "smooth" });
     resetPagination();
-  }, [isUploadQueueCompleted, resetPagination]);
+  }, [isUploadQueueCompleted, resetPagination, dispatch]);
 
   // ---------------------------------------------------------------------------
   // RENDER
