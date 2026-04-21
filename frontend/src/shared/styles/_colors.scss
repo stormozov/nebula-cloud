@@ -22,12 +22,6 @@
   --color-bg-inverse: #1a1a1a;
   --color-bg-overlay: rgba(0, 0, 0, 0.5);
   --color-bg-backdrop: rgba(255, 255, 255, 0.8);
-  --color-bg-skeleton: linear-gradient(
-    90deg,
-    #e0e0e0 25%,
-    #f0f0f0 50%,
-    #e0e0e0 75%
-  );
 
   // ---------------------------- Border colors --------------------------------
   --color-border-primary: #dee2e6;
@@ -86,6 +80,12 @@
 
   --color-selection-bg: #e0e7ff;
   --color-selection-text: #111827;
+  --color-bg-skeleton: linear-gradient(
+    90deg,
+    #e0e0e0 25%,
+    #f0f0f0 50%,
+    #e0e0e0 75%
+  );
 }
 
 // =============================== Dark theme ==================================
@@ -162,4 +162,10 @@
 
   --color-selection-bg: #475569;
   --color-selection-text: #f1f5f9;
+  --color-bg-skeleton: linear-gradient(
+    90deg,
+    #475569 25%,
+    #64748b 50%,
+    #475569 75%
+  );
 }
