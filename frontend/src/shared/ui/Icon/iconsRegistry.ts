@@ -39,6 +39,9 @@ import {
 import { PiPasswordBold, PiWarningDiamondFill } from "react-icons/pi";
 import { RiAdminFill } from "react-icons/ri";
 import { TbError404 } from "react-icons/tb";
+import { MdSunny } from "react-icons/md";
+import { IoMoon } from "react-icons/io5";
+import { PiMonitorFill } from "react-icons/pi";
 
 import CloudBadIcon from "@/assets/images/icons/CloudBadIcon.svg?react";
 import CloudLoadingIcon from "@/assets/images/icons/CloudLoadingIcon.svg?react";
@@ -112,4 +115,7 @@ export const ICONS = {
   // ========== Theme / Mode ==========
   lightbulbOn: BsFillLightbulbFill,
   lightbulbOff: BsLightbulbOffFill,
+  sun: MdSunny,
+  moon: IoMoon,
+  monitor: PiMonitorFill,
 } as const;

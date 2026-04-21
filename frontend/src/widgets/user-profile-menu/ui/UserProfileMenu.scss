@@ -18,7 +18,7 @@
     cursor: pointer;
     transition: background-color 0.2s;
 
-    &:hover {
+    &:hover:not(:disabled) {
       background-color: var(--color-border-primary);
     }
 
@@ -38,7 +38,7 @@
   &__name {
     font-size: 0.875rem;
     font-weight: 500;
-    color: var(--text-primary);
+    color: var(--color-text-primary);
 
     @media (max-width: 768px) {
       display: none;
