@@ -4,6 +4,31 @@
 
 .page-welcome {
   &__main {
-    padding-top: 4rem;
+    padding: 4rem 0;
+  }
+
+  &__container {
+    display: grid;
+    gap: 48px;
+  }
+
+  &__welcome-section {
+    display: grid;
+    justify-items: center;
+  }
+
+  &__subtitle {
+    max-width: 550px;
+    color: var(--color-text-secondary);
+    text-align: center;
+  }
+
+  &__features-title {
+    margin-bottom: 40px;
+  }
+
+  &__register-section {
+    display: grid;
+    justify-items: center;
   }
 }

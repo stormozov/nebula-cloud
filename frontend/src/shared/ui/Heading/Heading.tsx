@@ -17,7 +17,8 @@ export type HeadingSize = "sm" | "md" | "lg" | "xl" | "2xl";
 /**
  * Props for Heading component.
  */
-export interface HeadingProps extends React.HTMLAttributes<HTMLHeadingElement> {
+export interface IHeadingProps
+  extends React.HTMLAttributes<HTMLHeadingElement> {
   children: React.ReactNode;
   level?: HeadingLevel; // Select heading level (h1-h6)
   variant?: HeadingVariant; // Color variants
@@ -57,7 +58,7 @@ export function Heading({
   noMargin = false,
   className = "",
   ...props
-}: HeadingProps) {
+}: IHeadingProps) {
   const Tag = HEADING_TAGS[level];
 
   const classes = classNames(

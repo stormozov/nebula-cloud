@@ -52,3 +52,15 @@ export interface IVirtualCoordinates {
   /** The calculated bottom edge of the element after base transformation. */
   bottom: number;
 }
+
+/**
+ * Union type representing semantic color names used for styling UI elements.
+ */
+export type SemanticColor =
+  | "primary"
+  | "secondary"
+  | "tertiary"
+  | "info"
+  | "success"
+  | "warning"
+  | "error";

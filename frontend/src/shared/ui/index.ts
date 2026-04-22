@@ -1,3 +1,5 @@
+export * from "./Advantages";
+export * from "./AppFeatures";
 export * from "./Avatar";
 export * from "./Badge";
 export * from "./buttons";
