@@ -7,7 +7,7 @@
 
 $badge-height: 24px;
 $badge-min-width: 20px;
-$badge-padding-inline: 8px;
+$badge-padding-inline: var(--space-2);
 $badge-font-size: 12px;
 $badge-border-radius: 6px;
 $badge-dot-size: 10px;

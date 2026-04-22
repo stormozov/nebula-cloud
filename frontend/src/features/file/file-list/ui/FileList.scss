@@ -23,7 +23,7 @@
   }
 
   &__header-cell {
-    padding: 12px 16px;
+    padding: var(--space-3) var(--space-4);
 
     border-bottom: 2px solid var(--color-border-primary);
 

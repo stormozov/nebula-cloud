@@ -5,7 +5,7 @@
 .rename-file-modal {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-4);
 
   &__symbol-count {
     margin: 0;

@@ -6,7 +6,7 @@
   &__main {
     display: grid;
     align-items: center;
-    padding: 24px 0;
+    padding: var(--space-6) 0;
     min-height: calc(100vh - 60px);
   }
 
@@ -28,7 +28,7 @@
   }
 
   &__icon-404 {
-    margin-left: -64px;
+    margin-left: -var(--space-16);
     transform: skew(-10deg) rotate(-10deg);
   }
 

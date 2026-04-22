@@ -6,7 +6,7 @@
   // --------------------------- Basic variables -------------------------------
   --spinner-size: 2.5rem; // 40px
   --spinner-border-width: 0.25rem; // 4px
-  --spinner-gap: 1rem; // 16px
+  --spinner-gap: var(--space-1);
   --spinner-text-size: 0.875rem;
   --spinner-text-color: var(--color-text-secondary);
   --spinner-color: var(--color-primary);

@@ -5,8 +5,8 @@
 .tabs-switcher {
   display: flex;
 
-  padding: 4px;
-  margin-bottom: 24px;
+  padding: var(--space-1);
+  margin-bottom: var(--space-6);
 
   width: 100%;
 
@@ -16,7 +16,7 @@
   &__tab {
     flex: 1;
 
-    padding: 10px 16px;
+    padding: var(--space-3) var(--space-4);
 
     background-color: transparent;
     border: none;

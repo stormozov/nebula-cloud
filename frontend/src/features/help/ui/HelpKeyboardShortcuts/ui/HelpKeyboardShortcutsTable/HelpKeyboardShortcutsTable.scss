@@ -20,7 +20,7 @@
   }
 
   &__cell {
-    padding: 0.5rem;
+    padding: var(--space-2);
 
     &:first-child {
       width: 128px;
@@ -28,7 +28,7 @@
   }
 
   &__key {
-    padding: 0.25rem 0.5rem;
+    padding: var(--space-1) var(--space-2);
     background-color: var(--color-bg-tertiary);
     border-radius: 0.25rem;
     font-weight: bold;

@@ -4,12 +4,12 @@
 
 .page-welcome {
   &__main {
-    padding: 4rem 0;
+    padding: var(--space-16) 0;
   }
 
   &__container {
     display: grid;
-    gap: 48px;
+    gap: var(--space-12);
   }
 
   &__welcome-section {
@@ -24,7 +24,7 @@
   }
 
   &__features-title {
-    margin-bottom: 40px;
+    margin-bottom: var(--space-10);
   }
 
   &__register-section {

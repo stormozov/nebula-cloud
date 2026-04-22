@@ -6,9 +6,9 @@
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-3);
 
-  padding: 12px;
+  padding: var(--space-3);
 
   border-width: 1px;
   border-style: solid;
@@ -17,7 +17,7 @@
   transition: background-color 0.2s ease;
 
   &:not(:last-child) {
-    margin-bottom: 6px;
+    margin-bottom: var(--space-2);
   }
 
   // ---------------------------------------------------------------------------
@@ -86,7 +86,7 @@
   }
 
   &__name {
-    margin-bottom: 4px;
+    margin-bottom: var(--space-1);
 
     font-size: 14px;
     font-weight: 500;
@@ -96,7 +96,7 @@
   &__meta {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
 
     font-size: 12px;
     color: var(--color-text-secondary);
@@ -117,7 +117,7 @@
   &__progress {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     grid-row: 2;
     grid-column: 2;
 
@@ -171,7 +171,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: var(--space-2);
     grid-row: span 2;
     grid-column: 3;
   }

@@ -8,20 +8,20 @@
 
   &__section {
     position: relative;
-    padding: 1rem;
+    padding: var(--space-4);
     background-color: var(--color-bg-tertiary);
     border-radius: 10px;
     width: 100%;
 
     &:not(:last-child) {
-      margin-bottom: 1rem;
+      margin-bottom: var(--space-4);
     }
   }
 
   &__header {
     position: relative;
     display: flex;
-    margin-bottom: 0.8rem;
+    margin-bottom: var(--space-3);
 
     &.hovered {
       .user-details-modal-info__copy-block-btn {
@@ -40,13 +40,13 @@
 
   &__items {
     display: grid;
-    gap: 6px;
+    gap: var(--space-2);
   }
 
   &__item {
     position: relative;
 
-    padding: 6px 28px 6px 12px;
+    padding: var(--space-2) var(--space-6) var(--space-2) var(--space-3);
 
     background-color: var(--color-bg-primary);
     border: 2px solid transparent;
@@ -54,7 +54,7 @@
   }
 
   &__storage-progress {
-    padding-right: 12px;
+    padding-right: var(--space-3);
     cursor: default;
   }
 
@@ -73,7 +73,7 @@
   &__copy-decor-icon {
     position: absolute;
     top: 50%;
-    right: 0.5rem;
+    right: var(--space-2);
 
     opacity: 0;
     transition: opacity 0.2s;

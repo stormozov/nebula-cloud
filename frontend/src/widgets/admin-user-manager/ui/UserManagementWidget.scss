@@ -4,15 +4,15 @@
 
 .users-management {
   display: grid;
-  gap: 24px;
+  gap: var(--space-6);
 
   &__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
+    gap: var(--space-4);
 
-    padding-bottom: 16px;
+    padding-bottom: var(--space-4);
 
     border-bottom: 1px solid var(--color-border-secondary);
   }
@@ -24,7 +24,7 @@
   }
 
   &__load-more {
-    margin-top: 1.125rem;
+    margin-top: var(--space-4);
     text-align: center;
   }
 }

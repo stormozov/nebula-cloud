@@ -5,7 +5,7 @@
 .page-client-disk {
   &__main {
     .file-manager {
-      margin: 1rem 0;
+      margin: var(--space-4) 0;
     }
   }
 }

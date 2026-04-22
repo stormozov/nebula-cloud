@@ -5,9 +5,9 @@
 .file-manager {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: var(--space-6);
 
-  padding: 24px;
+  padding: var(--space-6);
 
   background-color: var(--color-bg-primary);
   border: 1px solid var(--color-border-primary);
@@ -16,25 +16,25 @@
   cursor: default;
 
   &__header {
-    padding-bottom: 1rem;
+    padding-bottom: var(--space-4);
     border-bottom: 1px solid var(--color-border-secondary);
   }
 
   &__header-top {
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-4);
   }
 
   &__dropzone {
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-4);
   }
 
   &__load-more {
-    margin-top: 1.125rem;
+    margin-top: var(--space-4);
     text-align: center;
   }
 
   &__empty-message {
-    padding: 48px 24px;
+    padding: var(--space-12) var(--space-6);
     font-size: 1rem;
     text-align: center;
     color: var(--color-text-secondary);

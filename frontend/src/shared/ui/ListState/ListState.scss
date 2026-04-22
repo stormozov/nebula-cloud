@@ -4,7 +4,7 @@
 
 .list-state {
   &__default-block {
-    padding: 60px 24px;
+    padding: var(--space-15) var(--space-6);
     border-radius: 8px;
     font-size: 1rem;
     text-align: center;
@@ -28,7 +28,7 @@
   }
 
   &__icon {
-    margin: 0 auto 12px;
+    margin: 0 auto var(--space-3);
     opacity: 0.5;
 
     .loading-spinner {

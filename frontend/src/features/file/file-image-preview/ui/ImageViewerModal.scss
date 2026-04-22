@@ -15,7 +15,7 @@
     align-items: center;
     justify-content: center;
 
-    padding: 2rem;
+    padding: var(--space-8);
 
     background: rgba(0, 0, 0, 0.9);
   }
@@ -53,21 +53,21 @@
   }
 
   &__error-heading {
-    margin: 0.5rem 0 1.5rem;
+    margin: var(--space-2) 0 var(--space-6);
     font-size: 1.3rem;
     font-weight: 500;
     color: var(--color-white);
   }
 
   &__loading-close {
-    margin-top: 1rem;
+    margin-top: var(--space-4);
   }
 
   // ------------------------------ Content ------------------------------------
   &__close {
     position: absolute;
-    top: 1rem;
-    right: 1rem;
+    top: var(--space-4);
+    right: var(--space-4);
     z-index: 10;
 
     display: flex;
@@ -110,7 +110,7 @@
   }
 
   &__footer {
-    padding: 1rem;
+    padding: var(--space-4);
     background: var(--color-bg-overlay);
     font-size: 0.9rem;
     text-align: center;
