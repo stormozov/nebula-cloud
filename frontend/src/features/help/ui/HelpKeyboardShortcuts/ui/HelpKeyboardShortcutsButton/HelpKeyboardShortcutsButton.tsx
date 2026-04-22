@@ -75,7 +75,7 @@ export function HelpKeyboardShortcutsButton({
     <>
       <Button
         variant="primary"
-        icon={{ name: "question" }}
+        icon={{ name: "keyboard" }}
         title="Показать справку по клавишам"
         aria-label="Показать справку по клавишам"
         {...buttonProps}

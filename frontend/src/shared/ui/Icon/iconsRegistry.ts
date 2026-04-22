@@ -7,12 +7,12 @@ import {
 } from "react-icons/bs";
 import {
   FaEye,
-  FaFolder,
+  FaFolder,FaKeyboard, 
   FaLock,
   FaSave,
   FaUpload,
   FaUserPlus,
-  FaUserTimes,
+  FaUserTimes
 } from "react-icons/fa";
 import {
   FaCheck,
@@ -29,19 +29,16 @@ import {
 } from "react-icons/fa6";
 import { FiMoreVertical } from "react-icons/fi";
 import { IoIosArrowBack, IoIosArrowForward, IoIosCloud } from "react-icons/io";
-import { IoReloadSharp, IoSearch } from "react-icons/io5";
+import { IoMoon, IoReloadSharp, IoSearch } from "react-icons/io5";
 import {
   MdEdit,
   MdLogin,
   MdLogout,
-  MdOutlineDoNotDisturbAlt,
+  MdOutlineDoNotDisturbAlt,MdSunny 
 } from "react-icons/md";
-import { PiPasswordBold, PiWarningDiamondFill } from "react-icons/pi";
+import { PiMonitorFill, PiPasswordBold, PiWarningDiamondFill } from "react-icons/pi";
 import { RiAdminFill } from "react-icons/ri";
 import { TbError404 } from "react-icons/tb";
-import { MdSunny } from "react-icons/md";
-import { IoMoon } from "react-icons/io5";
-import { PiMonitorFill } from "react-icons/pi";
 
 import CloudBadIcon from "@/assets/images/icons/CloudBadIcon.svg?react";
 import CloudLoadingIcon from "@/assets/images/icons/CloudLoadingIcon.svg?react";
@@ -75,6 +72,7 @@ export const ICONS = {
   export: FaFileExport,
   search: IoSearch,
   more: FiMoreVertical,
+  keyboard: FaKeyboard,
 
   // ========== Navigation & UI ==========
   close: AiOutlineClose,
