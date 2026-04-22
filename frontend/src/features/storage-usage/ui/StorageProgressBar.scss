@@ -9,7 +9,7 @@
     display: flex;
     justify-content: space-between;
     margin-bottom: var(--space-1);
-    font-size: 0.875rem;
+    font-size: var(--text-size-small);
   }
 
   &__track {
@@ -56,18 +56,17 @@
   &__extra {
     display: flex;
     justify-content: space-between;
-    margin-top: 4px;
+    margin-top: var(--space-1);
+    font-size: var(--text-size-caption);
   }
 
   &__busyness {
     margin: 0;
-    font-size: 0.75rem;
     color: var(--color-text-secondary);
   }
 
   &__percent {
     display: inline-block;
-    font-size: 0.75rem;
     text-align: right;
     color: var(--color-text-secondary);
   }

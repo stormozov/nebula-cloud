@@ -73,7 +73,12 @@ export function AdvantagesList() {
             <Icon name={advantage.icon} size={24} />
           </div>
 
-          <Heading level={3} className="advantages-list__title" noMargin>
+          <Heading
+            level={3}
+            visualSize="md"
+            className="advantages-list__title"
+            noMargin
+          >
             {advantage.title}
           </Heading>
 

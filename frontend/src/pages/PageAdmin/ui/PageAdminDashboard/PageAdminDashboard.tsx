@@ -17,7 +17,7 @@ export default function PageAdminDashboard() {
             align="center"
             className="page-admin-dashboard__main-wrapper h-full"
           >
-            <Heading level={1} size="xl" align="center">
+            <Heading level={1} align="center">
               Admin Dashboard
             </Heading>
             <UserManagementWidget />

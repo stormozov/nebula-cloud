@@ -69,7 +69,7 @@
     justify-content: center;
     grid-row: span 2;
 
-    font-size: 18px;
+    font-size: var(--text-size-large);
   }
 
   &__icon--uploading {
@@ -88,8 +88,8 @@
   &__name {
     margin-bottom: var(--space-1);
 
-    font-size: 14px;
-    font-weight: 500;
+    font-size: var(--text-size-small);
+    font-weight: var(--font-weight-medium);
     color: var(--color-text-primary);
   }
 
@@ -98,7 +98,7 @@
     align-items: center;
     gap: var(--space-2);
 
-    font-size: 12px;
+    font-size: var(--text-size-caption);
     color: var(--color-text-secondary);
   }
 
@@ -107,7 +107,7 @@
   }
 
   &__status-label {
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
   }
 
   // ---------------------------------------------------------------------------
@@ -141,8 +141,8 @@
 
   &__progress-text {
     min-width: 35px;
-    font-size: 12px;
-    font-weight: 600;
+    font-size: var(--text-size-caption);
+    font-weight: var(--font-weight-semibold);
     color: var(--color-text-secondary);
     text-align: right;
   }
@@ -158,7 +158,7 @@
     background-color: var(--color-error-light);
     border-radius: 4px;
 
-    font-size: 12px;
+    font-size: var(--text-size-caption);
     color: var(--color-error);
   }
 
@@ -190,7 +190,7 @@
     border: 1px solid var(--color-text-primary);
     border-radius: 4px;
 
-    font-size: 14px;
+    font-size: var(--text-size-small);
 
     cursor: pointer;
     transition: all 0.2s ease;

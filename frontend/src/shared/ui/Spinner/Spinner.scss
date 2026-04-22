@@ -7,7 +7,7 @@
   --spinner-size: 2.5rem; // 40px
   --spinner-border-width: 0.25rem; // 4px
   --spinner-gap: var(--space-1);
-  --spinner-text-size: 0.875rem;
+  --spinner-text-size: var(--text-size-small);
   --spinner-text-color: var(--color-text-secondary);
   --spinner-color: var(--color-primary);
   --spinner-track-color: rgba(0, 0, 0, 0.1);
@@ -17,7 +17,7 @@
   justify-content: center;
   align-items: center;
   gap: var(--spinner-gap);
-  font-size: 1rem;
+  font-size: var(--text-size-regular);
 
   &__circle {
     width: var(--spinner-size);

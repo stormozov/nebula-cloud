@@ -38,15 +38,15 @@
   &__name {
     margin: 0 0 var(--space-2);
 
-    font-size: 20px;
-    font-weight: 600;
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
     color: var(--color-text-primary);
     word-break: break-word;
   }
 
   &__comment {
     margin: 0 0 var(--space-4);
-    font-size: 14px;
+    font-size: var(--text-size-small);
     font-style: italic;
     color: var(--color-text-secondary);
   }
@@ -58,11 +58,11 @@
 
     margin: 0;
 
-    font-size: 13px;
+    font-size: var(--text-size-small);
     color: var(--color-text-tertiary);
 
     dt {
-      font-weight: 500;
+      font-weight: var(--font-weight-medium);
       color: var(--color-text-secondary);
     }
 
@@ -77,11 +77,11 @@
 
   &__hint {
     margin: 0;
-    font-size: 12px;
+    font-size: var(--text-size-small);
     color: var(--color-text-tertiary);
 
     strong {
-      font-weight: 500;
+      font-weight: var(--font-weight-medium);
       color: var(--color-text-secondary);
       word-break: break-all;
     }
@@ -94,7 +94,7 @@
 
     h2 {
       margin: 0 0 var(--space-4);
-      font-size: 20px;
+      font-size: var(--font-size-xl);
       color: var(--color-text-primary);
     }
 
@@ -120,7 +120,7 @@
     border-left: 4px solid var(--color-error);
     border-radius: 8px;
 
-    font-size: 14px;
+    font-size: var(--text-size-small);
     color: var(--color-error);
   }
 
@@ -132,7 +132,7 @@
     }
 
     &__name {
-      font-size: 18px;
+      font-size: var(--text-size-large);
     }
   }
 }

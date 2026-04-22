@@ -8,7 +8,7 @@
 $badge-height: 24px;
 $badge-min-width: 20px;
 $badge-padding-inline: var(--space-2);
-$badge-font-size: 12px;
+$badge-font-size: var(--text-size-caption);
 $badge-border-radius: 6px;
 $badge-dot-size: 10px;
 $badge-icon-size: 12px;
@@ -63,8 +63,8 @@ $light-variants: (
   border-radius: $badge-border-radius;
 
   font-size: $badge-font-size;
-  font-weight: 500;
-  line-height: 1;
+  font-weight: var(--font-weight-medium);
+  line-height: var(--font-line-height-1);
   color: var(--color-text-inverse);
   white-space: nowrap;
 
@@ -141,7 +141,7 @@ $light-variants: (
 
   &--superscript {
     vertical-align: super;
-    font-size: 0.75rem;
+    font-size: var(--text-size-caption);
     height: 1.725em;
     min-width: auto;
     padding: 0 0.8em;

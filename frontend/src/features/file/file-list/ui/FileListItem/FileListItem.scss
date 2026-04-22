@@ -12,7 +12,7 @@
   &__cell {
     padding: var(--space-3);
     border-bottom: 1px solid var(--color-border-primary);
-    font-size: 12px;
+    font-size: var(--text-size-caption);
     color: var(--color-text-tertiary);
     vertical-align: middle;
 
@@ -26,8 +26,8 @@
   &__name {
     display: block;
 
-    font-size: 0.875rem;
-    font-weight: 500;
+    font-size: var(--text-size-small);
+    font-weight: var(--font-weight-medium);
     color: var(--color-text-primary);
     text-overflow: ellipsis;
     white-space: nowrap;

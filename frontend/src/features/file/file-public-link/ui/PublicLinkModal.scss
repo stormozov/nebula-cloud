@@ -18,13 +18,13 @@
 
     border-radius: 6px;
 
-    font-size: 0.875rem;
+    font-size: var(--text-size-small);
 
     cursor: default;
 
     p {
       margin: 0;
-      font-weight: 500;
+      font-weight: var(--font-weight-medium);
     }
   }
 
@@ -49,12 +49,12 @@
   }
 
   &__icon {
-    font-size: 1.25rem;
-    font-weight: bold;
-    line-height: 1;
+    font-size: var(--heading-size-3);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--font-line-height-1);
 
     &--info {
-      font-size: 1.25rem;
+      font-size: var(--heading-size-3);
     }
   }
 
@@ -66,8 +66,8 @@
   &__hint {
     margin: 0;
 
-    font-size: 0.75rem;
-    line-height: 1.4;
+    font-size: var(--text-size-caption);
+    line-height: var(--font-line-height-3);
     color: var(--color-text-tertiary);
     text-align: center;
 
@@ -85,7 +85,7 @@
     border: 1px solid var(--color-error);
     border-radius: 6px;
 
-    font-size: 0.813rem;
+    font-size: var(--text-size-small);
     color: var(--color-error);
   }
 }

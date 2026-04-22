@@ -61,8 +61,8 @@
   }
 
   &__title {
-    font-size: 18px;
-    font-weight: 600;
+    font-size: var(--text-size-large);
+    font-weight: var(--font-weight-semibold);
     color: var(--color-text-primary);
     margin: 0;
   }
@@ -81,7 +81,7 @@
     border: 1px solid transparent;
     border-radius: 4px;
 
-    font-size: 18px;
+    font-size: var(--text-size-large);
     color: var(--color-text-secondary);
 
     cursor: pointer;

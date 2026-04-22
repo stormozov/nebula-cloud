@@ -36,8 +36,8 @@
   }
 
   &__name {
-    font-size: 0.875rem;
-    font-weight: 500;
+    font-size: var(--text-size-small);
+    font-weight: var(--font-weight-medium);
     color: var(--color-text-primary);
 
     @media (max-width: 768px) {

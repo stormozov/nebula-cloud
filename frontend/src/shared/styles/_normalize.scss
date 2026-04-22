@@ -19,7 +19,8 @@
 
 // Base styles for html
 html {
-  font-size: 16px;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
   -webkit-text-size-adjust: 100%;
   -moz-tab-size: 4;
   tab-size: 4;
@@ -31,8 +32,8 @@ body {
 
   background-color: var(--color-bg-secondary);
 
-  font-size: 16px;
-  line-height: 1.5;
+  font-size: var(--text-size-regular);
+  line-height: var(--font-line-height-3);
   color: var(--color-text-primary);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -100,22 +101,22 @@ h3,
 h4,
 h5,
 h6 {
-  font-weight: 600;
-  line-height: 1.25;
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--font-line-height-2);
 }
 
 // Paragraph
 p {
   &:where(:not(:last-child)) {
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-4);
   }
 }
 
 // Code
 code,
 pre {
-  font-family: "Fira Code", "Consolas", "Monaco", monospace;
-  font-size: 0.875rem;
+  font-family: var(--font-family-code);
+  font-size: var(--text-size-small);
 }
 
 // Highlight
@@ -151,7 +152,7 @@ pre {
 // Adaptive styles
 @media (max-width: 768px) {
   html {
-    font-size: 14px;
+    font-size: var(--text-size-small);
   }
 }
 

@@ -27,8 +27,8 @@
 
     border-bottom: 2px solid var(--color-border-primary);
 
-    font-size: 14px;
-    font-weight: 600;
+    font-size: var(--text-size-small);
+    font-weight: var(--font-weight-semibold);
     text-align: center;
     color: var(--color-text-secondary);
   }
@@ -45,7 +45,7 @@
   &-error,
   &-empty {
     padding: var(--space-12) var(--space-6);
-    font-size: 16px;
+    font-size: var(--text-size-regular);
     text-align: center;
     color: var(--color-text-secondary);
   }

@@ -6,7 +6,7 @@
   &__default-block {
     padding: var(--space-15) var(--space-6);
     border-radius: 8px;
-    font-size: 1rem;
+    font-size: var(--text-size-regular);
     text-align: center;
     cursor: default;
   }

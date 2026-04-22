@@ -5,8 +5,8 @@ import {
   Heading,
   type HeadingAlign,
   type HeadingLevel,
-  type HeadingSize,
   type HeadingVariant,
+  type HeadingVisualSize,
 } from "./Heading";
 
 /**
@@ -71,7 +71,7 @@ describe("Heading", () => {
       "accent",
     ];
     const aligns: HeadingAlign[] = ["left", "center", "right"];
-    const sizes: HeadingSize[] = ["sm", "md", "lg", "xl", "2xl"];
+    const sizes: HeadingVisualSize[] = ["sm", "md", "lg", "xl", "2xl"];
 
     /**
      * @description Verifies base CSS class application for component recognition

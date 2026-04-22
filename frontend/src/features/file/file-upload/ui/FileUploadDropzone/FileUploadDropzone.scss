@@ -108,20 +108,20 @@
 
   // Icon
   &__icon {
-    font-size: 48px;
-    line-height: 1;
+    font-size: var(--font-size-5xl);
+    line-height: var(--font-line-height-1);
   }
 
   // Main text
   &__text {
-    font-size: 16px;
-    font-weight: 500;
+    font-size: var(--text-size-regular);
+    font-weight: var(--font-weight-medium);
     color: var(--color-text-primary);
   }
 
   // Hint text
   &__hint {
-    font-size: 13px;
+    font-size: var(--text-size-caption);
     color: var(--color-text-secondary);
   }
 
@@ -175,12 +175,12 @@
     }
 
     .file-upload-dropzone__text {
-      font-size: 20px;
-      font-weight: 600;
+      font-size: var(--heading-size-3);
+      font-weight: var(--font-weight-semibold);
     }
 
     .file-upload-dropzone__hint {
-      font-size: 14px;
+      font-size: var(--text-size-small);
     }
   }
 }

@@ -1,3 +1,4 @@
+import { Heading } from "@/shared/ui";
 import { AuthForm } from "@/widgets/auth-form";
 
 import "./PageAuth.scss";
@@ -20,7 +21,9 @@ export default function PageAuth() {
     <div className="page-auth">
       <div className="page-auth__container">
         <div className="page-auth__header">
-          <h1 className="page-auth__title">Nebula Cloud</h1>
+          <Heading level={1} align="center" className="page-auth__title">
+            Nebula Cloud
+          </Heading>
           <p className="page-auth__subtitle">
             Ваше надёжное облачное хранилище
           </p>

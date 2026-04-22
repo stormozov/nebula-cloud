@@ -19,7 +19,7 @@
 
   &__count {
     flex: 1;
-    font-size: 0.875rem;
+    font-size: var(--text-size-small);
     color: var(--color-text-secondary);
   }
 

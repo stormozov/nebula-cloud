@@ -9,19 +9,19 @@
 
   &__symbol-count {
     margin: 0;
-    font-size: 13px;
+    font-size: var(--text-size-caption);
     color: var(--color-text-secondary);
 
     strong {
       color: var(--color-text-primary);
-      font-weight: 500;
+      font-weight: var(--font-weight-medium);
       word-break: break-word;
     }
   }
   
   &__current {
     margin: 0;
-    font-size: 13px;
+    font-size: var(--text-size-caption);
     color: var(--color-text-tertiary);
     font-style: italic;
 

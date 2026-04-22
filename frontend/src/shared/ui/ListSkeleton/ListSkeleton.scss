@@ -27,8 +27,8 @@
 
     border-bottom: 2px solid var(--color-border-primary);
 
-    font-size: 14px;
-    font-weight: 600;
+    font-size: var(--text-size-small);
+    font-weight: var(--font-weight-semibold);
     text-align: center;
     color: var(--color-text-secondary);
   }
@@ -59,7 +59,7 @@
 
   &__body-cell {
     padding: var(--space-3);
-    font-size: 14px;
+    font-size: var(--text-size-small);
     text-align: center;
 
     svg {

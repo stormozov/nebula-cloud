@@ -89,7 +89,11 @@ export function AppFeatures({ titleProps }: IAppFeaturesProps) {
               <Icon name={feature.icon} size={16} />
             </div>
             <div className="app-features__content">
-              <Heading level={3} className="app-features__title">
+              <Heading
+                level={3}
+                visualSize="md"
+                className="app-features__title"
+              >
                 {feature.title}
               </Heading>
               <p className="app-features__description">{feature.description}</p>
