@@ -68,7 +68,7 @@
 
 ### Выход из системы
 
-**Endpoint:** `POST /api/auth/logout/`
+**Endpoint:** `POST /api/users/auth/logout/`
 
 **Headers:**
 ```
@@ -93,7 +93,7 @@ Authorization: Bearer <access_token>
 
 ### Обновление токена
 
-**Endpoint:** `POST /api/auth/refresh/`
+**Endpoint:** `POST /api/users/auth/refresh/`
 
 **Request Body:**
 ```json
@@ -175,11 +175,34 @@ Authorization: Bearer <access_token>
 {
     "total_files": 10,
     "total_size": 104857600,
-    "total_size_formatted": "100 MB"
+    "total_size_formatted": "100 MB",
+    "storage_limit": 50,
+    "storage_limit_formatted": "50 GB",
+    "usage_percent": 50,
+    "storage_path": "storage/123/",
 }
 ```
 
 ---
+
+### Информация о сессии
+
+**Endpoint:** `GET /api/users/me/session-info/`
+
+**Headers:**
+```
+Authorization: Bearer <access_token>
+```
+
+**Response (200):**
+```json
+{
+    "user_agent": "Mozilla/5.0...",
+    "ip_address": "127.0.0.1",
+    "session_start": "2024-01-01T12:00:00Z",
+    "last_activity": "2024-01-01T12:05:00Z"
+}
+```
 
 ### Деактивация аккаунта
 
@@ -196,7 +219,25 @@ Authorization: Bearer <access_token>
 
 ## Файловое хранилище
 
-### Загрузка файла
+
+### Альтернативная загрузка (upload action)
+**Endpoint:** `POST /api/storage/files/upload/`
+
+**Headers:**
+```
+Authorization: Bearer <access_token>
+Content-Type: multipart/form-data
+```
+
+**Request Body:**
+```
+file: <binary>
+comment: "Мой документ"
+```
+
+**Response (201):** (аналогично стандартной загрузке)
+
+### Стандартная загрузка файла
 
 **Endpoint:** `POST /api/storage/files/`
 
@@ -313,9 +354,9 @@ Authorization: Bearer <access_token>
 
 ### Публичная ссылка
 
-#### Создание публичной ссылки
+#### Генерация публичной ссылки (заменяет существующую)
 
-**Endpoint:** `POST /api/storage/files/{id}/generate-public-link/`
+**Endpoint:** `POST /api/storage/files/{id}/public-link/generate`
 
 **Request Body:**
 ```json
@@ -328,6 +369,22 @@ Authorization: Bearer <access_token>
 ```json
 {
     "public_link": "abc123xyz"
+}
+```
+
+#### Удаление публичной ссылки
+
+**Endpoint:** `DELETE /api/storage/files/{id}/public-link/`
+
+**Headers:**
+```
+Authorization: Bearer <access_token>
+```
+
+**Response (200):**
+```json
+{
+    "public_link": null
 }
 ```
 
@@ -448,13 +505,13 @@ Authorization: Bearer <access_token>
 
 ## Коды ошибок
 
-| Код | Описание |
-|-----|----------|
-| 200 | Успешно |
-| 201 | Создано |
-| 400 | Неверный запрос |
-| 401 | Не авторизован |
-| 403 | Запрещено |
-| 404 | Не найдено |
-| 429 | Слишком много запросов |
+| Код | Описание                  |
+| --- | ------------------------- |
+| 200 | Успешно                   |
+| 201 | Создано                   |
+| 400 | Неверный запрос           |
+| 401 | Не авторизован            |
+| 403 | Запрещено                 |
+| 404 | Не найдено                |
+| 429 | Слишком много запросов    |
 | 500 | Внутренняя ошибка сервера |
