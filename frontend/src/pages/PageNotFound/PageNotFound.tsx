@@ -31,7 +31,7 @@ export default function PageNotFound() {
               />
             </div>
 
-            <Heading level={1} size="2xl" align="center">
+            <Heading level={1} visualSize="4xl" align="center">
               Облако не всегда пушистое: здесь — 404
             </Heading>
 

@@ -91,9 +91,9 @@ export const useUserBlocksData = (
 
     const storageInfo: IUserDetailsInfoItem[] = [
       {
-        title: "Общий размер",
+        title: "Занятость диска",
         value: (
-          <div className="user-details-modal-info__item user-details-modal-info__storage-progress">
+          <div className="user-details-modal-info__storage-progress">
             <p className="user-details-modal-info__label">Занятость диска:</p>
             <StorageProgressBar
               used={used}
@@ -106,9 +106,7 @@ export const useUserBlocksData = (
           </div>
         ),
         copyValue: "",
-        originalValue: `Общий размер: ${
-          storageStats?.storage.totalSizeFormatted || ""
-        }`,
+        originalValue: `Занятость диска: ${usedFormatted} из ${limitFormatted} (${percent}%)`,
       },
       {
         title: "Кол-во файлов",

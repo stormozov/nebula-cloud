@@ -52,7 +52,7 @@ export function UserDetailsModalInfo({
         >
           <Heading
             level={4}
-            size="sm"
+            visualSize="sm"
             noMargin
             className="user-details-modal-info__title"
           >
@@ -68,23 +68,21 @@ export function UserDetailsModalInfo({
           </Button>
         </header>
         <div className="user-details-modal-info__items">
-          {items.map((info) => {
-            if (info.copyValue) {
-              return (
-                <div key={info.title} className="user-details-modal-info__item">
-                  <UserCopyableInfoRow
-                    label={info.title}
-                    value={info.value}
-                    originalValue={info.originalValue}
-                    copyValue={info.copyValue}
-                    onCopy={handleRowClick}
-                  />
-                </div>
-              );
-            }
-
-            return info.value;
-          })}
+          {items.map((info) => (
+            <div key={info.title} className="user-details-modal-info__item">
+              {info.copyValue ? (
+                <UserCopyableInfoRow
+                  label={info.title}
+                  value={info.value}
+                  originalValue={info.originalValue}
+                  copyValue={info.copyValue}
+                  onCopy={handleRowClick}
+                />
+              ) : (
+                info.value
+              )}
+            </div>
+          ))}
         </div>
       </section>
     );
