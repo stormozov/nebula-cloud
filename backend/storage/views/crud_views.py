@@ -6,7 +6,7 @@ All actions in this module require authentication and appropriate permissions.
 from datetime import datetime
 
 from django.db.models import Q
-from django.http import FileResponse, JsonResponse
+from django.http import FileResponse
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound, ValidationError

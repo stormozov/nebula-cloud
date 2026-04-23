@@ -709,7 +709,7 @@ class TestPublicLinkIntegration:
 
         # Assert 1: Link generated
         assert generate_response.status_code == status.HTTP_200_OK
-        
+
         # Get raw public_link from DB (not frontend URL)
         uploaded_file.refresh_from_db()
         public_link = uploaded_file.public_link
@@ -785,7 +785,6 @@ class TestPublicLinkIntegration:
 
         # Assert: Access denied
         assert response.status_code == status.HTTP_404_NOT_FOUND
-
 
     def test_each_public_link_returns_correct_file(
         self,

@@ -61,11 +61,7 @@ class FileSerializer(serializers.ModelSerializer):
 
     def get_public_link_url(self, obj: File) -> str | None:
         """Return frontend public URL if link exists."""
-        return (
-            get_public_frontend_url(obj.public_link)
-            if obj.public_link
-            else None
-        )
+        return get_public_frontend_url(obj.public_link) if obj.public_link else None
 
     def get_download_url(self, obj: File) -> str:
         """Return authenticated download URL."""

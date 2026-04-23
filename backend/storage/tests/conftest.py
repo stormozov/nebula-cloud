@@ -402,6 +402,7 @@ def file_index(request):
     """Parametrized fixture providing indices 0-4 for multiple_files testing."""
     return request.param
 
+
 @pytest.fixture
 def create_file(db, user_account):
     """

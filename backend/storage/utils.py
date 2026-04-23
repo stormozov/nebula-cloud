@@ -45,7 +45,6 @@ def validate_filename(value):
     Also rejected: trailing dot (.), trailing space ( ), empty string
     """
 
-
     if not value or not value.strip():
         raise serializers.ValidationError("Имя файла не может быть пустым")
 
