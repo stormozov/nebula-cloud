@@ -3,7 +3,7 @@
 // =============================================================================
 
 .help-keyboard-shortcuts-table {
-  border-radius: 0.5rem;
+  border-radius: var(--radius-md);
   overflow: hidden;
 
   &__header-row {
@@ -30,7 +30,7 @@
   &__key {
     padding: var(--space-1) var(--space-2);
     background-color: var(--color-bg-tertiary);
-    border-radius: 0.25rem;
+    border-radius: var(--radius-sm);
     font-weight: bold;
   }
 }

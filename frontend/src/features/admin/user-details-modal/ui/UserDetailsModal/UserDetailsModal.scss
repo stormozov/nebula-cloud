@@ -39,7 +39,8 @@
     height: 93vh;
 
     background-color: var(--color-bg-primary);
-    border-radius: 20px 20px 0 0;
+    border-radius: var(--radius-xl) var(--radius-xl) var(--radius-none)
+      var(--radius-none);
 
     overflow: hidden;
     animation: slideDashboardModalIn 0.3s ease-out;

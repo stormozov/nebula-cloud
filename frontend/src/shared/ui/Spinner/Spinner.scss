@@ -25,7 +25,7 @@
 
     border: var(--spinner-border-width) solid var(--spinner-track-color);
     border-left-color: var(--spinner-color);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
 
     color: var(--spinner-text-color);
 

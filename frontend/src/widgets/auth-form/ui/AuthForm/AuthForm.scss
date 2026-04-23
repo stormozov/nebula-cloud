@@ -16,7 +16,7 @@
 
   background-color: var(--color-bg-primary);
   box-shadow: var(--color-shadow-lg);
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
 
   &__panel {
     animation: fadeIn 0.3s ease;

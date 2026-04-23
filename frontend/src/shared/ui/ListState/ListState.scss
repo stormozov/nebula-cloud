@@ -5,7 +5,7 @@
 .list-state {
   &__default-block {
     padding: var(--space-15) var(--space-6);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     font-size: var(--text-size-regular);
     text-align: center;
     cursor: default;

@@ -9,7 +9,7 @@ $badge-height: 24px;
 $badge-min-width: 20px;
 $badge-padding-inline: var(--space-2);
 $badge-font-size: var(--text-size-caption);
-$badge-border-radius: 6px;
+$badge-border-radius: var(--radius-md);
 $badge-dot-size: 10px;
 $badge-icon-size: 12px;
 $badge-transition:
@@ -151,7 +151,7 @@ $light-variants: (
     min-width: $badge-dot-size;
     height: $badge-dot-size;
     padding: 0;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
   }
 
   &--copyable {

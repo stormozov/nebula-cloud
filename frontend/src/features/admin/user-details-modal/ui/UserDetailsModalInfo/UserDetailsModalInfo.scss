@@ -10,7 +10,7 @@
     position: relative;
     padding: var(--space-4);
     background-color: var(--color-bg-tertiary);
-    border-radius: 10px;
+    border-radius: var(--radius-lg);
     width: 100%;
 
     &:not(:last-child) {
@@ -50,7 +50,7 @@
 
     background-color: var(--color-bg-primary);
     border: 2px solid transparent;
-    border-radius: 6px;
+    border-radius: var(--radius-md);
 
     &:has(.user-details-modal-info-copyable-row) {
       padding-right: var(--space-6);
