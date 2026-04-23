@@ -1,4 +1,3 @@
-```markdown
 # Nebula Cloud
 
 [🇷🇺 RU версия](./README_RU.md)
@@ -74,4 +73,3 @@ API documentation [here](./backend/docs/ru/API.md)
 ---
 
 _The application is developed for educational/personal purposes. It is not a commercial product._
-```
