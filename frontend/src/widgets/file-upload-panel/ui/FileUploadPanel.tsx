@@ -39,11 +39,11 @@ export function FileUploadPanel() {
   useEffect(() => {
     if (isQueueCompleted) {
       if (failedCount > 0) {
-        const storageError = queue.find((upload) => 
-          upload.error?.includes('Превышен лимит хранилища')
+        const storageError = queue.find((upload) =>
+          upload.error?.includes("Превышен лимит хранилища"),
         );
         if (storageError) {
-          toast.error(storageError.error || 'Ошибка загрузки');
+          toast.error(storageError.error || "Ошибка загрузки");
         } else {
           toast.error(`Ошибки загрузки файлов (${failedCount})`);
         }

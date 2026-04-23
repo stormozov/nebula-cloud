@@ -123,7 +123,7 @@ export const useUserManager = (): IUseUserManagerReturns => {
       },
       renders: {
         renderLoading: () => <ListSkeleton />,
-      }
+      },
     },
 
     // -- Selected user --------------------------------------------------------

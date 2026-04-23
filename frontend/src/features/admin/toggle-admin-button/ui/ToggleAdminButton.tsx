@@ -48,7 +48,7 @@ export function ToggleAdminButton({
             `Роль администратора пользователя ${userId} успешно изменена`,
             {
               position: "top-center",
-            }
+            },
           );
         } catch {
           toast.error("Не удалось изменить роль администратора");

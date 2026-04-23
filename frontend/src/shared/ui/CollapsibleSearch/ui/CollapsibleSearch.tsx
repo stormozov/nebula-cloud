@@ -6,7 +6,7 @@ import {
   Button,
   ControlledInput,
   type IButtonProps,
-  type IControlledInputProps
+  type IControlledInputProps,
 } from "@/shared/ui";
 
 import "./CollapsibleSearch.scss";

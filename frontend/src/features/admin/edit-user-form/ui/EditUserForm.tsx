@@ -1,10 +1,5 @@
 import type { UserDetailsResponse } from "@/entities/user";
-import {
-  Button,
-  ControlledInput,
-  Heading,
-  PageWrapper
-} from "@/shared/ui";
+import { Button, ControlledInput, Heading, PageWrapper } from "@/shared/ui";
 
 import { useEditUserForm } from "../lib/useEditUserForm";
 

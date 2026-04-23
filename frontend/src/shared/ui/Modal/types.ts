@@ -28,7 +28,6 @@ export interface IModalProps {
   onClose: () => void;
 }
 
-
 /**
  * Modal form props (for modals with forms).
  */

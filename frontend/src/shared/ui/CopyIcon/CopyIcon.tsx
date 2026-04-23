@@ -10,7 +10,7 @@ export interface CopyButtonProps {
 }
 
 /**
- * A button with an icon that toggles between a copy and check icon to indicate 
+ * A button with an icon that toggles between a copy and check icon to indicate
  * copy-to-clipboard status.
  */
 export function CopyIcon({ iconProps }: CopyButtonProps) {

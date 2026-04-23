@@ -22,7 +22,7 @@ interface IAvatarProps {
    * labeling.
    */
   alt: string;
-  /** 
+  /**
    * The size of the avatar.
    */
   size?: "sm" | "md" | "lg";

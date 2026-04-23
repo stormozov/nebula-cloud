@@ -121,7 +121,9 @@ export function UserDetailsModal({ modalProps }: IUserDetailsModalProps) {
                   `Детали пользователя ${user.username || user.fullName}`}
 
                 {isSuccess && isCurrentUser && (
-                  <Badge variant="info-light" superscript>Вы</Badge>
+                  <Badge variant="info-light" superscript>
+                    Вы
+                  </Badge>
                 )}
               </Heading>
               <PageWrapper>

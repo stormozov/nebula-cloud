@@ -189,13 +189,13 @@ describe("Modal", () => {
       const [isOpen, setIsOpen] = React.useState(true);
       return (
         <Modal
-            isOpen={isOpen}
-            title="Modal"
-            onClose={() => setIsOpen(false)}
-            focusTarget={focusRef as React.RefObject<HTMLElement>}
-          >
-            <input ref={focusRef} type="text" />
-          </Modal>
+          isOpen={isOpen}
+          title="Modal"
+          onClose={() => setIsOpen(false)}
+          focusTarget={focusRef as React.RefObject<HTMLElement>}
+        >
+          <input ref={focusRef} type="text" />
+        </Modal>
       );
     };
 

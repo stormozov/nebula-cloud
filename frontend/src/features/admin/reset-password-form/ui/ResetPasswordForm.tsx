@@ -1,9 +1,4 @@
-import {
-  Button,
-  ControlledInput,
-  Heading,
-  PageWrapper
-} from "@/shared/ui";
+import { Button, ControlledInput, Heading, PageWrapper } from "@/shared/ui";
 
 import type { IResetPasswordFormProps } from "../lib/types";
 import { useResetPasswordForm } from "../lib/useResetPasswordForm";

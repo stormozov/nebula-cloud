@@ -9,7 +9,6 @@ import { server } from "@tests/mocks/server";
 import { delay, HttpResponse, http } from "msw";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { fileSlice } from "../../model/slice";
 import type { IFile } from "../../model/types";
 
 // =============================================================================
@@ -56,7 +55,6 @@ const createTestStore = () => {
   return configureStore({
     reducer: {
       [fileApi.reducerPath]: fileApi.reducer,
-      file: fileSlice.reducer,
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware().concat(fileApi.middleware),

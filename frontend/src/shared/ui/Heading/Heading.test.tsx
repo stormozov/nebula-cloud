@@ -122,7 +122,7 @@ describe("Heading", () => {
      */
     sizes.forEach((size) => {
       it(`applies heading--${size} class when size="${size}"`, () => {
-        render(<Heading size={size}>Test</Heading>);
+        render(<Heading visualSize={size}>Test</Heading>);
         const heading = screen.getByRole("heading");
         expect(heading).toHaveClass(`heading--${size}`);
       });
@@ -139,7 +139,7 @@ describe("Heading", () => {
           level={3}
           variant="accent"
           align="center"
-          size="xl"
+          visualSize="xl"
           className="custom-class"
         >
           Combined

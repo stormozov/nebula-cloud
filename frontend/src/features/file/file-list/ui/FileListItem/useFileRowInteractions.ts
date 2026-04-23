@@ -36,9 +36,8 @@ export const useFileRowInteractions = ({
   disabled,
   onSelect,
 }: IUseFileRowInteractionsProps) => {
-  const [contextMenu, setContextMenu] = useState<IContextMenuState>(
-    INIT_CONTEXT_STATE,
-  );
+  const [contextMenu, setContextMenu] =
+    useState<IContextMenuState>(INIT_CONTEXT_STATE);
 
   const handleRowClick = useCallback(() => {
     if (!disabled && onSelect) onSelect(file);

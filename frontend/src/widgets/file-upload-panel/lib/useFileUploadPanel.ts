@@ -58,7 +58,7 @@ export interface IFileUploadPanelReturns {
    * @param uploadId - The unique identifier of the upload to remove.
    */
   handleRemove: (uploadId: string) => void;
-};
+}
 
 /**
  * Custom hook for managing the file upload panel state and interactions.

@@ -46,7 +46,7 @@ export const adminApi = createApi({
         if (arg?.page === 1 || !currentCache) return newItems;
 
         const existingIds = new Set(currentCache.results.map((u) => u.id));
-        
+
         currentCache.results.push(
           ...newItems.results.filter((u) => !existingIds.has(u.id)),
         );
