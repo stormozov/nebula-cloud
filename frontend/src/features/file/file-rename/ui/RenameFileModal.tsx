@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import type { IFile } from "@/entities/file";
-import { Button, ControlledInput, Icon } from "@/shared/ui";
+import { Button, ControlledInput } from "@/shared/ui";
 import { Modal } from "@/shared/ui/Modal";
 
 import "./RenameFileModal.scss";
@@ -79,7 +79,6 @@ export function RenameFileModal({
 
     setValidationError(null);
     await onSubmit(newFileName.trim());
-    // Modal closes after successful submission (handled by parent)
   };
 
   const handleKeyDown = (
@@ -108,18 +107,18 @@ export function RenameFileModal({
         <>
           <Button
             variant="secondary"
-            onClick={handleClose}
+            icon={{ name: "close" }}
             disabled={isSubmitting}
+            onClick={handleClose}
           >
-            <Icon name="close" />
             Отмена
           </Button>
           <Button
             variant="primary"
-            onClick={handleSubmit}
+            icon={{ name: "save" }}
             loading={isSubmitting}
+            onClick={handleSubmit}
           >
-            <Icon name="save" />
             Сохранить
           </Button>
         </>

@@ -1,6 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { formatFileSize, parseFileSize, truncateWithMiddleEllipsis } from "../file-format";
+import {
+  formatFileSize,
+  parseFileSize,
+  truncateWithMiddleEllipsis,
+} from "../file-format";
 
 describe("file-format", () => {
   beforeEach(() => {
@@ -354,7 +358,10 @@ describe("file-format", () => {
           expected: 1024,
           desc: "multiple trailing spaces",
         },
-      ])("should handle $desc: '$input' -> $expected", ({ input, expected }) => {
+      ])("should handle $desc: '$input' -> $expected", ({
+        input,
+        expected,
+      }) => {
         expect(parseFileSize(input)).toBe(expected);
       });
     });
@@ -401,7 +408,7 @@ describe("file-format", () => {
       it.each([
         { input: " 1.00 КБ", expected: 0, desc: "leading space" },
         { input: "1KB", expected: 0, desc: "Latin K" },
-{ input: "1КБ", expected: 1024, desc: "no space parses" },
+        { input: "1КБ", expected: 1024, desc: "no space parses" },
       ])("should return 0 for $desc: '$input' -> $expected", ({
         input,
         expected,
@@ -462,9 +469,20 @@ describe("file-format", () => {
       it.each([
         { input: "", expected: "", desc: "empty string" },
         { input: "short", expected: "short", desc: "single word" },
-        { input: "a".repeat(35), expected: "a".repeat(35), desc: "exactly maxLength" },
-        { input: "hello world test string", expected: "hello world test string", desc: "< maxLength multi-word" },
-      ])("should return unchanged for $desc: '$input'", ({ input, expected }) => {
+        {
+          input: "a".repeat(35),
+          expected: "a".repeat(35),
+          desc: "exactly maxLength",
+        },
+        {
+          input: "hello world test string",
+          expected: "hello world test string",
+          desc: "< maxLength multi-word",
+        },
+      ])("should return unchanged for $desc: '$input'", ({
+        input,
+        expected,
+      }) => {
         expect(truncateWithMiddleEllipsis(input)).toBe(expected);
       });
     });
@@ -480,14 +498,15 @@ describe("file-format", () => {
        */
       it.each([
         {
-          input: "this is a very long sentence with many words to test truncation logic properly",
+          input:
+            "this is a very long sentence with many words to test truncation logic properly",
           expected: "this is a very ... properly",
-          desc: "long sentence defaults"
+          desc: "long sentence defaults",
         },
         {
           input: "word1 word2 word3 word4 word5 word6 word7 word8 word9",
           expected: "word1 word2 word3 word4 ... word9",
-          desc: "more words"
+          desc: "more words",
         },
       ])("should truncate defaults: $desc", ({ input, expected }) => {
         expect(truncateWithMiddleEllipsis(input)).toBe(expected);
@@ -504,7 +523,10 @@ describe("file-format", () => {
        * @expected Even char split around ...
        */
       it("should even-split chars for tiny maxLength", () => {
-        const result = truncateWithMiddleEllipsis("abcdefghijklmnopqrstuvwxyz", 10);
+        const result = truncateWithMiddleEllipsis(
+          "abcdefghijklmnopqrstuvwxyz",
+          10,
+        );
         expect(result.length).toBe(9);
         expect(result).toBe("abc...xyz");
       });
@@ -523,14 +545,18 @@ describe("file-format", () => {
         {
           input: "this is a longer test string",
           maxLength: 15,
-          expected: "this ... string"
+          expected: "this ... string",
         },
         {
           input: "abc def ghi",
           maxLength: 5,
-          expected: "a...i"
+          expected: "a...i",
         },
-      ])("custom maxLength=$maxLength: '$input' -> '$expected'", ({ input, maxLength, expected }) => {
+      ])("custom maxLength=$maxLength: '$input' -> '$expected'", ({
+        input,
+        maxLength,
+        expected,
+      }) => {
         expect(truncateWithMiddleEllipsis(input, maxLength)).toBe(expected);
       });
 

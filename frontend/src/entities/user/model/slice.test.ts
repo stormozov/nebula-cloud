@@ -19,7 +19,12 @@ const createMockUser = (overrides: Partial<IUser> = {}): IUser => ({
   email: "test@example.com",
   firstName: "Test",
   lastName: "User",
+  fullName: "Test User",
+  isActive: true,
   isStaff: false,
+  storagePath: "",
+  dateJoined: "2022-01-01T00:00:00.000Z",
+  lastLogin: "",
   ...overrides,
 });
 
@@ -753,7 +758,12 @@ describe("userSlice", () => {
         email: "min@example.com",
         firstName: "Min",
         lastName: "User",
+        fullName: "Min User",
+        isActive: true,
         isStaff: false,
+        storagePath: "",
+        dateJoined: "",
+        lastLogin: "",
       };
 
       const state = reducer(initialState, setUser(minimalUser));

@@ -20,6 +20,7 @@ import fileUploadReducer from "@/entities/file-upload/model/slice";
 import { userApi } from "@/entities/user";
 import { adminApi } from "@/entities/user/api/adminApi";
 import userReducer from "@/entities/user/model/slice";
+import { themeReducer } from "@/features/theme";
 
 import { resetApiMiddleware } from "../middlewares/resetApiMiddleware";
 
@@ -136,6 +137,7 @@ const rootReducer = combineReducers({
   [userApi.reducerPath]: userApi.reducer,
   [fileApi.reducerPath]: fileApi.reducer,
   [adminApi.reducerPath]: adminApi.reducer,
+  theme: themeReducer,
 });
 
 export const store = configureStore({

@@ -1,8 +1,10 @@
 import classNames from "classnames";
-import { useCallback, useEffect, useRef } from "react";
+import { useRef } from "react";
+import { createPortal } from "react-dom";
+
+import { useBodyScrollLock, useFocusTrap } from "@/shared/hooks";
 
 import { Button } from "../buttons";
-import { Icon } from "../Icon";
 import type { IModalProps } from "./types";
 
 import "./Modal.scss";
@@ -31,19 +33,19 @@ export function Modal({
   onClose,
 }: IModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
-  const previousFocusRef = useRef<HTMLElement | null>(null);
+
+  useFocusTrap({
+    active: isOpen,
+    containerRef: modalRef,
+    onEscape: closeOnEsc ? onClose : undefined,
+    initialFocusRef: focusTarget,
+  });
+
+  useBodyScrollLock(isOpen);
 
   // ---------------------------------------------------------------------------
   // HANDLERS
   // ---------------------------------------------------------------------------
-
-  const handleKeyDown = useCallback(
-    (event: KeyboardEvent): void => {
-      if (!closeOnEsc) return;
-      if (event.key === "Escape") onClose();
-    },
-    [closeOnEsc, onClose],
-  );
 
   const handleOverlayClick = (
     event: React.MouseEvent<HTMLDivElement>,
@@ -57,56 +59,13 @@ export function Modal({
   };
 
   // ---------------------------------------------------------------------------
-  // FOCUS TRAP
-  // ---------------------------------------------------------------------------
-
-  /**
-   * Focus trap: focus first focusable element when modal opens.
-   */
-  useEffect(() => {
-    if (isOpen) {
-      // Store previous focus
-      previousFocusRef.current = document.activeElement as HTMLElement;
-
-      // Focus target first if provided, else first focusable
-      let focusableElement: HTMLElement | null = null;
-      if (focusTarget?.current) {
-        focusableElement = focusTarget.current;
-      } else {
-        const queryResult = modalRef.current?.querySelector<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-        );
-        focusableElement = queryResult || null;
-      }
-      focusableElement?.focus();
-
-      // Add keyboard listener
-      document.addEventListener("keydown", handleKeyDown);
-
-      // Prevent body scroll
-      document.body.style.overflow = "hidden";
-    }
-
-    return () => {
-      // Cleanup
-      document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "";
-
-      // Restore previous focus or target
-      previousFocusRef.current?.focus();
-    };
-  }, [isOpen, handleKeyDown, focusTarget]);
-
-
-
-  // ---------------------------------------------------------------------------
   // RENDER
   // ---------------------------------------------------------------------------
 
   // Don't render if closed
   if (!isOpen) return null;
 
-  return (
+  const modalContent = (
     // biome-ignore lint/a11y/useKeyWithClickEvents: <dialog is used for accessibility>
     <div
       className="modal-overlay"
@@ -133,9 +92,8 @@ export function Modal({
               className="modal__close-btn"
               onClick={handleCloseButtonClick}
               aria-label="Закрыть модальное окно"
-            >
-              <Icon name="close" />
-            </Button>
+              icon={{ name: "close" }}
+            />
           )}
         </header>
 
@@ -147,4 +105,8 @@ export function Modal({
       </div>
     </div>
   );
+
+  return typeof document !== "undefined"
+    ? createPortal(modalContent, document.body)
+    : modalContent;
 }

@@ -1,0 +1,36 @@
+// =============================================================================
+// Styles for the HelpKeyboardShortcutsTable component
+// =============================================================================
+
+.help-keyboard-shortcuts-table {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+
+  &__header-row {
+    background-color: var(--color-bg-secondary);
+    font-size: var(--text-size-small);
+    color: var(--color-text-secondary);
+    text-align: left;
+  }
+
+  &__row {
+    &:not(:last-child) {
+      border-bottom: 1px solid var(--color-border-secondary);
+    }
+  }
+
+  &__cell {
+    padding: var(--space-2);
+
+    &:first-child {
+      width: 128px;
+    }
+  }
+
+  &__key {
+    padding: var(--space-1) var(--space-2);
+    background-color: var(--color-bg-tertiary);
+    border-radius: var(--radius-sm);
+    font-weight: bold;
+  }
+}

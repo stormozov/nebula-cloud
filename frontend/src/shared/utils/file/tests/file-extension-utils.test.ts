@@ -145,11 +145,12 @@ describe("file-extension-utils", () => {
         originalName: "script.js",
         expected: false,
       },
-    ])(
-      "should return $expected for non-image extension",
-      ({ originalName, expected }) => {
-        expect(isImageFile(createMockFile(originalName))).toBe(expected);
-      })
+    ])("should return $expected for non-image extension", ({
+      originalName,
+      expected,
+    }) => {
+      expect(isImageFile(createMockFile(originalName))).toBe(expected);
+    });
 
     /**
      * @description Should return false for filename without extension

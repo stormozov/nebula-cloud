@@ -6,22 +6,22 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-4);
   text-align: center;
 
   &__icon {
-    font-size: 48px;
-    line-height: 1;
+    font-size: var(--font-size-5xl);
+    line-height: var(--font-line-height-1);
   }
 
   &__message {
     p {
-      margin: 0 0 8px;
-      font-size: 15px;
+      margin: 0 0 var(--space-2);
+      font-size: var(--text-size-regular);
       color: var(--color-text-primary);
 
       strong {
-        font-weight: 600;
+        font-weight: var(--font-weight-semibold);
         color: var(--color-primary);
         word-break: break-word;
       }

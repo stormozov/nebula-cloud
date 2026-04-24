@@ -54,7 +54,7 @@ export function Navigation({ items = defaultItems }) {
     (item) => !item.roles || item.roles.includes(role),
   );
 
-  if (visibleItems.length === 0 || visibleItems.length === 1) return null;
+  if (visibleItems.length <= 1) return null;
 
   return (
     <nav className="navigation">

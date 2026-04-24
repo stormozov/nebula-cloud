@@ -1,0 +1,44 @@
+// =============================================================================
+// Styles module for Avatar component
+// =============================================================================
+
+.avatar {
+  border-radius: var(--radius-md);
+  object-fit: cover;
+
+  // -------------------------------- Fallback ---------------------------------
+
+  &--fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+  }
+  
+  // ---------------------------------- Sizes ----------------------------------
+
+  &--sm {
+    width: 2.3em;
+    height: 2.3em;
+
+    font-size: var(--text-size-caption);
+    line-height: var(--font-line-height-0);
+  }
+
+  &--md {
+    width: 3em;
+    height: 3em;
+
+    font-size: var(--text-size-small);
+    line-height: var(--font-line-height-0);
+  }
+
+  &--lg {
+    width: 4em;
+    height: 4em;
+
+    font-size: var(--text-size-regular);
+    line-height: var(--font-line-height-0);
+  }
+}

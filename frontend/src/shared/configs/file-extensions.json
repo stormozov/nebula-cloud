@@ -1,7 +1,7 @@
 {
-  "image": ["jpg", "jpeg", "png", "gif", "bmp", "svg", "webp", "ico"],
-  "video": ["mp4", "avi", "mov", "wmv", "mkv", "webm", "flv"],
-  "audio": ["mp3", "wav", "flac", "aac", "ogg", "wma"],
+  "image": ["jpg", "jpeg", "png", "gif", "bmp", "svg", "webp"],
+  "video": ["mp4", "avi", "mov", "mkv"],
+  "audio": ["mp3", "wav"],
   "document": [
     "pdf",
     "doc",
@@ -11,20 +11,8 @@
     "ppt",
     "pptx",
     "txt",
-    "rtf"
+    "rtf",
+    "csv"
   ],
-  "archive": ["zip", "rar", "7z", "tar", "gz", "bz2"],
-  "code": [
-    "js",
-    "ts",
-    "jsx",
-    "tsx",
-    "py",
-    "java",
-    "c",
-    "cpp",
-    "html",
-    "css",
-    "json"
-  ]
+  "archive": ["zip", "rar", "7z", "tar", "gz"]
 }

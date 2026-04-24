@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router";
+import { toast } from "react-toastify";
 
 import { useRegisterMutation } from "@/entities/user";
 import { hasFieldErrors, parseDjangoApiErrors } from "@/shared/api";
@@ -142,6 +143,10 @@ export const useRegisterForm = ({
 
         // Success flow
         onSuccess?.();
+        toast.success("Регистрация прошла успешно", {
+          position: "bottom-center",
+          autoClose: 2000,
+        });
         navigate("/disk", { replace: true });
       } catch (error: unknown) {
         let apiFieldErrors: IRegisterFormErrors = {};

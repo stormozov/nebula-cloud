@@ -1,4 +1,12 @@
-import type { IUserRegister } from "./types";
+import { copyToClipboardWithFeedback } from "@/shared/utils";
+
+import type {
+  IStorageStats,
+  IStorageStatsResponse,
+  IUserListResponse,
+  IUserRegister,
+  UserListItemCopyField,
+} from "./types";
 
 /**
  * Transforms form data to API request format.
@@ -16,3 +24,57 @@ export const transformDataToApi = (data: IUserRegister) => ({
   first_name: data.firstName,
   last_name: data.lastName,
 });
+
+/**
+ * Copies a specified field of a user to clipboard with feedback.
+ *
+ * @param user - User object
+ * @param field - Field to copy ('id', 'username', or 'email')
+ * @param onSuccess - Optional success callback (receives the copied value)
+ * @param onError - Optional error callback
+ */
+export const copyUserField = async (
+  user: IUserListResponse,
+  field: UserListItemCopyField,
+  onSuccess?: (value: string) => void,
+  onError?: () => void,
+): Promise<void> => {
+  let value: string;
+  let label: string;
+
+  switch (field) {
+    case "id":
+      value = String(user.id);
+      label = `ID пользователя ${value}`;
+      break;
+    case "username":
+      value = user.username;
+      label = `Логин ${value}`;
+      break;
+    case "email":
+      value = user.email;
+      label = `Email ${value}`;
+      break;
+  }
+
+  await copyToClipboardWithFeedback(
+    value,
+    () => onSuccess?.(label),
+    () => onError?.(),
+  );
+};
+
+/**
+ * Type guard function that checks if the provided data is of type
+ * `IStorageStatsResponse`.
+ *
+ * @param data - The object to be checked, which can be either `IStorageStats`
+ * or `IStorageStatsResponse`.
+ * @returns A boolean indicating whether the data has both `user` and `storage`
+ * properties, thus confirming it is of type `IStorageStatsResponse`.
+ */
+export function isAdminResponse(
+  data: IStorageStats | IStorageStatsResponse,
+): data is IStorageStatsResponse {
+  return "user" in data && "storage" in data;
+}

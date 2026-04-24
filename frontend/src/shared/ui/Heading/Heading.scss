@@ -5,10 +5,12 @@
 .heading {
   // Basic styles
   margin-top: 0;
-  margin-bottom: 1rem;
-  line-height: 1.2;
-  font-weight: 700;
-  font-family: var(--font-family-base, 'Inter', sans-serif);
+  margin-bottom: var(--space-4);
+
+  font-family: var(--font-family-base, "Inter", sans-serif);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--font-line-height-2);
+
   transition: color 0.2s ease-in-out;
 
   &--no-margin {
@@ -16,43 +18,57 @@
   }
 
   // ---------------------------------------------------------------------------
-  // Semantic dimensions (by header level)
-  // ---------------------------------------------------------------------------
-  &.h1 { font-size: 2.5rem; }
-  &.h2 { font-size: 2rem; }
-  &.h3 { font-size: 1.75rem; }
-  &.h4 { font-size: 1.5rem; }
-  &.h5 { font-size: 1.25rem; }
-  &.h6 { 
-    font-size: 1rem; 
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  // ---------------------------------------------------------------------------
   // Visual dimensions (override semantic dimensions if necessary)
   // ---------------------------------------------------------------------------
-  &--sm { font-size: 1rem; }
-  &--md { font-size: 1.5rem; }
-  &--lg { font-size: 2rem; }
-  &--xl { font-size: 2.5rem; }
-  &--2xl { font-size: 3rem; }
+
+  &--visual-sm {
+    font-size: var(--heading-size-6);
+  }
+
+  &--visual-md {
+    font-size: var(--heading-size-5);
+  }
+
+  &--visual-lg {
+    font-size: var(--heading-size-4);
+  }
+
+  &--visual-xl {
+    font-size: var(--heading-size-3);
+  }
+
+  &--visual-2xl {
+    font-size: var(--heading-size-2);
+  }
+
+  &--visual-3xl {
+    font-size: var(--heading-size-1);
+  }
+
+  &--visual-4xl {
+    font-size: var(--font-size-4xl);
+  }
+
+  &--visual-5xl {
+    font-size: var(--font-size-5xl);
+  }
 
   // ---------------------------------------------------------------------------
   // Color variants
   // ---------------------------------------------------------------------------
+
   &--primary {
     color: var(--color-text-primary);
   }
 
   &--secondary {
     color: var(--color-text-secondary);
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
   }
 
   &--tertiary {
     color: var(--color-text-tertiary);
-    font-weight: 400;
+    font-weight: var(--font-weight-regular);
   }
 
   &--inverse {
@@ -62,7 +78,7 @@
   &--link {
     color: var(--color-text-link);
     cursor: pointer;
-    
+
     &:hover {
       color: var(--color-text-link-hover);
       text-decoration: underline;
@@ -71,7 +87,7 @@
 
   &--accent {
     color: var(--color-primary);
-    
+
     &:hover {
       color: var(--color-primary-hover);
     }
@@ -80,6 +96,7 @@
   // ---------------------------------------------------------------------------
   // Alignment
   // ---------------------------------------------------------------------------
+
   &--left {
     text-align: left;
   }

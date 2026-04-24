@@ -1,4 +1,5 @@
 import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import axios from "axios";
 
 import type { IParsedApiErrors } from "@/shared/types/api";
 
@@ -122,4 +123,80 @@ export const isError401 = (err: FetchBaseQueryError): boolean => {
   return (
     err && typeof err === "object" && "status" in err && err.status === 401
   );
+};
+
+/**
+ * Extracts a human-readable error message from an unknown `detail` value.
+ *
+ * @param detail - The error detail to extract a message from. Can be any type.
+ * @returns A formatted error message as a string.
+ *
+ * @example
+ * ```ts
+ * extractDetailMessage("Invalid input"); // → "Invalid input"
+ * extractDetailMessage(["Error 1", "Error 2"]); // → "Error 1; Error 2"
+ * extractDetailMessage([{ string: "Field is required" }]); // → "Field is required"
+ * ```
+ */
+const extractDetailMessage = (detail: unknown): string => {
+  // String case
+  if (typeof detail === "string") return detail;
+
+  // Array case
+  if (Array.isArray(detail) && detail.length > 0) {
+    const first = detail[0];
+    if (typeof first === "string") return detail.join("; ");
+    // Массив объектов ErrorDetail
+    if (typeof first === "object" && first !== null && "string" in first) {
+      return detail
+        .map((item) => (item as { string?: string }).string || String(item))
+        .join("; ");
+    }
+  }
+
+  // Object case
+  if (typeof detail === "object" && detail !== null && "string" in detail) {
+    return (detail as { string: string }).string;
+  }
+
+  // Fallback
+  return JSON.stringify(detail);
+};
+
+/**
+ * Extracts a user-friendly error message from an Axios error response.
+ *
+ * @param error - The unknown error object, expected to be an Axios error.
+ * @returns A formatted error message as a string, or `null` if no valid error
+ * structure is found.
+ *
+ * @example
+ * ```ts
+ * try {
+ *   await axios.get("/api/protected");
+ * } catch (error) {
+ *   const message = extractApiErrorMessage(error);
+ *   if (message) console.error("API Error:", message);
+ * }
+ * ```
+ */
+export const extractApiErrorMessage = (error: unknown): string | null => {
+  if (!axios.isAxiosError(error) || !error.response?.data) return null;
+
+  const data = error.response.data;
+
+  // 1. Direct field detail
+  if (data.detail) return extractDetailMessage(data.detail);
+
+  // 2. DRF often returns errors in the fields, so we look for the first one
+  for (const key of Object.keys(data)) {
+    const value = data[key];
+    if (Array.isArray(value) && value.length > 0) {
+      return extractDetailMessage(value);
+    }
+    if (typeof value === "string") return value;
+  }
+
+  // 3. The fallback option is the entire object as a string
+  return JSON.stringify(data);
 };

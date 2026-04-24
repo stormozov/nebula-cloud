@@ -1,4 +1,5 @@
 // LIB
+export * from "./lib/types";
 export * from "./lib/useUserManager";
 
 // UI

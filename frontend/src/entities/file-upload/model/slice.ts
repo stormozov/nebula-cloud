@@ -54,7 +54,7 @@ export const fileUploadSlice = createSlice({
       const ids = uploadIds || files.map(() => crypto.randomUUID());
 
       const newUploads: IUploadFile[] = files.map((file, index) => ({
-        id: ids[index], // ← Используем ID из компонента
+        id: ids[index],
         file: {
           name: file.name,
           size: file.size,
@@ -73,6 +73,40 @@ export const fileUploadSlice = createSlice({
       state.isPanelVisible = true;
       state.isQueueCompleted = false;
 
+      if (!state.activeUploadId) {
+        const nextFile = findNextPendingFile(state.queue);
+        if (nextFile) {
+          state.activeUploadId = nextFile.id;
+          nextFile.status = "uploading";
+          nextFile.startedAt = Date.now();
+        }
+      }
+    },
+
+    /**
+     * Retry a failed upload.
+     *
+     * Resets status to pending and starts upload if queue is idle.
+     */
+    retryUpload: (state, action: PayloadAction<{ uploadId: string }>) => {
+      const { uploadId } = action.payload;
+      const uploadItem = state.queue.find((item) => item.id === uploadId);
+
+      // Only failed uploads can be retried
+      if (!uploadItem || uploadItem.status !== "error") return;
+
+      // Check if file is available in storage (handled in processor)
+      // Reset to pending
+      uploadItem.status = "pending";
+      uploadItem.progress = 0;
+      uploadItem.error = undefined;
+      uploadItem.needsReupload = false;
+      state.isQueueCompleted = false;
+
+      // Decrement failed counter as it will be re-attempted
+      state.totalFailed = Math.max(0, state.totalFailed - 1);
+
+      // If no active upload, start this one
       if (!state.activeUploadId) {
         const nextFile = findNextPendingFile(state.queue);
         if (nextFile) {
@@ -290,6 +324,11 @@ export const fileUploadSlice = createSlice({
       nextFile.startedAt = Date.now();
     },
 
+    setNeedsReupload: (state, action: PayloadAction<{ uploadId: string }>) => {
+      const item = state.queue.find((i) => i.id === action.payload.uploadId);
+      if (item) item.needsReupload = true;
+    },
+
     /**
      * Reset upload state (e.g., on logout).
      */
@@ -314,6 +353,7 @@ export const fileUploadSlice = createSlice({
 
 export const {
   addFiles,
+  retryUpload,
   updateProgress,
   updateStatus,
   removeFile,
@@ -323,6 +363,7 @@ export const {
   clearCompleted,
   forceClearQueue,
   markForReupload,
+  setNeedsReupload,
   resetState,
 } = fileUploadSlice.actions;
 

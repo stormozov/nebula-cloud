@@ -1,0 +1,52 @@
+// =============================================================================
+// File list item styles
+// =============================================================================
+
+.file-list-item {
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: var(--color-bg-secondary);
+  }
+
+  &__cell {
+    padding: var(--space-3);
+    border-bottom: 1px solid var(--color-border-primary);
+    font-size: var(--text-size-caption);
+    color: var(--color-text-tertiary);
+    vertical-align: middle;
+
+    &--size,
+    &--uploaded,
+    &--downloaded {
+      width: 100px;
+    }
+  }
+
+  &__name {
+    display: block;
+
+    font-size: var(--text-size-small);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    overflow: hidden;
+  }
+
+  &__comment {
+    display: block;
+    width: 100%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  &__actions-button {
+    svg {
+      max-width: unset;
+      height: unset;
+    }
+  }
+}

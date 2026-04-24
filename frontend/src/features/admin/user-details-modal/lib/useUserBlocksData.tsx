@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 
 import type { IStorageStatsResponse, IUser } from "@/entities/user";
+import { StorageProgressBar, useStorageUsage } from "@/features/storage-usage";
 import { StatusBadge } from "@/shared/ui";
 import { formatDate, truncateWithMiddleEllipsis } from "@/shared/utils";
 
@@ -24,6 +25,9 @@ export const useUserBlocksData = (
   user: IUser,
   storageStats?: IStorageStatsResponse,
 ): IUseUserBlocksDataReturns[] => {
+  const { used, limit, usedFormatted, limitFormatted, percent } =
+    useStorageUsage(user.id);
+
   return useMemo(() => {
     const generalInfo: IUserDetailsInfoItem[] = [
       {
@@ -87,10 +91,22 @@ export const useUserBlocksData = (
 
     const storageInfo: IUserDetailsInfoItem[] = [
       {
-        title: "Путь хранилища",
-        value: storageStats?.storage.path,
-        copyValue: storageStats?.storage.path ?? "",
-        originalValue: `Путь хранилища: ${storageStats?.storage.path ?? ""}`,
+        title: "Занятость диска",
+        value: (
+          <div className="user-details-modal-info__storage-progress">
+            <p className="user-details-modal-info__label">Занятость диска:</p>
+            <StorageProgressBar
+              used={used}
+              total={limit}
+              usedFormatted={usedFormatted}
+              totalFormatted={limitFormatted}
+              percent={percent}
+              showLabels
+            />
+          </div>
+        ),
+        copyValue: "",
+        originalValue: `Занятость диска: ${usedFormatted} из ${limitFormatted} (${percent}%)`,
       },
       {
         title: "Кол-во файлов",
@@ -106,6 +122,12 @@ export const useUserBlocksData = (
           storageStats?.storage.totalSizeFormatted || ""
         }`,
       },
+      {
+        title: "Путь хранилища",
+        value: storageStats?.storage.path,
+        copyValue: storageStats?.storage.path ?? "",
+        originalValue: `Путь хранилища: ${storageStats?.storage.path ?? ""}`,
+      },
     ];
 
     return [
@@ -113,5 +135,5 @@ export const useUserBlocksData = (
       { title: "Доп. информация", items: additionalInfo },
       { title: "Статистика диска", items: storageInfo },
     ];
-  }, [user, storageStats]);
+  }, [user, storageStats, limit, usedFormatted, limitFormatted, percent, used]);
 };

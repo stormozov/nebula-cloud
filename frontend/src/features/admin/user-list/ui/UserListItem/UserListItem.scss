@@ -24,8 +24,8 @@
   }
 
   &__body-cell {
-    padding: 12px;
-    font-size: 14px;
+    padding: var(--space-3);
+    font-size: var(--text-size-small);
     text-align: center;
 
     svg {

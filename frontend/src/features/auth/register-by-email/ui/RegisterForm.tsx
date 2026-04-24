@@ -1,6 +1,6 @@
 import type { JSX } from "react";
 
-import { Button, ControlledInput, Form, Icon } from "@/shared/ui";
+import { Button, ControlledInput, Form } from "@/shared/ui";
 
 import { useRegisterForm } from "../lib/useRegisterForm";
 
@@ -123,11 +123,11 @@ export function RegisterForm({
         type="submit"
         variant="primary"
         size="large"
+        icon={{ name: "register" }}
         loading={isSubmitting}
         fullWidth
         className="register-form__submit-btn"
       >
-        <Icon name="register" />
         Зарегистрироваться
       </Button>
     </Form>

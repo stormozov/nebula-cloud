@@ -1,15 +1,13 @@
-import {
-  type IUserDetailsModalProps,
-  UserDetailsModal,
-  UserList,
-  UserSearchInput,
-} from "@/features/admin";
-import { Button, Icon, ModalConfirm } from "@/shared/ui";
+import { UserDetailsModal, UserList, UserSearchInput } from "@/features/admin";
+import { Badge, Button, Heading, ModalConfirm } from "@/shared/ui";
 
 import { useUserManager } from "../lib/useUserManager";
 
 import "./UserManagementWidget.scss";
 
+/**
+ * A widget component for managing users in the admin dashboard.
+ */
 export function UserManagementWidget() {
   const {
     usersList,
@@ -23,6 +21,16 @@ export function UserManagementWidget() {
   return (
     <div className="users-management w-full">
       <header className="users-management__header">
+        <Heading level={2} noMargin className="users-management__header-title">
+          Управление пользователями
+        </Heading>
+
+        <div className="users-management__count">
+          <Badge icon="person" superscript>
+            {usersList.totalCount} пользователей
+          </Badge>
+        </div>
+
         <UserSearchInput
           buttonProps={{
             children: "Поиск",
@@ -35,35 +43,29 @@ export function UserManagementWidget() {
             onChange: search.setTerm,
           }}
         />
-        <div className="users-management__count">
-          Всего пользователей: {usersList.totalCount}
-        </div>
       </header>
 
       <UserList
         users={usersList.items}
-        isLoading={usersList.isLoading}
-        error={usersList.error}
+        states={usersList.states}
+        renders={usersList.renders}
         onSelectUser={selected.setUserId}
       />
-      {usersList.hasMore && (
+
+      {usersList.items.length > 0 && usersList.hasMore && (
         <div className="users-management__load-more">
           <Button
+            icon={{ name: "retry" }}
             loading={pagination.isLoadMoreLoading}
             disabled={pagination.isLoadMoreLoading}
             onClick={() => pagination.loadMore(false)}
           >
-            <Icon name="retry" />
             Загрузить еще
           </Button>
         </div>
       )}
 
-      {selected.userId && (
-        <UserDetailsModal
-          modalProps={userDetailsModal as IUserDetailsModalProps["modalProps"]}
-        />
-      )}
+      {selected.userId && <UserDetailsModal modalProps={userDetailsModal} />}
 
       <ModalConfirm
         isOpen={confirmModal.isOpen}

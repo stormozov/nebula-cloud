@@ -8,7 +8,7 @@
   display: flex;
   flex-direction: column;
 
-  padding: 32px;
+  padding: var(--space-8);
   margin: 0 auto;
 
   width: 100%;
@@ -16,14 +16,14 @@
 
   background-color: var(--color-bg-primary);
   box-shadow: var(--color-shadow-lg);
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
 
   &__panel {
     animation: fadeIn 0.3s ease;
   }
 
   @media (max-width: 600px) {
-    padding: 24px 16px;
-    margin: 16px;
+    padding: var(--space-6) var(--space-4);
+    margin: var(--space-4);
   }
 }

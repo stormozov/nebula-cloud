@@ -5,50 +5,37 @@
 .file-manager {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: var(--space-6);
 
-  padding: 24px;
+  padding: var(--space-6);
 
   background-color: var(--color-bg-primary);
   border: 1px solid var(--color-border-primary);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
+
+  cursor: default;
 
   &__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-bottom: 16px;
+    padding-bottom: var(--space-4);
     border-bottom: 1px solid var(--color-border-secondary);
   }
 
-  &__dropzone {
-    margin-bottom: 16px;
+  &__header-top {
+    margin-bottom: var(--space-4);
   }
 
-  &__header-title {
-    &-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-
-      padding: 5px 10px;
-
-      background-color: var(--color-info-light);
-      border-radius: 6px;
-
-      font-size: 0.75rem;
-      color: var(--color-info);
-    }
+  &__dropzone {
+    margin-bottom: var(--space-4);
   }
 
   &__load-more {
-    margin-top: 1.125rem;
+    margin-top: var(--space-4);
     text-align: center;
   }
 
   &__empty-message {
-    padding: 48px 24px;
-    font-size: 16px;
+    padding: var(--space-12) var(--space-6);
+    font-size: var(--text-size-regular);
     text-align: center;
     color: var(--color-text-secondary);
     cursor: default;

@@ -68,12 +68,10 @@ export function PublicLinkModal({
 
   const handleGenerateBtnClick = async (): Promise<void> => {
     await onGenerate();
-    // Modal closes after successful generation (handled by parent)
   };
 
   const handleDeleteBtnClick = async (): Promise<void> => {
     await onDelete();
-    // Modal closes after successful deletion (handled by parent)
   };
 
   const handleClose = (): void => {
@@ -92,19 +90,19 @@ export function PublicLinkModal({
         <>
           <Button
             variant="secondary"
-            onClick={handleClose}
+            icon={{ name: "close" }}
             disabled={isGenerating || isDeleting}
+            onClick={handleClose}
           >
-            <Icon name="close" />
             Закрыть
           </Button>
           {hasLink && (
             <Button
               variant="danger"
-              onClick={handleDeleteBtnClick}
+              icon={{ name: "deleteLink" }}
               loading={isDeleting}
+              onClick={handleDeleteBtnClick}
             >
-              <Icon name="deleteLink" />
               Удалить ссылку
             </Button>
           )}
@@ -131,21 +129,12 @@ export function PublicLinkModal({
             <div className="public-link-modal__actions">
               <Button
                 variant="primary"
-                onClick={handleCopyBtnClick}
-                disabled={isGenerating || isDeleting || copySuccess}
+                icon={{ name: copySuccess ? "check" : "copy" }}
                 fullWidth
+                disabled={isGenerating || isDeleting || copySuccess}
+                onClick={handleCopyBtnClick}
               >
-                {copySuccess ? (
-                  <>
-                    <Icon name="check" />
-                    Скопировано!
-                  </>
-                ) : (
-                  <>
-                    <Icon name="copy" />
-                    Скопировать
-                  </>
-                )}
+                {copySuccess ? "Скопировано!" : "Скопировать"}
               </Button>
             </div>
 
@@ -163,11 +152,11 @@ export function PublicLinkModal({
             <div className="public-link-modal__actions">
               <Button
                 variant="primary"
-                onClick={handleGenerateBtnClick}
+                icon={{ name: "share" }}
                 loading={isGenerating}
                 fullWidth
+                onClick={handleGenerateBtnClick}
               >
-                <Icon name="share" />
                 Создать публичную ссылку
               </Button>
             </div>

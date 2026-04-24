@@ -5,25 +5,25 @@
 .tabs-switcher {
   display: flex;
 
-  padding: 4px;
-  margin-bottom: 24px;
+  padding: var(--space-1);
+  margin-bottom: var(--space-6);
 
   width: 100%;
 
   background-color: var(--color-bg-secondary);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
 
   &__tab {
     flex: 1;
 
-    padding: 10px 16px;
+    padding: var(--space-3) var(--space-4);
 
     background-color: transparent;
     border: none;
-    border-radius: 6px;
+    border-radius: var(--radius-md);
 
-    font-size: 15px;
-    font-weight: 500;
+    font-size: var(--text-size-small);
+    font-weight: var(--font-weight-medium);
     color: var(--color-text-secondary);
 
     cursor: pointer;

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 import { useAppDispatch } from "@/app/store/hooks";
 import {
@@ -85,8 +86,8 @@ export const useGlobalDragDrop = ({
       const validationResult = validateFileBatch(files);
 
       if (validationResult.invalidFiles.length > 0) {
-        validationResult.invalidFiles.forEach(({ file, error }) => {
-          console.error(`❌ Файл "${file.name}": ${error}`);
+        validationResult.invalidFiles.forEach(({ error }) => {
+          toast.error(`${error}`);
         });
         if (validationResult.validFiles.length === 0) return;
       }

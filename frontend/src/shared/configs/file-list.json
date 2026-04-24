@@ -1,43 +1,4 @@
 {
-  "actions": [
-    {
-      "id": "view",
-      "icon": "eye",
-      "title": "Просмотр",
-      "ariaLabel": "Просмотр файла"
-    },
-    {
-      "id": "download",
-      "icon": "download",
-      "title": "Скачать",
-      "ariaLabel": "Скачать файл"
-    },
-    {
-      "id": "publicLink",
-      "icon": "share",
-      "title": "Публичная ссылка",
-      "ariaLabel": "Копировать публичную ссылку"
-    },
-    {
-      "id": "rename",
-      "icon": "pencil",
-      "title": "Переименовать",
-      "ariaLabel": "Переименовать файл"
-    },
-    {
-      "id": "editComment",
-      "icon": "comment",
-      "title": "Комментарий",
-      "ariaLabel": "Изменить комментарий"
-    },
-    {
-      "id": "delete",
-      "icon": "trash",
-      "title": "Удалить",
-      "ariaLabel": "Удалить файл",
-      "isDanger": true
-    }
-  ],
   "header_columns": [
     {
       "key": "icon",
@@ -71,7 +32,7 @@
     },
     {
       "key": "actions",
-      "label": "Действия",
+      "label": "",
       "className": "file-list__header-cell--actions"
     }
   ]

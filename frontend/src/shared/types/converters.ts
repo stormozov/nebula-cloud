@@ -11,4 +11,3 @@ export type CamelToSnakeObj = IFile[] | Record<string, unknown> | unknown;
 
 /** Return type for converting from camelCase to snake_case */
 export type CamelToSnakeReturn = CamelToSnakeObj;
-

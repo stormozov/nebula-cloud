@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { UserDetailsResponse } from "@/entities/user";
 import type { ModalConfirmDialogRequest } from "@/shared/ui";
+import type { SelectUser } from "@/widgets/admin-user-manager";
 
 /**
  * Union type that defines the possible actions available
@@ -69,13 +70,10 @@ export interface IUserDetailsModalActionsProps {
 export interface IUserDetailsInfoItem {
   /** The title of the information item */
   title: string;
-
   /** Additional information or content associated with the item */
   value: ReactNode;
-
   /** The value to be copied to the clipboard */
   copyValue: string;
-
   /** The value of the information item */
   originalValue?: string;
 }
@@ -85,7 +83,7 @@ export interface IUserDetailsInfoItem {
  */
 export interface IModalContentProps {
   /** The ID of the user whose details are being displayed */
-  userId: number;
+  userId: SelectUser;
   /** An array of user IDs */
   allUserIds: number[];
   /** Indicates if there are more users to load */

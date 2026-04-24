@@ -5,13 +5,13 @@
 .edit-comment-modal {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-3);
 
   &__symbol-count {
     margin: 0;
-    font-size: 12px;
+    font-size: var(--text-size-caption);
     color: var(--color-text-secondary);
-    line-height: 1.4;
+    line-height: var(--font-line-height-3);
 
     small {
       opacity: 0.8;
@@ -20,7 +20,7 @@
 
   &__current {
     margin: 0;
-    font-size: 13px;
+    font-size: var(--text-size-caption);
     color: var(--color-text-tertiary);
     font-style: italic;
 

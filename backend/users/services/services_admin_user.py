@@ -38,11 +38,17 @@ def calculate_storage_stats(user: UserAccount) -> dict:
     user_files = File.objects.filter(owner=user)  # pylint: disable=no-member
     total_size = user_files.aggregate(total=models.Sum("size"))["total"] or 0
     file_count = user_files.count()
+    storage_limit = user.storage_limit
+
+    usage_percent = (total_size / storage_limit * 100) if storage_limit > 0 else 0
 
     return {
         "file_count": file_count,
         "total_size": total_size,
         "total_size_formatted": format_size(total_size),
+        "storage_limit": storage_limit,
+        "storage_limit_formatted": format_size(storage_limit),
+        "usage_percent": round(usage_percent, 2),
     }
 
 

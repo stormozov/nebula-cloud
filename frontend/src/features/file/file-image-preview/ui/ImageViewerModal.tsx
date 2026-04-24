@@ -1,24 +1,12 @@
-import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-import type { IFile } from "@/entities/file";
-import { getImageBlobFromApi } from "@/entities/file";
-import { Button, Icon } from "@/shared/ui";
+import { Button, Icon, Spinner } from "@/shared/ui";
 import { truncateWithMiddleEllipsis } from "@/shared/utils";
 
-import "./ImageViewerModal.scss";
+import type { IImageViewerModalProps } from "./types";
+import { useImageViewerModal } from "./useImageViewerModal";
 
-/**
- * Props for ImageViewerModal component.
- */
-interface IImageViewerModalProps {
-  /** Whether the modal is open */
-  isOpen: boolean;
-  /** File to view */
-  file: IFile | null;
-  /** Callback to close the modal */
-  onClose: () => void;
-}
+import "./ImageViewerModal.scss";
 
 /**
  * Modal for viewing an image.
@@ -28,58 +16,85 @@ export function ImageViewerModal({
   file,
   onClose,
 }: IImageViewerModalProps) {
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const modalRef = useRef<HTMLDivElement>(null);
-  const imageUrlRef = useRef<string | null>(null);
-
-  useEffect(() => {
-    if (!isOpen || !file) {
-      setImageUrl(null);
-      setError(null);
-      return;
-    }
-
-    const fetchImage = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const blob = await getImageBlobFromApi(file.id);
-        const url = URL.createObjectURL(blob);
-        imageUrlRef.current = url;
-        setImageUrl(url);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load image");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchImage();
-
-    return () => {
-      if (imageUrlRef.current) {
-        URL.revokeObjectURL(imageUrlRef.current);
-        imageUrlRef.current = null;
-      }
-    };
-  }, [isOpen, file]);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    if (isOpen) document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onClose]);
-
-  useEffect(() => {
-    if (isOpen && modalRef.current) modalRef.current.focus();
-  }, [isOpen]);
+  const { modalRef, imageUrl, loading, error } = useImageViewerModal({
+    isOpen,
+    file,
+    onClose,
+  });
 
   if (!isOpen || !file) return null;
+
+  const renderLoadingState = () => (
+    <div className="image-viewer-modal__state">
+      <Spinner color="tertiary" text="Загрузка изображения..." />
+      <Button
+        variant="secondary"
+        icon={{ name: "close" }}
+        className="image-viewer-modal__loading-close"
+        onClick={onClose}
+      >
+        Закрыть
+      </Button>
+    </div>
+  );
+
+  const renderErrorState = () => (
+    <div className="image-viewer-modal__state">
+      <Icon
+        name="cloudBad"
+        size={96}
+        className="image-viewer-modal__error-icon"
+      />
+
+      <p className="image-viewer-modal__error-heading">
+        Не удалось загрузить изображение
+      </p>
+
+      {error && <p>{error}</p>}
+
+      <Button variant="secondary" icon={{ name: "close" }} onClick={onClose}>
+        Закрыть
+      </Button>
+    </div>
+  );
+
+  const renderImage = () => {
+    if (!imageUrl) return null;
+    return (
+      <>
+        <button
+          type="button"
+          className="image-viewer-modal__close"
+          onClick={onClose}
+          aria-label="Закрыть просмотр"
+        >
+          <Icon name="close" size={16} />
+        </button>
+
+        <div className="image-viewer-modal__image-container">
+          <img
+            src={imageUrl}
+            alt={file.originalName}
+            className="image-viewer-modal__image"
+          />
+        </div>
+
+        <div className="image-viewer-modal__footer">
+          <span title={file.originalName}>
+            {truncateWithMiddleEllipsis(file.originalName, 30)} (
+            {file.sizeFormatted})
+          </span>
+        </div>
+      </>
+    );
+  };
+
+  const renderContent = () => {
+    if (loading) return renderLoadingState();
+    if (error) return renderErrorState();
+    if (imageUrl) return renderImage();
+    return null;
+  };
 
   return createPortal(
     <div
@@ -89,48 +104,7 @@ export function ImageViewerModal({
       ref={modalRef}
       tabIndex={-1}
     >
-      <div className="image-viewer-modal__container">
-        {error ? (
-          <div className="image-viewer-modal__error">
-            <h3>Ошибка загрузки изображения</h3>
-            <p>{error}</p>
-            <Button onClick={onClose}>
-              <Icon name="close" />
-              Закрыть
-            </Button>
-          </div>
-        ) : loading ? (
-          <div className="image-viewer-modal__loading">
-            Загрузка изображения...
-          </div>
-        ) : imageUrl ? (
-          <>
-            <button
-              type="button"
-              className="image-viewer-modal__close"
-              onClick={onClose}
-              aria-label="Закрыть просмотр"
-            >
-              <Icon name="close" size={16} />
-            </button>
-
-            <div className="image-viewer-modal__image-container">
-              <img
-                src={imageUrl}
-                alt={file.originalName}
-                className="image-viewer-modal__image"
-              />
-            </div>
-
-            <div className="image-viewer-modal__footer">
-              <span title={file.originalName}>
-                {truncateWithMiddleEllipsis(file.originalName, 30)} (
-                {file.sizeFormatted})
-              </span>
-            </div>
-          </>
-        ) : null}
-      </div>
+      <div className="image-viewer-modal__container">{renderContent()}</div>
     </div>,
     document.body,
   );

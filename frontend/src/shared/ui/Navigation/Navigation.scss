@@ -4,13 +4,13 @@
 
 .navigation {
   display: flex;
-  gap: 24px;
-  font-size: 1rem;
+  gap: var(--space-6);
+  font-size: var(--text-size-regular);
 
   &__link {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: var(--space-1);
 
     &:not(&--active):hover {
       color: var(--color-text-link-hover);

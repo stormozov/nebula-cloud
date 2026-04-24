@@ -8,20 +8,20 @@
 
   &__section {
     position: relative;
-    padding: 1rem;
+    padding: var(--space-4);
     background-color: var(--color-bg-tertiary);
-    border-radius: 10px;
+    border-radius: var(--radius-lg);
     width: 100%;
 
     &:not(:last-child) {
-      margin-bottom: 1rem;
+      margin-bottom: var(--space-4);
     }
   }
 
   &__header {
     position: relative;
     display: flex;
-    margin-bottom: 0.8rem;
+    margin-bottom: var(--space-3);
 
     &.hovered {
       .user-details-modal-info__copy-block-btn {
@@ -40,50 +40,43 @@
 
   &__items {
     display: grid;
-    gap: 6px;
+    gap: var(--space-2);
   }
 
   &__item {
     position: relative;
 
-    display: block;
-
-    padding: 6px 28px 6px 12px;
+    padding: var(--space-2) var(--space-3);
 
     background-color: var(--color-bg-primary);
     border: 2px solid transparent;
-    border-radius: 6px;
+    border-radius: var(--radius-md);
 
-    text-align: left;
-
-    cursor: pointer;
-    transition: all 0.2s;
-
-    &:hover {
-      border-color: var(--color-border-tertiary);
-
-      .user-details-modal-info__copy-decor-icon {
-        opacity: 1;
-      }
+    &:has(.user-details-modal-info-copyable-row) {
+      padding-right: var(--space-6);
     }
   }
 
+  &__storage-progress {
+    cursor: default;
+  }
+
   &__value {
-    font-size: 16px;
-    font-weight: 500;
+    font-size: var(--text-size-regular);
+    font-weight: var(--font-weight-medium);
     color: var(--color-text-primary);
   }
 
   &__label {
     margin: 0;
-    font-size: 13px;
+    font-size: var(--text-size-caption);
     color: var(--color-text-secondary);
   }
 
   &__copy-decor-icon {
     position: absolute;
     top: 50%;
-    right: 0.5rem;
+    right: var(--space-2);
 
     opacity: 0;
     transition: opacity 0.2s;

@@ -84,6 +84,9 @@ export const baseQueryWithAuthErrorHandling: BaseQueryFn<
     } catch {
       const { logout } = await import("@/entities/user");
       api.dispatch(logout());
+      if (window.location.pathname !== "/auth") {
+        window.location.href = "/auth";
+      }
     }
   }
 

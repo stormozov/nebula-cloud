@@ -3,7 +3,7 @@
 // =============================================================================
 
 .form {
-  --form-gap: 16px;
+  --form-gap: var(--space-4);
 
   display: grid;
   gap: var(--form-gap);
@@ -29,17 +29,17 @@
   }
 
   &__submit-error {
-    padding: 8px 12px;
+    padding: var(--space-3) var(--space-4);
 
     background-color: var(--color-error-light);
     border-left: 3px solid var(--color-error);
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
 
-    font-size: 14px;
+    font-size: var(--text-size-small);
     color: var(--color-error);
   }
 
   &__submit-btn {
-    margin-top: 8px;
+    margin-top: var(--space-2);
   }
 }

@@ -1,0 +1,51 @@
+// =============================================================================
+// Style module for UserProfileMenu component
+// =============================================================================
+
+.user-profile-menu {
+  &__trigger {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+
+    padding: var(--space-2) var(--space-3);
+
+    background: transparent;
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-md);
+
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover:not(:disabled) {
+      background-color: var(--color-border-primary);
+    }
+
+    &[aria-expanded="true"] {
+      background-color: var(--color-border-primary);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-primary);
+    }
+  }
+
+  &__avatar {
+    flex-shrink: 0;
+  }
+
+  &__name {
+    font-size: var(--text-size-small);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+
+    @media (max-width: 768px) {
+      display: none;
+    }
+  }
+
+  &__chevron {
+    color: var(--text-secondary);
+  }
+}

@@ -97,7 +97,11 @@ const renderAuthGuard = ({
         email: "test@example.com",
         firstName: "Test",
         lastName: "User",
+        fullName: "Test User",
+        isActive: true,
         isStaff,
+        storagePath: "",
+        dateJoined: "",
       }
     : null;
 

@@ -4,7 +4,7 @@
 
 .auth-actions {
   display: flex;
-  gap: 1rem;
+  gap: var(--space-4);
 
   &--reverse {
     flex-direction: row-reverse;

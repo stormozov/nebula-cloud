@@ -1,5 +1,7 @@
+import { toast } from "react-toastify";
+
 import { useToggleAdminMutation } from "@/entities/user";
-import { Button, Icon, type ModalConfirmDialogRequest } from "@/shared/ui";
+import { Button, type ModalConfirmDialogRequest } from "@/shared/ui";
 
 /**
  * Props interface for the ToggleAdminButton component.
@@ -42,8 +44,14 @@ export function ToggleAdminButton({
         try {
           await toggleAdmin({ id: userId, isStaff: !isStaff }).unwrap();
           onSuccess?.();
-        } catch (err) {
-          console.error("Failed to toggle admin status:", err);
+          toast.success(
+            `Роль администратора пользователя ${userId} успешно изменена`,
+            {
+              position: "top-center",
+            },
+          );
+        } catch {
+          toast.error("Не удалось изменить роль администратора");
         }
       },
     );
@@ -52,23 +60,16 @@ export function ToggleAdminButton({
   return (
     <Button
       variant="danger"
+      icon={{
+        name: isStaff ? (disabled ? "lock" : "person") : "adminStatus",
+      }}
       title={disabled ? "Вы не можете изменить роль администратора" : ""}
       fullWidth={fullWidth}
       loading={isLoading}
       disabled={disabled}
       onClick={handleToggle}
     >
-      {isStaff ? (
-        <>
-          {disabled ? <Icon name="lock" /> : <Icon name="person" />}
-          Снять роль администратора
-        </>
-      ) : (
-        <>
-          {disabled ? <Icon name="lock" /> : <Icon name="adminStatus" />}
-          Назначить роль администратора
-        </>
-      )}
+      {isStaff ? "Снять роль администратора" : "Назначить роль администратора"}
     </Button>
   );
 }

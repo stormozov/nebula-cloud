@@ -4,13 +4,13 @@
 
 .page-admin-dashboard {
   &__main {
-    padding: 1rem 0;
+    padding: var(--space-4) 0;
   }
 
   &__main-wrapper {
-    padding: 24px;
+    padding: var(--space-6);
     background-color: var(--color-bg-primary);
     border: 1px solid var(--color-border-primary);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
   }
 }

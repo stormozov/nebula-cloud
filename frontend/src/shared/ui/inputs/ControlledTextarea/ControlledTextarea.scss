@@ -5,32 +5,32 @@
 .controlled-textarea {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-2);
 
   &__label {
-    font-size: 14px;
-    font-weight: 500;
+    font-size: var(--text-size-small);
+    font-weight: var(--font-weight-medium);
     color: var(--color-text-primary);
 
     &__required {
-      margin-left: 4px;
+      margin-left: var(--space-1);
       color: var(--color-error);
     }
   }
 
   &__field {
-    padding: 10px 12px;
+    padding: var(--space-3) var(--space-4);
 
     width: 100%;
     min-height: 80px;
 
     background-color: var(--color-bg-primary);
     border: 1px solid var(--color-border-primary);
-    border-radius: 4px;
+    border-radius: var(--radius-md);
 
-    font-size: 14px;
+    font-size: var(--text-size-small);
     font-family: inherit;
-    line-height: 1.5;
+    line-height: var(--font-line-height-3);
     color: var(--color-text-primary);
 
     resize: vertical;
@@ -56,9 +56,9 @@
   }
 
   &__error {
-    font-size: 12px;
+    font-size: var(--text-size-caption);
     color: var(--color-error);
-    margin-top: 4px;
+    margin-top: var(--space-1);
   }
 
   &--error {

@@ -1,6 +1,8 @@
 import classNames from "classnames";
+import { toast } from "react-toastify";
+
 import { useExportUserDataMutation } from "@/entities/user";
-import { Button, type IButtonProps, Icon } from "@/shared/ui";
+import { Button, type IButtonProps } from "@/shared/ui";
 import { downloadFile } from "@/shared/utils";
 
 /**
@@ -27,17 +29,23 @@ export function ExportUserJson({
   const [exportUserData, { isLoading }] = useExportUserDataMutation();
 
   const handleExportUserData = async () => {
-    const response = await exportUserData(userId).unwrap();
-    const blob = new Blob([JSON.stringify(response, null, 2)], {
-      type: "application/json",
-    });
-    downloadFile(blob, `user_${userId}_data.json`);
+    try {
+      const response = await exportUserData(userId).unwrap();
+      const blob = new Blob([JSON.stringify(response, null, 2)], {
+        type: "application/json",
+      });
+      downloadFile(blob, `user_${userId}_data.json`);
+      toast.info("Данные в формате JSON подготовлены к экспорту");
+    } catch {
+      toast.error("Ошибка при экспорте данных пользователя");
+    }
   };
 
   return (
     <Button
       aria-label={`Экспорт JSON данных пользователя ${userId}`}
       {...buttonProps}
+      icon={{ name: "export" }}
       className={classNames(
         "user-json-data-export-btn",
         buttonProps?.className,
@@ -46,7 +54,6 @@ export function ExportUserJson({
       disabled={isLoading}
       onClick={handleExportUserData}
     >
-      <Icon name="export" />
       Экспорт JSON
     </Button>
   );

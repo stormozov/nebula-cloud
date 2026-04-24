@@ -5,28 +5,30 @@
 .controlled-input {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--space-1);
   width: 100%;
 
   &__label {
-    font-size: 14px;
-    font-weight: 500;
+    font-size: var(--text-size-small);
+    font-weight: var(--font-weight-medium);
     color: var(--color-text-primary);
 
     &__required {
-      margin-left: 4px;
+      margin-left: var(--space-1);
       color: var(--color-error);
     }
   }
 
   &__field {
-    padding: 10px 12px;
+    padding: var(--space-3) var(--space-4);
+
+    width: 100%;
 
     background-color: var(--color-bg-primary);
     border: 1px solid var(--color-border-primary);
-    border-radius: 6px;
+    border-radius: var(--radius-md);
 
-    font-size: 16px;
+    font-size: var(--text-size-regular);
     color: var(--color-text-primary);
 
     transition:
@@ -68,8 +70,8 @@
   }
 
   &__error {
-    margin-top: 2px;
-    font-size: 12px;
+    margin-top: var(--space-1);
+    font-size: var(--text-size-caption);
     color: var(--color-error);
   }
 }

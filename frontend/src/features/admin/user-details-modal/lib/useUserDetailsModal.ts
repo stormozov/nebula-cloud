@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { toast } from "react-toastify";
 
 import { useAppSelector } from "@/app/store/hooks";
 import {
@@ -6,9 +7,9 @@ import {
   useGetStorageStatsQuery,
   useGetUserQuery,
 } from "@/entities/user";
+import { useAnimatedClose } from "@/shared/hooks";
 
 import type { IModalContentProps, UserDetailsModalActionsType } from "./types";
-import { useModalClose } from "./useModalClose";
 
 /**
  * Props for the `useUserDetailsModal` hook.
@@ -31,15 +32,18 @@ export function useUserDetailsModal({
   onUserDeleted,
   isConfirmOpen = false,
 }: UseUserDetailsModalProps) {
+  const currentUser = useAppSelector(selectUser);
+
   const [action, setAction] = useState<UserDetailsModalActionsType>("none");
 
-  const currentUser = useAppSelector(selectUser);
-  const { data: user, isLoading } = useGetUserQuery(userId, { skip: !userId });
-  const { data: storageStats } = useGetStorageStatsQuery(userId, {
+  const { data: user, isLoading } = useGetUserQuery(userId || 0, {
+    skip: !userId,
+  });
+  const { data: storageStats } = useGetStorageStatsQuery(userId || 0, {
     skip: !userId,
   });
 
-  const { isClosing, handleCloseWithAnimation } = useModalClose({
+  const { isClosing, handleCloseWithAnimation } = useAnimatedClose({
     onClose,
     isBlocked: isConfirmOpen,
   });
@@ -50,23 +54,27 @@ export function useUserDetailsModal({
       handleInlineFormClose();
       if (message === "delete" && user?.id) onUserDeleted?.(user.id);
       if (close) handleCloseWithAnimation();
-      if (message) console.log(message);
+      if (message) toast.success(message);
     },
-    [handleInlineFormClose, handleCloseWithAnimation, onUserDeleted, user],
+    [handleInlineFormClose, user, onUserDeleted, handleCloseWithAnimation],
   );
 
-  if (!user) return {};
+  const isCurrentUser = Boolean(
+    currentUser?.id && user?.id && currentUser.id === user.id,
+  );
 
   // Creating props for child components
-  const actionsProps = {
-    user,
-    action,
-    isCurrentUser: currentUser?.id === user?.id,
-    setAction,
-    requestConfirm,
-    onSuccess: handleActionSuccess,
-    onClose: handleInlineFormClose,
-  };
+  const actionsProps = user
+    ? {
+        user,
+        action,
+        isCurrentUser,
+        setAction,
+        requestConfirm,
+        onSuccess: handleActionSuccess,
+        onClose: handleInlineFormClose,
+      }
+    : undefined;
 
   return {
     user,

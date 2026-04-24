@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router";
+import { ToastContainer } from "react-toastify";
 
 import { useAppSelector } from "@/app/store/hooks";
 import { selectIsDropzoneVisible } from "@/entities/file-upload";
@@ -48,6 +49,7 @@ export const RootLayout = () => {
         <FileUploadDropzone mode="global" clickable={false} disabled={false} />
       )}
 
+      <ToastContainer theme="colored" />
       <FileUploadPanel />
     </>
   );

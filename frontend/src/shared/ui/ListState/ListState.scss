@@ -1,0 +1,40 @@
+// =============================================================================
+// Style module for ListState component
+// =============================================================================
+
+.list-state {
+  &__default-block {
+    padding: var(--space-15) var(--space-6);
+    border-radius: var(--radius-md);
+    font-size: var(--text-size-regular);
+    text-align: center;
+    cursor: default;
+  }
+
+  &--loading &__default-block {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-primary);
+    cursor: wait;
+  }
+
+  &--error &__default-block {
+    background-color: var(--color-error-light);
+    color: var(--color-error);
+  }
+
+  &--empty &__default-block {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text-secondary);
+  }
+
+  &__icon {
+    margin: 0 auto var(--space-3);
+    opacity: 0.5;
+
+    .loading-spinner {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: spin 1s linear infinite;
+    }
+  }
+}

@@ -12,17 +12,26 @@ export type HeadingVariant =
   | "link"
   | "accent";
 export type HeadingAlign = "left" | "center" | "right";
-export type HeadingSize = "sm" | "md" | "lg" | "xl" | "2xl";
+export type HeadingVisualSize =
+  | "sm"
+  | "md"
+  | "lg"
+  | "xl"
+  | "2xl"
+  | "3xl"
+  | "4xl"
+  | "5xl";
 
 /**
  * Props for Heading component.
  */
-export interface HeadingProps extends React.HTMLAttributes<HTMLHeadingElement> {
+export interface IHeadingProps
+  extends React.HTMLAttributes<HTMLHeadingElement> {
   children: React.ReactNode;
   level?: HeadingLevel; // Select heading level (h1-h6)
   variant?: HeadingVariant; // Color variants
   align?: HeadingAlign; // Alignment
-  size?: HeadingSize; // Visual size
+  visualSize?: HeadingVisualSize; // Visual size
   noMargin?: boolean; // Remove default margin
 }
 
@@ -53,11 +62,11 @@ export function Heading({
   level = 1,
   variant = "primary",
   align = "left",
-  size,
+  visualSize,
   noMargin = false,
   className = "",
   ...props
-}: HeadingProps) {
+}: IHeadingProps) {
   const Tag = HEADING_TAGS[level];
 
   const classes = classNames(
@@ -65,7 +74,7 @@ export function Heading({
     `heading--${variant}`,
     `heading--${align}`,
     {
-      "heading--size": size === "sm",
+      [`heading--visual-${visualSize}`]: visualSize,
       "heading--no-margin": noMargin,
     },
     className,

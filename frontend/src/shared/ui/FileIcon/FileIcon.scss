@@ -7,12 +7,12 @@
   align-items: center;
   justify-content: center;
 
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 
   user-select: none;
 
   &__symbol {
-    line-height: 1;
+    line-height: var(--font-line-height-1);
   }
 
   // -------------------------- File type colors -------------------------------

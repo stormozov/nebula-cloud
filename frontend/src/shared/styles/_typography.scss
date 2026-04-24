@@ -1,0 +1,82 @@
+// =============================================================================
+// Fonts
+// =============================================================================
+
+@import url("https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&subset=cyrillic-ext");
+
+// -----------------------------------------------------------------------------
+// Variables
+// -----------------------------------------------------------------------------
+
+:root {
+  // -- BASE -------------------------------------------------------------------
+  --font-family-base: "Roboto", sans-serif;
+  --font-size-base: 16px;
+
+  --font-family-code: "Fira Code", "Consolas", "Monaco", monospace;
+
+  --font-size-2xs: 0.5rem; // 8px
+  --font-size-xs: 0.75rem; // 12px
+  --font-size-sm: 0.875rem; // 14px
+  --font-size-md: 1rem; // 16px
+  --font-size-lg: 1.125rem; // 18px
+  --font-size-xl: 1.25rem; // 20px
+  --font-size-2xl: 1.5rem; // 24px
+  --font-size-3xl: 2rem; // 32px
+  --font-size-4xl: 2.5rem; // 40px
+  --font-size-5xl: 3rem; // 48px
+
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --font-line-height-0: 0;
+  --font-line-height-1: 1;
+  --font-line-height-2: 1.2;
+  --font-line-height-3: 1.4;
+
+  // -- SEMANTIC ASSIGNMENT: TEXT ----------------------------------------------
+  --text-size-small: var(--font-size-sm);
+  --text-size-caption: var(--font-size-xs);
+  --text-size-regular: var(--font-size-md);
+  --text-size-large: var(--font-size-lg);
+
+  // -- SEMANTIC ASSIGNMENT: HEADINGS ------------------------------------------
+  --heading-size-1: var(--font-size-3xl);
+  --heading-size-2: var(--font-size-2xl);
+  --heading-size-3: var(--font-size-xl);
+  --heading-size-4: var(--font-size-lg);
+  --heading-size-5: var(--font-size-md);
+  --heading-size-6: var(--font-size-sm);
+}
+
+// -----------------------------------------------------------------------------
+// Semantic dimensions (by header level)
+// -----------------------------------------------------------------------------
+
+h1 {
+  font-size: var(--heading-size-1);
+}
+
+h2 {
+  font-size: var(--heading-size-2);
+}
+
+h3 {
+  font-size: var(--heading-size-3);
+}
+
+h4 {
+  font-size: var(--heading-size-4);
+}
+
+h5 {
+  font-size: var(--heading-size-5);
+}
+
+h6 {
+  font-size: var(--heading-size-6);
+  text-transform: uppercase;
+}

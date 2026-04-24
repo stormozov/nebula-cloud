@@ -1,20 +1,12 @@
 import classNames from "classnames";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
 
-import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
-import {
-  cancelUpload,
-  clearCompleted,
-  type IUploadFile,
-  removeFile,
-  selectCanClosePanel,
-  selectIsPanelVisible,
-  selectIsQueueCompleted,
-  selectUploadQueue,
-  selectUploadStats,
-  setPanelVisible,
-} from "@/entities/file-upload";
+import type { IUploadFile } from "@/entities/file-upload";
 import { FileUploadItem } from "@/features/file/file-upload";
 import { Button, Icon } from "@/shared/ui";
+
+import { useFileUploadPanel } from "../lib/useFileUploadPanel";
 
 import "./FileUploadPanel.scss";
 
@@ -25,44 +17,18 @@ import "./FileUploadPanel.scss";
  * Positioned in bottom-right corner, appears automatically when uploads start.
  */
 export function FileUploadPanel() {
-  const dispatch = useAppDispatch();
-  const queue = useAppSelector(selectUploadQueue);
-  const isPanelVisible = useAppSelector(selectIsPanelVisible);
-  const isQueueCompleted = useAppSelector(selectIsQueueCompleted);
-  const canClosePanel = useAppSelector(selectCanClosePanel);
-  const stats = useAppSelector(selectUploadStats);
-
-  /**
-   * Handle panel close button click.
-   * Only allowed when queue is completed or empty.
-   */
-  const handleClose = (): void => {
-    if (!canClosePanel) return;
-    dispatch(setPanelVisible(false));
-    dispatch(clearCompleted());
-  };
-
-  /**
-   * Handle cancel upload button click.
-   */
-  const handleCancel = (uploadId: string): void => {
-    dispatch(cancelUpload({ uploadId }));
-  };
-
-  /**
-   * Handle retry upload button click.
-   * For failed uploads, user needs to re-select the file.
-   */
-  const handleRetry = (uploadId: string): void => {
-    console.warn("Retry upload:", uploadId);
-  };
-
-  /**
-   * Handle remove from queue button click.
-   */
-  const handleRemove = (uploadId: string): void => {
-    dispatch(removeFile({ uploadId }));
-  };
+  const {
+    queue,
+    isPanelVisible,
+    isQueueCompleted,
+    stats,
+    isClosing,
+    canClosePanel,
+    handleCloseWithAnimation,
+    handleCancel,
+    handleRetry,
+    handleRemove,
+  } = useFileUploadPanel();
 
   const {
     success: completedCount,
@@ -70,37 +36,51 @@ export function FileUploadPanel() {
     uploading: uploadingCount,
   } = stats;
 
-  /**
-   * Get panel title based on queue state.
-   */
+  useEffect(() => {
+    if (isQueueCompleted) {
+      if (failedCount > 0) {
+        const storageError = queue.find((upload) =>
+          upload.error?.includes("Превышен лимит хранилища"),
+        );
+        if (storageError) {
+          toast.error(storageError.error || "Ошибка загрузки");
+        } else {
+          toast.error(`Ошибки загрузки файлов (${failedCount})`);
+        }
+      } else {
+        toast.success("Файлы успешно загружены");
+      }
+    }
+  }, [isQueueCompleted, failedCount, queue]);
+
   const getPanelTitle = (): string => {
     if (uploadingCount > 0) return `Загрузка (${uploadingCount})`;
     if (isQueueCompleted) return `Готово (${completedCount}/${queue.length})`;
     return `Файлы (${queue.length})`;
   };
 
+  const panelClasses = classNames("file-upload-panel", {
+    "file-upload-panel--visible": isPanelVisible,
+    "file-upload-panel--closing": isClosing,
+  });
+
   // Don't render if panel is hidden and queue is empty
-  if (!isPanelVisible && queue.length === 0) return null;
+  if (!isPanelVisible && queue.length === 0 && !isClosing) return null;
 
   return (
-    <div
-      className={classNames("file-upload-panel", {
-        "file-upload-panel--visible": isPanelVisible,
-      })}
-    >
+    <div className={panelClasses}>
       {/* Header */}
       <header className="file-upload-panel__header">
         <div className="file-upload-panel__title">
           {getPanelTitle()}
-          {isQueueCompleted && (
-            <Icon name="check" color="success" />
-          )}
+          {isQueueCompleted && <Icon name="check" color="success" />}
         </div>
         <Button
           type="button"
           variant="ghost"
           className="file-upload-panel__close-btn"
-          onClick={handleClose}
+          icon={{ name: "close" }}
+          onClick={handleCloseWithAnimation}
           disabled={!canClosePanel}
           title={
             canClosePanel
@@ -108,9 +88,7 @@ export function FileUploadPanel() {
               : "Нельзя закрыть во время загрузки"
           }
           aria-label="Закрыть панель загрузок"
-        >
-          ✕
-        </Button>
+        />
       </header>
 
       {/* Upload Queue List */}
@@ -147,10 +125,10 @@ export function FileUploadPanel() {
             type="button"
             variant="outline"
             size="small"
+            icon={{ name: "trash" }}
             className="file-upload-panel__clear-btn"
-            onClick={handleClose}
+            onClick={handleCloseWithAnimation}
           >
-            <Icon name="trash" />
             Очистить
           </Button>
         </footer>

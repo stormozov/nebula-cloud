@@ -1,5 +1,6 @@
-import type { RootState } from "@/app/store/store";
 import { createSelector } from "@reduxjs/toolkit";
+
+import type { RootState } from "@/app/store/store";
 
 /**
  * Get full upload state.

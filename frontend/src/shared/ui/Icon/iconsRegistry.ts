@@ -8,6 +8,7 @@ import {
 import {
   FaEye,
   FaFolder,
+  FaKeyboard,
   FaLock,
   FaSave,
   FaUpload,
@@ -18,18 +19,38 @@ import {
   FaCheck,
   FaComment,
   FaCopy,
-  FaDownload,FaFileExport, 
+  FaDownload,
+  FaFileExport,
   FaLinkSlash,
   FaPencil,
+  FaQuestion,
   FaShareNodes,
   FaTrashCan,
-  FaUser
+  FaUser,
 } from "react-icons/fa6";
+import { FiMoreVertical } from "react-icons/fi";
 import { IoIosArrowBack, IoIosArrowForward, IoIosCloud } from "react-icons/io";
-import { IoReloadSharp, IoSearch } from "react-icons/io5";
-import { MdEdit, MdLogin, MdLogout, MdOutlineDoNotDisturbAlt } from "react-icons/md";
-import { PiPasswordBold, PiWarningDiamondFill } from "react-icons/pi";
+import { IoMoon, IoReloadSharp, IoSearch } from "react-icons/io5";
+import {
+  MdEdit,
+  MdLogin,
+  MdLogout,
+  MdOutlineDoNotDisturbAlt,
+  MdSunny,
+} from "react-icons/md";
+import {
+  PiMonitorFill,
+  PiPasswordBold,
+  PiWarningDiamondFill,
+} from "react-icons/pi";
 import { RiAdminFill } from "react-icons/ri";
+import { TbError404 } from "react-icons/tb";
+
+import CloudBadIcon from "@/assets/images/icons/CloudBadIcon.svg?react";
+import CloudLoadingIcon from "@/assets/images/icons/CloudLoadingIcon.svg?react";
+import CloudWarningIcon from "@/assets/images/icons/CloudWarningIcon.svg?react";
+
+import { createIconAdapter } from "./iconAdapter";
 
 /**
  * A constant object that maps icon names to their corresponding React component
@@ -56,6 +77,8 @@ export const ICONS = {
   pencil: FaPencil,
   export: FaFileExport,
   search: IoSearch,
+  more: FiMoreVertical,
+  keyboard: FaKeyboard,
 
   // ========== Navigation & UI ==========
   close: AiOutlineClose,
@@ -68,6 +91,11 @@ export const ICONS = {
   warning: PiWarningDiamondFill,
   infoSquare: BsInfoSquareFill,
   doNotDisturb: MdOutlineDoNotDisturbAlt,
+  cloudBad: createIconAdapter(CloudBadIcon),
+  cloudWarning: createIconAdapter(CloudWarningIcon),
+  cloudLoading: createIconAdapter(CloudLoadingIcon),
+  notFound: TbError404,
+  question: FaQuestion,
 
   // ========== User & Admin ==========
   person: FaUser,
@@ -91,4 +119,7 @@ export const ICONS = {
   // ========== Theme / Mode ==========
   lightbulbOn: BsFillLightbulbFill,
   lightbulbOff: BsLightbulbOffFill,
+  sun: MdSunny,
+  moon: IoMoon,
+  monitor: PiMonitorFill,
 } as const;

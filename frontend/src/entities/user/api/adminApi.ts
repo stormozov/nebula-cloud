@@ -38,6 +38,24 @@ export const adminApi = createApi({
         const queryString = queryParams.toString();
         return `/admin/users/${queryString ? `?${queryString}` : ""}`;
       },
+      serializeQueryArgs: ({ endpointName, queryArgs }) => {
+        const search = queryArgs?.search ?? "";
+        return `${endpointName}-${search}`;
+      },
+      merge: (currentCache, newItems, { arg }) => {
+        if (arg?.page === 1 || !currentCache) return newItems;
+
+        const existingIds = new Set(currentCache.results.map((u) => u.id));
+
+        currentCache.results.push(
+          ...newItems.results.filter((u) => !existingIds.has(u.id)),
+        );
+        currentCache.next = newItems.next;
+      },
+      // Принудительный запрос только при изменении страницы
+      forceRefetch: ({ currentArg, previousArg }) => {
+        return currentArg?.page !== previousArg?.page;
+      },
       providesTags: (result) => {
         if (result?.results) {
           return [
@@ -80,7 +98,7 @@ export const adminApi = createApi({
         url: `/admin/users/${id}/`,
         method: "DELETE",
       }),
-      invalidatesTags: ["User"],
+      invalidatesTags: [{ type: "User", id: "LIST" }],
     }),
 
     /**

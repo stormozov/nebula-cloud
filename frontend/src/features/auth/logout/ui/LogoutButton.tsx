@@ -1,8 +1,7 @@
-import { useNavigate } from "react-router";
-
-import { useLogoutMutation } from "@/entities/user";
 import type { IButtonProps } from "@/shared/ui";
-import { Button, Icon } from "@/shared/ui";
+import { Button } from "@/shared/ui";
+
+import { useLogout } from "../lib/useLogout";
 
 import "./LogoutButton.scss";
 
@@ -24,30 +23,20 @@ export function LogoutButton({
   className,
   ...restProps
 }: IButtonProps) {
-  const navigate = useNavigate();
-  const [logout, { isLoading }] = useLogoutMutation();
-
-  const handleClick = async (): Promise<void> => {
-    try {
-      await logout().unwrap();
-      navigate("/", { replace: true });
-    } catch {
-      navigate("/", { replace: true });
-    }
-  };
+  const { logout, isLoading } = useLogout();
 
   return (
     <Button
       type="button"
       variant={variant}
       size={size}
+      icon={{ name: "logout" }}
       fullWidth={fullWidth}
       loading={isLoading}
       className={`logout-button ${className || ""}`}
-      onClick={handleClick}
+      onClick={logout}
       {...restProps}
     >
-      <Icon name="logout" />
       Выход
     </Button>
   );

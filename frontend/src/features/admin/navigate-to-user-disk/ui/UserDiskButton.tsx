@@ -1,15 +1,14 @@
-import { useNavigate } from "react-router";
-
-import { Button, Icon } from "@/shared/ui";
+import { useNavigateToUserDisk } from "@/shared/hooks";
+import { Button } from "@/shared/ui";
 
 import "./UserDiskButton.scss";
 
 /**
  * Interface defining the props for the UserDiskButton component.
  */
-export interface UserDiskButtonProps {
+export interface IUserDiskButtonProps {
+  /** The ID of the user whose disk should be navigated to. */
   userId: number;
-  isCurrentUser: boolean;
 }
 
 /**
@@ -24,21 +23,17 @@ export interface UserDiskButtonProps {
  * <UserDiskButton userId={123} isCurrentUser={false} />
  * ```
  */
-export function UserDiskButton({ userId, isCurrentUser }: UserDiskButtonProps) {
-  const navigate = useNavigate();
-
-  const currentNavigatePath = isCurrentUser
-    ? "/disk"
-    : `/admin/user/${userId}/disk`;
+export function UserDiskButton({ userId }: IUserDiskButtonProps) {
+  const { navigateToDisk } = useNavigateToUserDisk({ userId });
 
   return (
     <Button
       variant="secondary"
+      icon={{ name: "folder" }}
       className="user-disk-button"
       fullWidth
-      onClick={() => navigate(currentNavigatePath)}
+      onClick={() => navigateToDisk()}
     >
-      <Icon name="folder" />
       Перейти к диску
     </Button>
   );
