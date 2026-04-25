@@ -213,7 +213,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Media files (user uploads)
 MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT = env("MEDIA_ROOT", default=BASE_DIR / "media")
 
 # File upload settings
 MAX_UPLOAD_SIZE = 100 * 1024 * 1024  # 100 MB
@@ -244,7 +244,7 @@ IS_TESTING = (
 # Security settings for production (auto-applied when DEBUG=False)
 if not DEBUG and not IS_TESTING:
     # HTTPS enforcement
-    SECURE_SSL_REDIRECT = True
+    SECURE_SSL_REDIRECT = os.getenv("SECURE_SSL_REDIRECT", "True") == "True"
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 
