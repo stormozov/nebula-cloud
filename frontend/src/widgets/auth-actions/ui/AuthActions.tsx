@@ -12,6 +12,8 @@ interface IAuthActionsProps {
   registerFirst?: boolean;
   size?: ButtonSize;
   className?: string;
+  mobileColumn?: boolean;
+  onlyIcon?: boolean;
 }
 
 /**
@@ -33,19 +35,22 @@ export function AuthActions({
   registerFirst = false,
   size = "medium",
   className,
+  mobileColumn = false,
+  onlyIcon = false,
 }: IAuthActionsProps) {
   const containerClasses = classNames("auth-actions", {
     "auth-actions--reverse": registerFirst,
+    "auth-actions--mobile-column": mobileColumn,
     className,
   });
 
   return (
     <div className={containerClasses}>
       <LoginButton variant="secondary" size={size}>
-        Войти
+        {onlyIcon ? null : "Войти"}
       </LoginButton>
       <RegisterButton variant="primary" size={size}>
-        Зарегистрироваться
+        {onlyIcon ? null : "Зарегистрироваться"}
       </RegisterButton>
     </div>
   );
