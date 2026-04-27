@@ -32,6 +32,7 @@ export function FileListItemPlain({
     <>
       <tr
         className="file-list-item"
+        data-file-id={file.id}
         onClick={handleRowClick}
         onDoubleClick={() => handlers.onView?.(file)}
         onKeyDown={handleKeyDown}
