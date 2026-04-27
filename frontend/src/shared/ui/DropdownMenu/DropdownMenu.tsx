@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { cloneElement, useRef } from "react";
+import React, { cloneElement, useRef } from "react";
 import { createPortal } from "react-dom";
 
 import { Button, Divider, Icon } from "@/shared/ui";
@@ -108,8 +108,17 @@ export function DropdownMenu<T>(props: IDropdownMenuProps<T>) {
           e.preventDefault();
         }}
       >
-        {items.map((menuItem) => {
-          // If it's a separator
+        {items.map((menuItem, index) => {
+          // 1. If it's a React element, render it as is
+          if (React.isValidElement(menuItem)) {
+            return (
+              <React.Fragment key={menuItem.key ?? index}>
+                {menuItem}
+              </React.Fragment>
+            );
+          }
+
+          // 2. If it's a separator
           if ((menuItem as IDropdownMenuActionItem<T>).onClick === undefined) {
             const separator = menuItem;
             return (
@@ -117,7 +126,7 @@ export function DropdownMenu<T>(props: IDropdownMenuProps<T>) {
             );
           }
 
-          // If it's an action
+          // 3. The usual action
           const action = menuItem as IDropdownMenuActionItem<T>;
           const currentActionIndex = actionCounter++;
           const disabled =

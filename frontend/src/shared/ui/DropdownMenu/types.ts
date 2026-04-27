@@ -39,7 +39,8 @@ export interface IDropdownMenuSeparatorItem {
  */
 export type DropdownMenuItem<T> =
   | IDropdownMenuActionItem<T>
-  | IDropdownMenuSeparatorItem;
+  | IDropdownMenuSeparatorItem
+  | React.ReactElement;
 
 /**
  * Placement options for the dropdown menu.
