@@ -20,6 +20,35 @@
     &--uploaded,
     &--downloaded {
       width: 100px;
+
+      @media (max-width: 992px) {
+        width: 80px;
+      }
+    }
+
+    &--comment {
+      @media (max-width: 992px) {
+        display: none;
+      }
+    }
+
+    &--uploaded {
+      @media (max-width: 375px) {
+        display: none;
+      }
+    }
+
+    &--downloaded {
+      @media (max-width: 480px) {
+        display: none;
+      }
+    }
+
+    @media (max-width: 800px) {
+      width: auto;
+    }
+    @media (max-width: 480px) {
+      padding: var(--space-2);
     }
   }
 

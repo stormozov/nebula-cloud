@@ -1,5 +1,6 @@
 import { memo } from "react";
 
+import { useMediaQuery } from "@/shared/hooks";
 import { DropdownMenu, FileIcon } from "@/shared/ui";
 import {
   formatDate,
@@ -27,6 +28,7 @@ export function FileListItemPlain({
     handleContextMenu,
     handleContextMenuClose,
   } = useFileRowInteractions({ file, handlers, actions, disabled, onSelect });
+  const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
 
   return (
     <>
@@ -46,7 +48,7 @@ export function FileListItemPlain({
 
         <td className="file-list-item__cell file-list-item__cell--name">
           <span className="file-list-item__name" title={file.originalName}>
-            {truncateWithMiddleEllipsis(file.originalName)}
+            {truncateWithMiddleEllipsis(file.originalName, isMobile ? 20 : 35)}
           </span>
         </td>
 
