@@ -3,6 +3,7 @@ import { useRef } from "react";
 import { createPortal } from "react-dom";
 
 import { type IModalContentProps, UserNavigation } from "@/features/admin";
+import { useMediaQuery } from "@/shared/hooks";
 import { useBodyScrollLock, useFocusTrap } from "@/shared/hooks";
 import {
   Badge,
@@ -54,6 +55,9 @@ export function UserDetailsModal({ modalProps }: IUserDetailsModalProps) {
 
   const hasError = !isLoading && !user;
   const isSuccess = !isLoading && user && actionsProps;
+
+  const isDesktop1024 = useMediaQuery({ query: "(min-width: 1025px)" });
+  const isMobile576px = useMediaQuery({ query: "(max-width: 576px)" });
 
   const renderLoadingState = () => (
     <div className="user-details-modal__loading-state">
@@ -111,6 +115,7 @@ export function UserDetailsModal({ modalProps }: IUserDetailsModalProps) {
               className="user-details-modal__header-wrapper"
               align="center"
               justify="space-between"
+              direction={isMobile576px ? "column" : "row"}
             >
               <Heading level={3} className="user-details-modal__header-title">
                 <Icon name="person" color="primary" />
@@ -139,7 +144,7 @@ export function UserDetailsModal({ modalProps }: IUserDetailsModalProps) {
                 <Button
                   ref={closeButtonRef}
                   variant="secondary"
-                  size="small"
+                  size={isMobile576px ? "medium" : "small"}
                   icon={{ name: "close" }}
                   title="Закрыть окно (ESC)"
                   aria-label="Закрыть окно"
@@ -149,7 +154,10 @@ export function UserDetailsModal({ modalProps }: IUserDetailsModalProps) {
             </PageWrapper>
           </header>
 
-          <PageWrapper className="user-details-modal__content">
+          <PageWrapper
+            direction={isDesktop1024 ? "row" : "column"}
+            className="user-details-modal__content"
+          >
             {renderMainContent()}
           </PageWrapper>
         </div>
