@@ -3,7 +3,14 @@ import type React from "react";
 import { FileSearchInput } from "@/features/file/file-search";
 import { FileUploadButton } from "@/features/file/file-upload";
 import { HelpKeyboardShortcutsButton } from "@/features/help";
-import { BackButton, Badge, Heading, PageWrapper } from "@/shared/ui";
+import { useMediaQuery } from "@/shared/hooks";
+import {
+  BackButton,
+  Badge,
+  ControlledInput,
+  Heading,
+  PageWrapper,
+} from "@/shared/ui";
 
 /**
  * Props for the FileManagerHeader component.
@@ -40,9 +47,13 @@ export function FileManagerHeader({
   storageWidget,
   onSearchChange,
 }: FileManagerHeaderProps) {
+  const isMobile600px = useMediaQuery({ query: "(max-width: 600px)" });
+  const isMobile440px = useMediaQuery({ query: "(max-width: 440px)" });
+  const isMobile375px = useMediaQuery({ query: "(max-width: 375px)" });
+
   if (!isAdmin) {
     return (
-      <header className="file-manager__header">
+      <header className="file-manager__header file-manager__header--user-mode">
         <PageWrapper
           align="center"
           justify="space-between"
@@ -52,32 +63,51 @@ export function FileManagerHeader({
             Ваш диск
           </Heading>
           <PageWrapper align="center">
-            <FileSearchInput
-              inputProps={{
-                value: searchTerm,
-                placeholder: "Поиск по названию и дате загрузки",
-                onChange: onSearchChange,
-              }}
-            />
+            {!isMobile600px && (
+              <FileSearchInput
+                inputProps={{
+                  value: searchTerm,
+                  placeholder: "Поиск по названию и дате загрузки",
+                  onChange: onSearchChange,
+                }}
+              />
+            )}
             <HelpKeyboardShortcutsButton
               buttonProps={{ variant: "secondary" }}
             />
-            <FileUploadButton>Загрузить файл</FileUploadButton>
+            <FileUploadButton>
+              {isMobile440px ? "" : "Загрузить файл"}
+            </FileUploadButton>
           </PageWrapper>
         </PageWrapper>
+
         {storageWidget}
+
+        {isMobile600px && (
+          <ControlledInput
+            value={searchTerm}
+            className="file-manager__mobile-search"
+            placeholder={"Поиск по ID, логину или email"}
+            autoComplete="off"
+            onChange={onSearchChange}
+          />
+        )}
       </header>
     );
   }
 
   return (
-    <header className="file-manager__header">
+    <header className="file-manager__header file-manager__header--admin-mode">
       <PageWrapper
+        direction={isMobile600px ? "column" : "row"}
         align="center"
         justify="space-between"
         className="file-manager__header-top"
       >
-        <PageWrapper>
+        <PageWrapper
+          direction={isMobile375px ? "column" : "row"}
+          align={isMobile375px ? "center" : "start"}
+        >
           <BackButton />
           <Heading level={2} noMargin className="file-manager__header-title">
             Файлы пользователя{" "}
@@ -90,7 +120,7 @@ export function FileManagerHeader({
           <FileSearchInput
             buttonProps={{
               children: "Поиск",
-              size: "small",
+              size: !isMobile600px ? "small" : "medium",
             }}
             inputProps={{
               value: searchTerm,
@@ -99,7 +129,10 @@ export function FileManagerHeader({
             }}
           />
           <HelpKeyboardShortcutsButton
-            buttonProps={{ variant: "secondary", size: "small" }}
+            buttonProps={{
+              variant: "secondary",
+              size: !isMobile600px ? "small" : "medium",
+            }}
           />
         </PageWrapper>
       </PageWrapper>

@@ -15,7 +15,9 @@ import "./UserDetailsModalInfo.scss";
  * Props interface for the UserDetailsModalInfo component.
  */
 interface IUserDetailsModalInfoProps {
+  /** User data to be displayed in the modal. */
   user: IUser;
+  /** Storage stats data to be displayed in the modal. */
   storageStats?: IStorageStatsResponse;
 }
 

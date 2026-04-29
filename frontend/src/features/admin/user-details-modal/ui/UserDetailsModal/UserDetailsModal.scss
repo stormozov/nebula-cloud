@@ -46,6 +46,10 @@
     animation: slideDashboardModalIn 0.3s ease-out;
     transition: transform 0.3s ease-out;
     transform: translateX(-50%);
+
+    @media (max-width: 576px) {
+      height: 95vh;
+    }
   }
 
   .container {
@@ -53,6 +57,10 @@
     flex-direction: column;
     padding: var(--space-5);
     height: 100%;
+
+    @media (max-width: 992px) {
+      padding: var(--space-4);
+    }
   }
 
   &__header {
@@ -91,6 +99,10 @@
     margin-top: var(--space-5);
     min-height: 0;
     overflow-y: auto;
+
+    @media (max-width: 1024px) {
+      gap: var(--space-12);
+    }
   }
 
   // ---------------------------------------------------------------------------

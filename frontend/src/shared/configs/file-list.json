@@ -23,12 +23,12 @@
     {
       "key": "uploaded",
       "label": "Загружен",
-      "className": "file-list__header-cell--date"
+      "className": "file-list__header-cell--date file-list__header-cell--uploaded"
     },
     {
       "key": "downloaded",
       "label": "Скачан",
-      "className": "file-list__header-cell--date"
+      "className": "file-list__header-cell--date file-list__header-cell--downloaded"
     },
     {
       "key": "actions",

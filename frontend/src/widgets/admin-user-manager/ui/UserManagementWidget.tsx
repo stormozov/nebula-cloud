@@ -1,5 +1,6 @@
 import { UserDetailsModal, UserList, UserSearchInput } from "@/features/admin";
-import { Badge, Button, Heading, ModalConfirm } from "@/shared/ui";
+import { useMediaQuery } from "@/shared/hooks";
+import { Badge, Button, ControlledInput, Heading, ModalConfirm } from "@/shared/ui";
 
 import { useUserManager } from "../lib/useUserManager";
 
@@ -18,31 +19,42 @@ export function UserManagementWidget() {
     userDetailsModal,
   } = useUserManager();
 
+  const isMobile600px = useMediaQuery({ query: "(max-width: 600px)" });
+
   return (
     <div className="users-management w-full">
       <header className="users-management__header">
         <Heading level={2} noMargin className="users-management__header-title">
           Управление пользователями
-        </Heading>
-
-        <div className="users-management__count">
-          <Badge icon="person" superscript>
+          <Badge icon="person" className="users-management__count" superscript>
             {usersList.totalCount} пользователей
           </Badge>
-        </div>
+        </Heading>
 
-        <UserSearchInput
-          buttonProps={{
-            children: "Поиск",
-            size: "small",
-          }}
-          inputProps={{
-            value: search.term,
-            className: "users-management__search",
-            placeholder: "Поиск по ID, логину или email",
-            onChange: search.setTerm,
-          }}
-        />
+        {!isMobile600px && (
+          <UserSearchInput
+            buttonProps={{
+              children: "Поиск",
+              size: "small",
+            }}
+            inputProps={{
+              value: search.term,
+              className: "users-management__search",
+              placeholder: "Поиск по ID, логину или email",
+              onChange: search.setTerm,
+            }}
+          />
+        )}
+
+        {isMobile600px && (
+          <ControlledInput
+            value={search.term}
+            className="users-management__search"
+            placeholder={"Поиск по ID, логину или email"}
+            autoComplete="off"
+            onChange={search.setTerm}
+          />
+        )}
       </header>
 
       <UserList

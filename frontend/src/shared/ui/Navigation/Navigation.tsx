@@ -1,9 +1,11 @@
 import classNames from "classnames";
+import { useState } from "react";
 import { NavLink } from "react-router";
 
 import { useAppSelector } from "@/app/store/hooks";
 import { selectIsStaff, type UserRoles } from "@/entities/user";
-import { Icon, type IconName } from "@/shared/ui";
+import { useMediaQuery } from "@/shared/hooks";
+import { Button, DropdownMenu, Icon, type IconName } from "@/shared/ui";
 
 import "./Navigation.scss";
 
@@ -47,8 +49,12 @@ const defaultItems: INavItem[] = [
  * the component returns `null` and does not render.
  */
 export function Navigation({ items = defaultItems }) {
+  const [isOpen, setIsOpen] = useState(false);
+
   const isStaff = useAppSelector(selectIsStaff);
   const role = isStaff ? "admin" : "user";
+
+  const isMobile = useMediaQuery({ query: "(max-width: 480px)" });
 
   const visibleItems = items.filter(
     (item) => !item.roles || item.roles.includes(role),
@@ -56,6 +62,43 @@ export function Navigation({ items = defaultItems }) {
 
   if (visibleItems.length <= 1) return null;
 
+  // Preparing JSX elements for mobile drop-down
+  const dropdownItems = visibleItems.map((navItem) => (
+    <NavLink
+      key={navItem.to}
+      to={navItem.to}
+      className="dropdown-menu__item"
+      onClick={() => setIsOpen(false)}
+    >
+      {navItem.icon && navItem.withIcon && <Icon name={navItem.icon} />}
+      {navItem.label}
+    </NavLink>
+  ));
+
+  if (isMobile) {
+    return (
+      <div className="navigation-mobile-wrapper">
+        <DropdownMenu
+          trigger={
+            <Button
+              variant="secondary"
+              className="navigation-mobile-button"
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              <Icon name="menu" />
+            </Button>
+          }
+          items={dropdownItems}
+          item={null as unknown as INavItem}
+          isOpen={isOpen}
+          onOpenChange={setIsOpen}
+          placement="bottom-end"
+        />
+      </div>
+    );
+  }
+
+  // The desktop version remains unchanged
   return (
     <nav className="navigation">
       {visibleItems.map((item) => (

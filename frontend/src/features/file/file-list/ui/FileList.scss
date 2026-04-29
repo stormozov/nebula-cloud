@@ -17,13 +17,12 @@
 
   &__header {
     background-color: var(--color-bg-secondary);
+    border-bottom: 2px solid var(--color-border-primary);
     cursor: default;
   }
 
   &__header-cell {
     padding: var(--space-3) var(--space-4);
-
-    border-bottom: 2px solid var(--color-border-primary);
 
     font-size: var(--text-size-small);
     font-weight: var(--font-weight-semibold);
@@ -37,18 +36,52 @@
 
     &--name {
       width: 300px;
+
+      @media (max-width: 768px) {
+        width: auto;
+      }
     }
 
-    &--size {
-      width: 100px;
+    &--comment {
+      @media (max-width: 992px) {
+        display: none;
+      }
     }
 
+    &--size,
     &--date {
       width: 100px;
+
+      @media (max-width: 768px) {
+        width: 85px;
+      }
+      @media (max-width: 480px) {
+        width: 70px;
+      }
+    }
+
+    &--uploaded {
+      @media (max-width: 375px) {
+        display: none;
+      }
+    }
+
+    &--downloaded {
+      @media (max-width: 480px) {
+        display: none;
+      }
     }
 
     &--actions {
       width: 64px;
+
+      @media (max-width: 480px) {
+        width: 50px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      padding: var(--space-2);
     }
   }
 
