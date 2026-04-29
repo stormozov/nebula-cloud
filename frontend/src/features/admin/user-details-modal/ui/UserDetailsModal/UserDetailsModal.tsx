@@ -3,8 +3,7 @@ import { useRef } from "react";
 import { createPortal } from "react-dom";
 
 import { type IModalContentProps, UserNavigation } from "@/features/admin";
-import { useMediaQuery } from "@/shared/hooks";
-import { useBodyScrollLock, useFocusTrap } from "@/shared/hooks";
+import { useBodyScrollLock, useFocusTrap, useMediaQuery } from "@/shared/hooks";
 import {
   Badge,
   Button,

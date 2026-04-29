@@ -395,7 +395,7 @@ class TestEdgePermissions:
 
         # Assert
         assert response.status_code == status.HTTP_200_OK
-        assert response.data == []
+        assert response.data["results"] == []
 
     def test_admin_can_delete_any_user_file(
         self, admin_client: APIClient, uploaded_file: File
@@ -437,7 +437,7 @@ class TestEdgePermissions:
         # Assert
         assert response.status_code == status.HTTP_200_OK
         # Regular user should only see their own files, ignoring user_id param
-        assert all(item["owner"] != another_user_account.email for item in response.data)
+        assert all(item["owner"] != another_user_account.email for item in response.data["results"])
 
     def test_invalid_user_id_parameter_falls_back_gracefully(self, admin_client: APIClient) -> None:
         """
@@ -456,7 +456,7 @@ class TestEdgePermissions:
         # Assert
         assert response.status_code == status.HTTP_200_OK
         # Should not crash, returns admin's files or empty list
-        assert isinstance(response.data, list)
+        assert isinstance(response.data["results"], list)
 
     def test_permission_check_happens_before_file_retrieval(self, authenticated_client):
         """
