@@ -102,14 +102,14 @@ describe("LogoutButton", () => {
     /**
      * @description Should render with default props correctly
      * @scenario Rendering component without any props should use default values
-     * @expected Button text is "Выход", variant is "ghost", size is "medium"
+     * @expected Button text is "Выйти", variant is "ghost", size is "medium"
      */
     it("should render with default props correctly", () => {
       renderWithRouter();
 
       const buttonElement = screen.getByRole("button");
 
-      expect(buttonElement).toHaveTextContent("Выход");
+      expect(buttonElement).toHaveTextContent("Выйти");
       expect(buttonElement).toBeInTheDocument();
     });
 

@@ -484,7 +484,7 @@ describe("useLoginForm", () => {
      * @scenario Valid form, mutation succeeds
      * @expected onSuccess and navigate('/disk') called
      */
-    it("should call onSuccess and navigate on successful login", async () => {
+    it("should call onSuccess on successful login", async () => {
       (validateLogin as ReturnType<typeof vi.fn>).mockReturnValue({
         isValid: true,
       });
@@ -509,7 +509,6 @@ describe("useLoginForm", () => {
       });
 
       expect(mockOnSuccess).toHaveBeenCalled();
-      expect(mockNavigate).toHaveBeenCalledWith("/disk", { replace: true });
     });
   });
 

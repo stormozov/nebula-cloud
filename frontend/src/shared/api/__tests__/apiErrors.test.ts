@@ -4,7 +4,7 @@ import {
   hasAnyErrors,
   hasFieldErrors,
   parseDjangoApiErrors,
-} from "./apiErrors";
+} from "../apiErrors";
 
 /** Helper to create expected result with field errors */
 const fieldErrors = (errors: Record<string, string>) => ({
@@ -132,13 +132,15 @@ describe("parseDjangoApiErrors", () => {
     });
 
     /**
-     * @description Should handle non-string detail values
-     * @scenario Detail exists but is not a string (e.g., array)
-     * @expected Should not treat it as submit error, returns empty errors
+     * @description Should extract first element from array detail
+     * @scenario detail is an array of strings
+     * @expected Returns submitError with the first element of the array
      */
-    it("should ignore non-string detail values", () => {
+    it("should extract first element from array detail", () => {
       const errorData = { detail: ["Error array"] };
-      expect(parseDjangoApiErrors(errorData)).toEqual(noErrors());
+      expect(parseDjangoApiErrors(errorData)).toEqual(
+        submitError("Error array"),
+      );
     });
   });
 

@@ -1,31 +1,38 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { store } from "@/app/store/store";
-import { logout } from "@/entities/user";
-
-import { getAccessTokenFromPersist } from "../utils/getPersistedAuthState";
-import { fetchWithAuth } from "./fetchWithAuth";
-import { getRefreshedToken } from "./tokenRefresh";
+import { fetchWithAuth } from "../fetchWithAuth";
 
 // =============================================================================
 // MOCKS
 // =============================================================================
 
-vi.mock("../utils/getPersistedAuthState", () => ({
-  getAccessTokenFromPersist: vi.fn(),
+const {
+  mockGetAccessTokenFromPersist,
+  mockGetRefreshedToken,
+  mockLogout,
+  mockStoreDispatch,
+} = vi.hoisted(() => ({
+  mockGetAccessTokenFromPersist: vi.fn(),
+  mockGetRefreshedToken: vi.fn(),
+  mockLogout: vi.fn(),
+  mockStoreDispatch: vi.fn(),
 }));
 
-vi.mock("./tokenRefresh", () => ({
-  getRefreshedToken: vi.fn(),
+vi.mock("@/shared/utils/getPersistedAuthState", () => ({
+  getAccessTokenFromPersist: mockGetAccessTokenFromPersist,
+}));
+
+vi.mock("../tokenRefresh", () => ({
+  getRefreshedToken: mockGetRefreshedToken,
 }));
 
 vi.mock("@/entities/user", () => ({
-  logout: vi.fn(),
+  logout: mockLogout,
 }));
 
 vi.mock("@/app/store/store", () => ({
   store: {
-    dispatch: vi.fn(),
+    dispatch: mockStoreDispatch,
   },
 }));
 
@@ -35,6 +42,7 @@ vi.mock("@/app/store/store", () => ({
 
 describe("fetchWithAuth", () => {
   const mockFetch = vi.fn();
+  const API_URL = "https://api.example.com";
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -53,13 +61,13 @@ describe("fetchWithAuth", () => {
    */
   it("should add Authorization header when token exists", async () => {
     const token = "test-token";
-    vi.mocked(getAccessTokenFromPersist).mockReturnValue(token);
+    mockGetAccessTokenFromPersist.mockReturnValue(token);
 
-    await fetchWithAuth("https://api.example.com");
+    await fetchWithAuth(API_URL);
 
     expect(mockFetch).toHaveBeenCalledTimes(1);
     const [url, options] = mockFetch.mock.calls[0];
-    expect(url).toBe("https://api.example.com");
+    expect(url).toBe(API_URL);
     expect(options?.headers).toBeInstanceOf(Headers);
     const headers = options?.headers as Headers;
     expect(headers.get("Authorization")).toBe(`Bearer ${token}`);
@@ -72,9 +80,9 @@ describe("fetchWithAuth", () => {
    *    null)
    */
   it("should not add Authorization header when token is missing", async () => {
-    vi.mocked(getAccessTokenFromPersist).mockReturnValue(null);
+    mockGetAccessTokenFromPersist.mockReturnValue(null);
 
-    await fetchWithAuth("https://api.example.com");
+    await fetchWithAuth(API_URL);
 
     const [_url, options] = mockFetch.mock.calls[0];
     const headers = options?.headers as Headers;
@@ -88,10 +96,10 @@ describe("fetchWithAuth", () => {
    */
   it("should merge provided headers with Authorization", async () => {
     const token = "test-token";
-    vi.mocked(getAccessTokenFromPersist).mockReturnValue(token);
+    mockGetAccessTokenFromPersist.mockReturnValue(token);
     const customHeaders = { "X-Custom": "value" };
 
-    await fetchWithAuth("https://api.example.com", { headers: customHeaders });
+    await fetchWithAuth(API_URL, { headers: customHeaders });
 
     const [_url, options] = mockFetch.mock.calls[0];
     const headers = options?.headers as Headers;
@@ -106,7 +114,7 @@ describe("fetchWithAuth", () => {
    */
   it("should pass other init options to fetch", async () => {
     const init: RequestInit = { method: "POST", body: "data" };
-    await fetchWithAuth("https://api.example.com", init);
+    await fetchWithAuth(API_URL, init);
 
     const [_url, options] = mockFetch.mock.calls[0];
     expect(options?.method).toBe("POST");
@@ -122,10 +130,10 @@ describe("fetchWithAuth", () => {
     const response = new Response(null, { status: 200 });
     mockFetch.mockResolvedValueOnce(response);
 
-    const result = await fetchWithAuth("https://api.example.com");
+    const result = await fetchWithAuth(API_URL);
     expect(result).toBe(response);
     expect(mockFetch).toHaveBeenCalledTimes(1);
-    expect(getRefreshedToken).not.toHaveBeenCalled();
+    expect(mockGetRefreshedToken).not.toHaveBeenCalled();
   });
 
   /**
@@ -137,8 +145,8 @@ describe("fetchWithAuth", () => {
   it("should retry on 401 if retry=true and token refresh succeeds", async () => {
     const token = "old-token";
     const newToken = "new-token";
-    vi.mocked(getAccessTokenFromPersist).mockReturnValue(token);
-    vi.mocked(getRefreshedToken).mockResolvedValue(newToken);
+    mockGetAccessTokenFromPersist.mockReturnValue(token);
+    mockGetRefreshedToken.mockResolvedValue(newToken);
 
     const fetchCalls: Array<{ headers: Record<string, string> }> = [];
     mockFetch.mockImplementation(async (_url, options) => {
@@ -150,7 +158,6 @@ describe("fetchWithAuth", () => {
         });
       }
       fetchCalls.push({ headers: headersObj });
-      // Возвращаем ответы последовательно: сначала 401, потом 200
       if (fetchCalls.length === 1) {
         return new Response(null, { status: 401 });
       } else {
@@ -158,11 +165,10 @@ describe("fetchWithAuth", () => {
       }
     });
 
-    await fetchWithAuth("https://api.example.com");
+    await fetchWithAuth(API_URL);
 
     expect(mockFetch).toHaveBeenCalledTimes(2);
-    expect(getAccessTokenFromPersist).toHaveBeenCalledTimes(1);
-
+    expect(mockGetAccessTokenFromPersist).toHaveBeenCalledTimes(1);
     expect(fetchCalls[0].headers.Authorization).toBe(`Bearer ${token}`);
     expect(fetchCalls[1].headers.Authorization).toBe(`Bearer ${newToken}`);
   });
@@ -174,19 +180,19 @@ describe("fetchWithAuth", () => {
    */
   it("should not retry on 401 if retry=false", async () => {
     const token = "test-token";
-    vi.mocked(getAccessTokenFromPersist).mockReturnValue(token);
+    mockGetAccessTokenFromPersist.mockReturnValue(token);
     const errorResponse = new Response(null, { status: 401 });
     mockFetch.mockResolvedValueOnce(errorResponse);
 
     const result = await fetchWithAuth(
-      "https://api.example.com",
+      API_URL,
       undefined,
       false,
     );
 
     expect(mockFetch).toHaveBeenCalledTimes(1);
     expect(result).toBe(errorResponse);
-    expect(getRefreshedToken).not.toHaveBeenCalled();
+    expect(mockGetRefreshedToken).not.toHaveBeenCalled();
   });
 
   /**
@@ -198,20 +204,21 @@ describe("fetchWithAuth", () => {
    */
   it("should dispatch logout and throw response when token refresh fails on 401", async () => {
     const token = "old-token";
-    vi.mocked(getAccessTokenFromPersist).mockReturnValue(token);
+    mockGetAccessTokenFromPersist.mockReturnValue(token);
     const refreshError = new Error("Refresh failed");
-    vi.mocked(getRefreshedToken).mockRejectedValue(refreshError);
+    mockGetRefreshedToken.mockRejectedValue(refreshError);
+    mockLogout.mockReturnValue({ type: "logout" }); // чтобы dispatch получил объект
 
     const errorResponse = new Response(null, { status: 401 });
     mockFetch.mockResolvedValueOnce(errorResponse);
 
-    await expect(fetchWithAuth("https://api.example.com")).rejects.toBe(
+    await expect(fetchWithAuth(API_URL)).rejects.toBe(
       errorResponse,
     );
 
     expect(mockFetch).toHaveBeenCalledTimes(1);
-    expect(getRefreshedToken).toHaveBeenCalledTimes(1);
-    expect(store.dispatch).toHaveBeenCalledWith(logout());
+    expect(mockGetRefreshedToken).toHaveBeenCalledTimes(1);
+    expect(mockStoreDispatch).toHaveBeenCalledWith({ type: "logout" });
   });
 
   /**
@@ -223,10 +230,10 @@ describe("fetchWithAuth", () => {
     const errorResponse = new Response(null, { status: 500 });
     mockFetch.mockResolvedValueOnce(errorResponse);
 
-    const result = await fetchWithAuth("https://api.example.com");
+    const result = await fetchWithAuth(API_URL);
     expect(result).toBe(errorResponse);
     expect(mockFetch).toHaveBeenCalledTimes(1);
-    expect(getRefreshedToken).not.toHaveBeenCalled();
+    expect(mockGetRefreshedToken).not.toHaveBeenCalled();
   });
 
   /**
@@ -238,8 +245,8 @@ describe("fetchWithAuth", () => {
   it("should return second response even if it's not 200 after refresh", async () => {
     const token = "old-token";
     const newToken = "new-token";
-    vi.mocked(getAccessTokenFromPersist).mockReturnValue(token);
-    vi.mocked(getRefreshedToken).mockResolvedValue(newToken);
+    mockGetAccessTokenFromPersist.mockReturnValue(token);
+    mockGetRefreshedToken.mockResolvedValue(newToken);
 
     const firstResponse = new Response(null, { status: 401 });
     const secondResponse = new Response(null, { status: 403 });
@@ -247,8 +254,8 @@ describe("fetchWithAuth", () => {
       .mockResolvedValueOnce(firstResponse)
       .mockResolvedValueOnce(secondResponse);
 
-    const result = await fetchWithAuth("https://api.example.com");
+    const result = await fetchWithAuth(API_URL);
     expect(result).toBe(secondResponse);
-    expect(store.dispatch).not.toHaveBeenCalled();
+    expect(mockStoreDispatch).not.toHaveBeenCalled();
   });
 });
