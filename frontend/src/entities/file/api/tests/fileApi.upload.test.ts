@@ -81,6 +81,7 @@ describe("fileApi - Upload Function", () => {
   // ---------------------------------------------------------------------------
   // uploadFile Basic Tests
   // ---------------------------------------------------------------------------
+
   describe("uploadFile Basic Functionality", () => {
     /**
      * @description Should upload file successfully
@@ -174,6 +175,7 @@ describe("fileApi - Upload Function", () => {
   // ---------------------------------------------------------------------------
   // uploadFile Progress Tests
   // ---------------------------------------------------------------------------
+
   describe("uploadFile Progress Callback", () => {
     /**
      * @description Should call progress callback during upload
@@ -229,6 +231,7 @@ describe("fileApi - Upload Function", () => {
   // ---------------------------------------------------------------------------
   // uploadFile FormData Tests
   // ---------------------------------------------------------------------------
+
   /**
    * @description Should include comment in upload request
    * @scenario Calling uploadFile with comment
@@ -262,6 +265,7 @@ describe("fileApi - Upload Function", () => {
   // ---------------------------------------------------------------------------
   // uploadFile Authentication Tests
   // ---------------------------------------------------------------------------
+
   describe("uploadFile Authentication", () => {
     /**
      * @description Should include auth token in upload request
@@ -313,6 +317,7 @@ describe("fileApi - Upload Function", () => {
   // ---------------------------------------------------------------------------
   // uploadFile Error Handling Tests
   // ---------------------------------------------------------------------------
+
   describe("uploadFile Error Handling", () => {
     /**
      * @description Should handle server error (500)
@@ -413,6 +418,7 @@ describe("fileApi - Upload Function", () => {
   // ---------------------------------------------------------------------------
   // uploadFile File Type Tests
   // ---------------------------------------------------------------------------
+
   describe("uploadFile File Types", () => {
     /**
      * @description Should handle text file upload
@@ -487,6 +493,7 @@ describe("fileApi - Upload Function", () => {
   // ---------------------------------------------------------------------------
   // uploadFile Integration Tests
   // ---------------------------------------------------------------------------
+
   describe("uploadFile Integration", () => {
     /**
      * @description Should work with Redux store state
@@ -555,6 +562,7 @@ describe("fileApi - Upload Function", () => {
   // ---------------------------------------------------------------------------
   // uploadFile Edge Cases Tests
   // ---------------------------------------------------------------------------
+  
   describe("uploadFile Edge Cases", () => {
     /**
      * @description Should handle file with very long name

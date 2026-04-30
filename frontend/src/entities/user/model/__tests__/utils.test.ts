@@ -1,8 +1,31 @@
-import { describe, expect, it } from "vitest";
-import type { IUserRegister } from "./types";
-import { transformDataToApi } from "./utils";
+import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 
-/** Centralized test data for easy maintenance */
+import { copyToClipboardWithFeedback } from "@/shared/utils";
+
+import type {
+  IStorageStats,
+  IStorageStatsResponse,
+  IUserListResponse,
+  IUserRegister,
+} from "../types";
+import { copyUserField, isAdminResponse, transformDataToApi } from "../utils";
+
+// =============================================================================
+// MOCKS
+// =============================================================================
+
+vi.mock("@/shared/utils", () => ({
+  copyToClipboardWithFeedback: vi.fn(),
+}));
+
+beforeEach(() => {
+  vi.clearAllMocks();
+});
+
+// =============================================================================
+// HELPERS
+// =============================================================================
+
 const VALID_USER_DATA: IUserRegister = {
   username: "testuser",
   email: "test@example.com",
@@ -12,7 +35,6 @@ const VALID_USER_DATA: IUserRegister = {
   lastName: "Doe",
 };
 
-/** Helper to create expected API result */
 const toApiResult = (data: IUserRegister) => ({
   username: data.username,
   email: data.email,
@@ -21,6 +43,10 @@ const toApiResult = (data: IUserRegister) => ({
   first_name: data.firstName,
   last_name: data.lastName,
 });
+
+// =============================================================================
+// TESTS: transformDataToApi
+// =============================================================================
 
 describe("transformDataToApi", () => {
   describe("Basic transformation with valid data", () => {
@@ -412,5 +438,283 @@ describe("transformDataToApi", () => {
       };
       expect(transformDataToApi(data)).toEqual(toApiResult(data));
     });
+  });
+});
+
+// =============================================================================
+// TESTS: copyUserField
+// =============================================================================
+
+describe("copyUserField", () => {
+  const mockCopyToClipboard = copyToClipboardWithFeedback as Mock;
+
+  const createUser = (
+    overrides: Partial<IUserListResponse> = {},
+  ): IUserListResponse => ({
+    id: 1,
+    username: "testuser",
+    email: "test@example.com",
+    isStaff: false,
+    isActive: true,
+    ...overrides,
+  });
+
+  describe("when field is 'id'", () => {
+    /**
+     * @description Should call copyToClipboardWithFeedback with stringified user id
+     * @scenario User with numeric id=42, copy field "id"
+     * @expected copyToClipboardWithFeedback called with "42" and two callbacks
+     */
+    it("should call copyToClipboardWithFeedback with stringified user id", async () => {
+      // Arrange
+      const user = createUser({ id: 42 });
+
+      // Act
+      await copyUserField(user, "id");
+
+      // Assert
+      expect(mockCopyToClipboard).toHaveBeenCalledWith(
+        "42",
+        expect.any(Function),
+        expect.any(Function),
+      );
+    });
+
+    /**
+     * @description Should call onSuccess with correct label when copying succeeds
+     * @scenario Copy field "id", copyToClipboardWithFeedback executes success callback
+     * @expected onSuccess called with "ID пользователя 42"
+     */
+    it("should call onSuccess with correct label when copying succeeds", async () => {
+      // Arrange
+      const user = createUser({ id: 42 });
+      const onSuccess = vi.fn();
+      mockCopyToClipboard.mockImplementation(
+        (_value: string, onSuccessCb: () => void) => {
+          onSuccessCb();
+        },
+      );
+
+      // Act
+      await copyUserField(user, "id", onSuccess);
+
+      // Assert
+      expect(onSuccess).toHaveBeenCalledWith("ID пользователя 42");
+    });
+
+    /**
+     * @description Should call onError when copyToClipboardWithFeedback triggers error callback
+     * @scenario Copy field "id", copyToClipboardWithFeedback executes error callback
+     * @expected onError called once
+     */
+    it("should call onError when copying fails", async () => {
+      // Arrange
+      const user = createUser();
+      const onError = vi.fn();
+      mockCopyToClipboard.mockImplementation(
+        (_value: string, _onSuccess: () => void, onErrorCb: () => void) => {
+          onErrorCb();
+        },
+      );
+
+      // Act
+      await copyUserField(user, "id", undefined, onError);
+
+      // Assert
+      expect(onError).toHaveBeenCalled();
+    });
+  });
+
+  describe("when field is 'username'", () => {
+    /**
+     * @description Should call copyToClipboardWithFeedback with username value
+     * @scenario User with username "john_doe", copy field "username"
+     * @expected copyToClipboardWithFeedback called with "john_doe"
+     */
+    it("should call copyToClipboardWithFeedback with username", async () => {
+      // Arrange
+      const user = createUser({ username: "john_doe" });
+
+      // Act
+      await copyUserField(user, "username");
+
+      // Assert
+      expect(mockCopyToClipboard).toHaveBeenCalledWith(
+        "john_doe",
+        expect.any(Function),
+        expect.any(Function),
+      );
+    });
+
+    /**
+     * @description Should call onSuccess with correct label when copying succeeds
+     * @scenario Copy field "username", success callback executed
+     * @expected onSuccess called with "Логин john_doe"
+     */
+    it("should call onSuccess with correct label when copying succeeds", async () => {
+      // Arrange
+      const user = createUser({ username: "john_doe" });
+      const onSuccess = vi.fn();
+      mockCopyToClipboard.mockImplementation(
+        (_value: string, onSuccessCb: () => void) => {
+          onSuccessCb();
+        },
+      );
+
+      // Act
+      await copyUserField(user, "username", onSuccess);
+
+      // Assert
+      expect(onSuccess).toHaveBeenCalledWith("Логин john_doe");
+    });
+  });
+
+  describe("when field is 'email'", () => {
+    /**
+     * @description Should call copyToClipboardWithFeedback with email value
+     * @scenario User with email "john@example.com", copy field "email"
+     * @expected copyToClipboardWithFeedback called with "john@example.com"
+     */
+    it("should call copyToClipboardWithFeedback with email", async () => {
+      // Arrange
+      const user = createUser({ email: "john@example.com" });
+
+      // Act
+      await copyUserField(user, "email");
+
+      // Assert
+      expect(mockCopyToClipboard).toHaveBeenCalledWith(
+        "john@example.com",
+        expect.any(Function),
+        expect.any(Function),
+      );
+    });
+
+    /**
+     * @description Should call onSuccess with correct label when copying succeeds
+     * @scenario Copy field "email", success callback executed
+     * @expected onSuccess called with "Email john@example.com"
+     */
+    it("should call onSuccess with correct label when copying succeeds", async () => {
+      // Arrange
+      const user = createUser({ email: "john@example.com" });
+      const onSuccess = vi.fn();
+      mockCopyToClipboard.mockImplementation(
+        (_value: string, onSuccessCb: () => void) => {
+          onSuccessCb();
+        },
+      );
+
+      // Act
+      await copyUserField(user, "email", onSuccess);
+
+      // Assert
+      expect(onSuccess).toHaveBeenCalledWith("Email john@example.com");
+    });
+  });
+
+  describe("when optional callbacks are not provided", () => {
+    /**
+     * @description Should not throw when onSuccess and onError are undefined
+     * @scenario Call copyUserField without providing onSuccess or onError
+     * @expected No error thrown, copyToClipboardWithFeedback still called
+     */
+    it("should not throw when onSuccess and onError are undefined", async () => {
+      // Arrange
+      const user = createUser();
+
+      // Act & Assert
+      await expect(copyUserField(user, "id")).resolves.toBeUndefined();
+      expect(mockCopyToClipboard).toHaveBeenCalled();
+    });
+  });
+});
+
+// =============================================================================
+// TESTS: isAdminResponse
+// =============================================================================
+
+describe("isAdminResponse", () => {
+  /**
+   * @description Should return true when data has both 'user' and 'storage' properties
+   * @scenario Object with { user: {}, storage: {} }
+   * @expected true
+   */
+  it("should return true when data has both 'user' and 'storage' properties", () => {
+    // Arrange
+    const data = { user: {}, storage: {} } as IStorageStatsResponse;
+
+    // Act
+    const result = isAdminResponse(data);
+
+    // Assert
+    expect(result).toBe(true);
+  });
+
+  /**
+   * @description Should return false when 'user' property is missing
+   * @scenario Object with { storage: {} } only
+   * @expected false
+   */
+  it("should return false when 'user' property is missing", () => {
+    // Arrange
+    const data = { storage: {} } as IStorageStatsResponse;
+
+    // Act
+    const result = isAdminResponse(data);
+
+    // Assert
+    expect(result).toBe(false);
+  });
+
+  /**
+   * @description Should return false when 'storage' property is missing
+   * @scenario Object with { user: {} } only
+   * @expected false
+   */
+  it("should return false when 'storage' property is missing", () => {
+    // Arrange
+    const data = { user: {} } as IStorageStatsResponse;
+
+    // Act
+    const result = isAdminResponse(data);
+
+    // Assert
+    expect(result).toBe(false);
+  });
+
+  /**
+   * @description Should return false when both properties are missing
+   * @scenario Empty object {}
+   * @expected false
+   */
+  it("should return false when both properties are missing", () => {
+    // Arrange
+    const data = {} as IStorageStats;
+
+    // Act
+    const result = isAdminResponse(data);
+
+    // Assert
+    expect(result).toBe(false);
+  });
+
+  /**
+   * @description Should return true even if object has extra properties alongside user and storage
+   * @scenario Object with { user: {}, storage: {}, extra: true }
+   * @expected true
+   */
+  it("should return true for objects with additional properties", () => {
+    // Arrange
+    const data = {
+      user: {},
+      storage: {},
+    } as IStorageStatsResponse;
+
+    // Act
+    const result = isAdminResponse(data);
+
+    // Assert
+    expect(result).toBe(true);
   });
 });
