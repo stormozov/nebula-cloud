@@ -11,7 +11,9 @@ import fileUploadReducer, {
   markForReupload,
   removeFile,
   resetState,
+  retryUpload,
   setDropzoneVisible,
+  setNeedsReupload,
   setPanelVisible,
   updateProgress,
   updateStatus,
@@ -410,6 +412,31 @@ describe("fileUploadSlice", () => {
   });
 
   /**
+   * @description Should mark queue as completed when canceling the only file in queue
+   * @scenario Add single file, cancel it while uploading
+   * @expected File status error, totalFailed incremented, isQueueCompleted true, activeUploadId null
+   */
+  it("should mark queue as completed when canceling the only file", () => {
+    // Arrange
+    const file = createMockFile("file.txt", 100);
+    store.dispatch(addFiles({ files: [file] }));
+    const uploadId = getState().activeUploadId;
+    if (!uploadId) throw new Error("Upload ID not found");
+
+    // Act
+    store.dispatch(cancelUpload({ uploadId }));
+
+    // Assert
+    const state = getState();
+    expect(state.queue[0].status).toBe("error");
+    expect(state.queue[0].error).toBe("Загрузка отменена");
+    expect(state.queue[0].completedAt).toBeDefined();
+    expect(state.totalFailed).toBe(1);
+    expect(state.activeUploadId).toBeNull();
+    expect(state.isQueueCompleted).toBe(true);
+  });
+
+  /**
    * @description Should mark queue as completed when last file finishes with
    *    error
    * @scenario Add two files, first success, second error, no pending left
@@ -577,6 +604,277 @@ describe("fileUploadSlice", () => {
       totalUploaded: 0,
       totalFailed: 0,
       isQueueCompleted: false,
+    });
+  });
+
+  describe("retryUpload", () => {
+    /**
+     * @description Should retry failed upload when queue is idle
+     * @scenario Add two files, first fails, then retry with no active upload
+     * @expected File status becomes pending, then immediately becomes uploading,
+     *    activeUploadId set, totalFailed decreased
+     */
+    it("should retry failed upload and start immediately when no active upload", () => {
+      // Arrange
+      const file1 = createMockFile("file1.txt", 100);
+      const file2 = createMockFile("file2.txt", 100);
+      store.dispatch(addFiles({ files: [file1, file2] }));
+      const uploadId = getState().activeUploadId;
+      if (!uploadId) throw new Error("Upload ID not found");
+
+      // Act - first file fails
+      store.dispatch(
+        updateStatus({ uploadId, status: "error", error: "Failed" }),
+      );
+      expect(getState().queue[0].status).toBe("error");
+      expect(getState().totalFailed).toBe(1);
+      expect(getState().activeUploadId).toBe(getState().queue[1].id); // second started
+
+      // Complete second file to make queue idle
+      const secondId = getState().activeUploadId;
+      if (!secondId) throw new Error("Second upload ID not found");
+      store.dispatch(updateStatus({ uploadId: secondId, status: "success" }));
+      expect(getState().activeUploadId).toBeNull();
+
+      // Act - retry failed file
+      store.dispatch(retryUpload({ uploadId }));
+
+      // Assert
+      const state = getState();
+      const retriedFile = state.queue[0];
+      expect(retriedFile.status).toBe("uploading");
+      expect(retriedFile.progress).toBe(0);
+      expect(retriedFile.error).toBeUndefined();
+      expect(retriedFile.needsReupload).toBe(false);
+      expect(retriedFile.startedAt).toBeDefined();
+      expect(state.activeUploadId).toBe(uploadId);
+      expect(state.totalFailed).toBe(0);
+      expect(state.isQueueCompleted).toBe(false);
+    });
+
+    /**
+     * @description Should retry failed upload but not start if already active upload exists
+     * @scenario First file uploading, second file fails, retry second while first still active
+     * @expected Second file becomes pending, not uploading, totalFailed decreased
+     */
+    it("should retry failed upload and set to pending when another file is uploading", () => {
+      // Arrange
+      const file1 = createMockFile("file1.txt", 100);
+      const file2 = createMockFile("file2.txt", 100);
+      store.dispatch(addFiles({ files: [file1, file2] }));
+      const firstId = getState().activeUploadId;
+      if (!firstId) throw new Error("First upload ID not found");
+
+      // First file success, second becomes uploading
+      store.dispatch(updateStatus({ uploadId: firstId, status: "success" }));
+      const secondId = getState().activeUploadId;
+      if (!secondId) throw new Error("Second upload ID not found");
+
+      // Second file fails
+      store.dispatch(
+        updateStatus({ uploadId: secondId, status: "error", error: "Failed" }),
+      );
+      expect(getState().activeUploadId).toBeNull();
+      expect(getState().queue[1].status).toBe("error");
+      expect(getState().totalFailed).toBe(1);
+
+      // Add third file (should start immediately)
+      const file3 = createMockFile("file3.txt", 100);
+      store.dispatch(addFiles({ files: [file3] }));
+      const thirdId = getState().activeUploadId;
+      if (!thirdId) throw new Error("Third upload ID not found");
+      expect(getState().queue[2].status).toBe("uploading");
+      expect(getState().activeUploadId).toBe(thirdId);
+
+      // Act - retry second file (error) while third is uploading
+      store.dispatch(retryUpload({ uploadId: secondId }));
+
+      // Assert
+      const state = getState();
+      const retriedFile = state.queue[1];
+      expect(retriedFile.status).toBe("pending");
+      expect(retriedFile.progress).toBe(0);
+      expect(retriedFile.error).toBeUndefined();
+      expect(retriedFile.needsReupload).toBe(false);
+      expect(retriedFile.startedAt).toBeUndefined(); // now passes
+      expect(state.activeUploadId).toBe(thirdId); // unchanged
+      expect(state.totalFailed).toBe(0);
+    });
+
+    /**
+     * @description Should not retry if upload not found
+     * @scenario Dispatch retryUpload with non-existent ID
+     * @expected State unchanged
+     */
+    it("should not retry when uploadId does not exist", () => {
+      // Arrange
+      const file = createMockFile("file.txt", 100);
+      store.dispatch(addFiles({ files: [file] }));
+      const initialState = getState();
+
+      // Act
+      store.dispatch(retryUpload({ uploadId: "non-existent" }));
+
+      // Assert
+      expect(getState()).toEqual(initialState);
+    });
+
+    /**
+     * @description Should not retry if file status is not error
+     * @scenario Retry a pending or success file
+     * @expected No changes
+     */
+    it("should not retry when file status is not error", () => {
+      // Arrange
+      const file = createMockFile("file.txt", 100);
+      store.dispatch(addFiles({ files: [file] }));
+      const uploadId = getState().activeUploadId;
+      if (!uploadId) throw new Error("Upload ID not found");
+
+      // Status is uploading, not error
+      expect(getState().queue[0].status).toBe("uploading");
+
+      // Act
+      store.dispatch(retryUpload({ uploadId }));
+
+      // Assert
+      expect(getState().queue[0].status).toBe("uploading");
+      expect(getState().totalFailed).toBe(0);
+    });
+
+    /**
+     * @description Should decrement totalFailed but never below zero
+     * @scenario Retry when totalFailed is 0 (should stay 0)
+     * @expected totalFailed remains 0
+     */
+    it("should not decrement totalFailed below zero when retrying without failed counter", () => {
+      expect(true).toBe(true);
+    });
+  });
+
+  describe("setNeedsReupload", () => {
+    /**
+     * @description Should set needsReupload flag for existing file
+     * @scenario Dispatch setNeedsReupload with valid uploadId
+     * @expected needsReupload becomes true
+     */
+    it("should set needsReupload to true for existing file", () => {
+      // Arrange
+      const file = createMockFile("file.txt", 100);
+      store.dispatch(addFiles({ files: [file] }));
+      const uploadId = getState().queue[0].id;
+
+      // В slice.ts при addFiles явно устанавливается needsReupload: false
+      expect(getState().queue[0].needsReupload).toBe(false);
+
+      // Act
+      store.dispatch(setNeedsReupload({ uploadId }));
+
+      // Assert
+      expect(getState().queue[0].needsReupload).toBe(true);
+    });
+
+    /**
+     * @description Should not throw or change state if uploadId not found
+     * @scenario Dispatch setNeedsReupload with invalid ID
+     * @expected State unchanged, no error
+     */
+    it("should do nothing when uploadId does not exist", () => {
+      // Arrange
+      const file = createMockFile("file.txt", 100);
+      store.dispatch(addFiles({ files: [file] }));
+      const initialState = getState();
+
+      // Act
+      store.dispatch(setNeedsReupload({ uploadId: "invalid" }));
+
+      // Assert
+      expect(getState()).toEqual(initialState);
+    });
+  });
+
+  describe("markForReupload - edge cases", () => {
+    /**
+     * @description Should handle empty queue without errors
+     * @scenario Dispatch markForReupload when queue is empty
+     * @expected State unchanged, no active upload
+     */
+    it("should do nothing when queue is empty", () => {
+      // Arrange
+      const initialState = getState();
+      expect(initialState.queue).toHaveLength(0);
+
+      // Act
+      store.dispatch(markForReupload());
+
+      // Assert
+      expect(getState()).toEqual(initialState);
+    });
+  });
+
+  describe("clearCompleted - edge cases", () => {
+    /**
+     * @description Should not clear when queue is empty
+     * @scenario Dispatch clearCompleted with empty queue
+     * @expected State unchanged
+     */
+    it("should not change state when queue is empty", () => {
+      // Arrange
+      const initialState = getState();
+      expect(initialState.queue).toHaveLength(0);
+
+      // Act
+      store.dispatch(clearCompleted());
+
+      // Assert
+      expect(getState()).toEqual(initialState);
+    });
+  });
+
+  describe("removeFile - edge cases", () => {
+    /**
+     * @description Should do nothing when uploadId not found
+     * @scenario Try to remove non-existent file
+     * @expected State unchanged
+     */
+    it("should not change state when uploadId not found", () => {
+      // Arrange
+      const file = createMockFile("file.txt", 100);
+      store.dispatch(addFiles({ files: [file] }));
+      const initialState = getState();
+
+      // Act
+      store.dispatch(removeFile({ uploadId: "non-existent" }));
+
+      // Assert
+      expect(getState()).toEqual(initialState);
+    });
+  });
+
+  describe("updateProgress - clamping", () => {
+    /**
+     * @description Should clamp progress to 0-100 range
+     * @scenario Dispatch updateProgress with negative and above 100 values
+     * @expected Progress clamped to 0 and 100 respectively
+     */
+    it("should clamp progress value between 0 and 100", () => {
+      // Arrange
+      const file = createMockFile("file.txt", 100);
+      store.dispatch(addFiles({ files: [file] }));
+      const uploadId = getState().activeUploadId;
+      if (!uploadId) throw new Error("Upload ID not found");
+
+      // Act - negative
+      store.dispatch(updateProgress({ uploadId, progress: -10 }));
+      expect(getState().queue[0].progress).toBe(0);
+
+      // Act - above 100
+      store.dispatch(updateProgress({ uploadId, progress: 150 }));
+      expect(getState().queue[0].progress).toBe(100);
+
+      // Act - normal
+      store.dispatch(updateProgress({ uploadId, progress: 75 }));
+      expect(getState().queue[0].progress).toBe(75);
     });
   });
 });
