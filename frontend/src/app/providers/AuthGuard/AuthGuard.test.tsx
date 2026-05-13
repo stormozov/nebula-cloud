@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import "@testing-library/jest-dom/vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router";
@@ -12,8 +12,9 @@ import type { IAuthState, IUser } from "@/entities/user/model/types";
 import { AuthGuard } from "./AuthGuard";
 import type { AuthGuardRole } from "./types";
 
-// Mock navigate
-const mockNavigate = vi.fn();
+// =============================================================================
+// MOCKS
+// =============================================================================
 
 /**
  * Mock react-router
@@ -31,6 +32,17 @@ vi.mock("react-router", async () => {
     ),
   };
 });
+
+/**
+ * Mock child component to verify access is granted.
+ */
+const MockChild = () => (
+  <div data-testid="child-content">Protected Content</div>
+);
+
+// =============================================================================
+// HELPER FUNCTIONS
+// =============================================================================
 
 /**
  * Creates a test store with customizable initial state.
@@ -53,13 +65,6 @@ const createTestStore = (initialState: Partial<IAuthState> = {}) => {
     } as { user: IAuthState },
   });
 };
-
-/**
- * Mock child component to verify access is granted.
- */
-const MockChild = () => (
-  <div data-testid="child-content">Protected Content</div>
-);
 
 /**
  * Test wrapper component with navigation tracking.
@@ -133,6 +138,10 @@ const renderAuthGuard = ({
   };
 };
 
+// =============================================================================
+// TESTS
+// =============================================================================
+
 describe("AuthGuard Component", () => {
   beforeEach(() => {
     vi.stubGlobal("location", {
@@ -145,6 +154,10 @@ describe("AuthGuard Component", () => {
     vi.unstubAllGlobals();
     vi.clearAllMocks();
   });
+
+  // ---------------------------------------------------------------------------
+  // Non-Authenticated User Scenarios
+  // ---------------------------------------------------------------------------
 
   describe("Unauthenticated User Scenarios", () => {
     /**
@@ -202,6 +215,10 @@ describe("AuthGuard Component", () => {
     });
   });
 
+  // ---------------------------------------------------------------------------
+  // Authenticated Non-Admin User Scenarios
+  // ---------------------------------------------------------------------------
+
   describe("Authenticated Non-Admin User Scenarios", () => {
     /**
      * @description Should redirect authenticated non-admin user from admin route to /disk
@@ -241,6 +258,10 @@ describe("AuthGuard Component", () => {
     });
   });
 
+  // ---------------------------------------------------------------------------
+  // Authenticated Admin User Scenarios
+  // ---------------------------------------------------------------------------
+
   describe("Authenticated Admin User Scenarios", () => {
     /**
      * @description Should allow authenticated admin user to access admin route
@@ -277,6 +298,10 @@ describe("AuthGuard Component", () => {
     });
   });
 
+  // ---------------------------------------------------------------------------
+  // Guest Route Scenarios (Auth Page)
+  // ---------------------------------------------------------------------------
+
   describe("Guest Route Scenarios (Auth Page)", () => {
     /**
      * @description Should redirect authenticated user from /auth to /disk
@@ -312,7 +337,29 @@ describe("AuthGuard Component", () => {
       expect(navigateMock).toHaveAttribute("data-to", "/custom-auth-redirect");
       expect(navigateMock).toHaveAttribute("data-replace", "true");
     });
+
+    /**
+     * @description Should redirect authenticated admin user from guest route to /admin/dashboard
+     * @scenario User is authenticated, isStaff is true, accessLevel is "guest", no redirectPath
+     * @expected Should redirect to /admin/dashboard
+     */
+    it("should redirect authenticated admin user from guest route to /admin/dashboard", () => {
+      renderAuthGuard({
+        isAuthenticated: true,
+        isStaff: true,
+        accessLevel: "guest",
+        initialPath: "/auth",
+      });
+
+      const navigateMock = screen.getByTestId("navigate-mock");
+      expect(navigateMock).toHaveAttribute("data-to", "/admin/dashboard");
+      expect(navigateMock).toHaveAttribute("data-replace", "true");
+    });
   });
+
+  // ---------------------------------------------------------------------------
+  // Loading State Scenarios
+  // ---------------------------------------------------------------------------
 
   describe("Loading State Scenarios", () => {
     /**
@@ -351,6 +398,10 @@ describe("AuthGuard Component", () => {
     });
   });
 
+  // ---------------------------------------------------------------------------
+  // Welcome Page Redirect Scenarios
+  // ---------------------------------------------------------------------------
+
   describe("Welcome Page Redirect Scenarios", () => {
     /**
      * @description Should redirect authenticated user from root path to /disk
@@ -385,6 +436,10 @@ describe("AuthGuard Component", () => {
       expect(screen.queryByTestId("navigate-mock")).not.toBeInTheDocument();
     });
   });
+
+  // ---------------------------------------------------------------------------
+  // Default Props and Edge Cases
+  // ---------------------------------------------------------------------------
 
   describe("Default Props and Edge Cases", () => {
     /**
@@ -439,6 +494,10 @@ describe("AuthGuard Component", () => {
     });
   });
 
+  // ---------------------------------------------------------------------------
+  // Navigation Behavior
+  // ---------------------------------------------------------------------------
+
   describe("Navigation Behavior", () => {
     /**
      * @description Should use replace option for navigation
@@ -456,6 +515,10 @@ describe("AuthGuard Component", () => {
       expect(navigateMock).toHaveAttribute("data-replace", "true");
     });
   });
+
+  // ---------------------------------------------------------------------------
+  // Export Verification
+  // ---------------------------------------------------------------------------
 
   describe("AuthGuard Export Verification", () => {
     /**
