@@ -1,5 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { act, renderHook } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { useNavigate } from "react-router";
 import {
@@ -182,6 +182,38 @@ describe("useLoginForm", () => {
       expect(result.current.formData.username).toBe("testuser");
       expect(result.current.errors.password).toBe("error");
     });
+
+    /**
+     * @description Should clear field error when changing a field that previously had an error
+     * @scenario Set error on username via blur, then change username value
+     * @expected Error becomes undefined, and handleChange internal condition is executed
+     */
+    it("should clear error when changing a field with existing error", async () => {
+      (validateLogin as Mock).mockReturnValue({
+        isValid: false,
+        error: "Invalid login",
+      });
+      const { result } = renderUseLoginForm();
+
+      // Arrange: set error on username via blur
+      act(() => {
+        result.current.handleChange("username")("bad");
+        result.current.handleBlur("username")();
+      });
+
+      // Ensure error is present before change
+      await waitFor(() => {
+        expect(result.current.errors.username).toBe("Invalid login");
+      });
+
+      // Act: change username field
+      act(() => {
+        result.current.handleChange("username")("gooduser");
+      });
+
+      // Assert: error cleared
+      expect(result.current.errors.username).toBeUndefined();
+    });
   });
 
   describe("Field Blur Validation", () => {
@@ -276,6 +308,27 @@ describe("useLoginForm", () => {
       expect(result.current.errors.password).toBe("Invalid password");
       expect(validatePassword).toHaveBeenCalledWith("weak");
     });
+
+    /**
+     * @description Should call validatePassword and set error when password is invalid on blur
+     * @scenario Set invalid password value, call handleBlur for password
+     * @expected validatePassword called, error set
+     */
+    it("should set error for invalid password on blur with explicit empty value", () => {
+      const mockError = { isValid: false, error: "Password is too weak" };
+      (validatePassword as Mock).mockReturnValue(mockError);
+      const { result } = renderUseLoginForm();
+
+      act(() => {
+        result.current.handleChange("password")("weak");
+      });
+      act(() => {
+        result.current.handleBlur("password")();
+      });
+
+      expect(validatePassword).toHaveBeenCalledWith("weak");
+      expect(result.current.errors.password).toBe("Password is too weak");
+    });
   });
 
   describe("Form Reset", () => {
@@ -340,13 +393,11 @@ describe("useLoginForm", () => {
      * @expected No client errors, mutation called
      */
     it("should proceed to API call when client validation passes", () => {
-      (validateLogin as ReturnType<typeof vi.fn>).mockReturnValue({
-        isValid: true,
+      (validateLogin as Mock).mockReturnValue({ isValid: true });
+      (validatePassword as Mock).mockReturnValue({ isValid: true });
+      mockLogin.mockReturnValue({
+        unwrap: vi.fn().mockResolvedValue({}),
       });
-      (validatePassword as ReturnType<typeof vi.fn>).mockReturnValue({
-        isValid: true,
-      });
-      mockLogin.mockResolvedValue({ unwrap: vi.fn().mockResolvedValue({}) });
       const { result } = renderUseLoginForm();
 
       act(() => {
@@ -514,36 +565,8 @@ describe("useLoginForm", () => {
 
   describe("Form Submission - API Errors", () => {
     beforeEach(() => {
-      (validateLogin as ReturnType<typeof vi.fn>).mockReturnValue({
-        isValid: true,
-      });
-      (validatePassword as ReturnType<typeof vi.fn>).mockReturnValue({
-        isValid: true,
-      });
-    });
-
-    /**
-     * @description Should handle 500 server error
-     * @scenario Mutation rejects with 500 status
-     * @expected submit error set to hardcoded message
-     */
-    it("should handle 500 server error with hardcoded message", async () => {
-      mockLogin.mockRejectedValue({ status: 500 });
-      const { result } = renderUseLoginForm();
-
-      act(() => {
-        result.current.handleChange("username")("user");
-        result.current.handleChange("password")("pass");
-      });
-
-      await act(async () => {
-        const mockEvent: IMockFormEvent = { preventDefault: vi.fn() };
-        result.current.handleSubmit(mockEvent as unknown as React.FormEvent);
-      });
-
-      expect(result.current.errors.submit).toBe(
-        "Ошибка входа. Проверьте логин и пароль.",
-      );
+      (validateLogin as Mock).mockReturnValue({ isValid: true });
+      (validatePassword as Mock).mockReturnValue({ isValid: true });
     });
 
     /**
@@ -593,11 +616,38 @@ describe("useLoginForm", () => {
         fieldErrors: {},
         submitError: "Invalid credentials",
       };
-      (parseDjangoApiErrors as ReturnType<typeof vi.fn>).mockReturnValue(
-        mockParsed,
-      );
-      (hasFieldErrors as ReturnType<typeof vi.fn>).mockReturnValue(false);
-      mockLogin.mockRejectedValue({ data: { detail: "Invalid credentials" } });
+      (parseDjangoApiErrors as Mock).mockReturnValue(mockParsed);
+      (hasFieldErrors as Mock).mockReturnValue(false);
+      mockLogin.mockReturnValue({
+        unwrap: vi
+          .fn()
+          .mockRejectedValue({ data: { detail: "Invalid credentials" } }),
+      });
+      const { result } = renderUseLoginForm();
+
+      act(() => {
+        result.current.handleChange("username")("user");
+        result.current.handleChange("password")("pass");
+      });
+
+      await act(async () => {
+        const mockEvent: IMockFormEvent = { preventDefault: vi.fn() };
+        result.current.handleSubmit(mockEvent as unknown as React.FormEvent);
+      });
+
+      expect(result.current.errors.submit).toBe("Invalid credentials");
+      expect(mockOnError).toHaveBeenCalledWith("Invalid credentials");
+    });
+
+    /**
+     * @description Should use fallback error if no specific handling
+     * @scenario Unknown error shape
+     * @expected Fallback 'Ошибка входа...' in submit
+     */
+    it("should use fallback error for unknown error", async () => {
+      mockLogin.mockReturnValue({
+        unwrap: vi.fn().mockRejectedValue(new Error("Unknown")),
+      });
       const { result } = renderUseLoginForm();
 
       act(() => {
@@ -614,30 +664,6 @@ describe("useLoginForm", () => {
         "Ошибка входа. Проверьте логин и пароль.",
       );
       expect(mockOnError).toHaveBeenCalledWith(
-        "Ошибка входа. Проверьте логин и пароль.",
-      );
-    });
-
-    /**
-     * @description Should use fallback error if no specific handling
-     * @scenario Unknown error shape
-     * @expected Fallback 'Ошибка входа...' in submit
-     */
-    it("should use fallback error for unknown error", () => {
-      mockLogin.mockRejectedValue(new Error("Unknown"));
-      const { result } = renderUseLoginForm();
-
-      act(() => {
-        result.current.handleChange("username")("user");
-        result.current.handleChange("password")("pass");
-      });
-
-      act(() => {
-        const mockEvent: IMockFormEvent = { preventDefault: vi.fn() };
-        result.current.handleSubmit(mockEvent as unknown as React.FormEvent);
-      });
-
-      expect(result.current.errors.submit).toBe(
         "Ошибка входа. Проверьте логин и пароль.",
       );
     });
@@ -672,6 +698,80 @@ describe("useLoginForm", () => {
       const { result } = renderUseLoginForm();
 
       expect(result.current.isSubmitting).toBe(true);
+    });
+
+    /**
+     * @description Should use parsed submitError when API returns non-field error (no fieldErrors, but submitError exists)
+     * @scenario API error has data, parseDjangoApiErrors returns { fieldErrors: {}, submitError: 'some message' }, hasFieldErrors returns false
+     * @expected errors.submit equals parsed submitError, onError called with that message
+     */
+    it("should use parsed submitError when API returns non-field error", async () => {
+      (validateLogin as Mock).mockReturnValue({ isValid: true });
+      (validatePassword as Mock).mockReturnValue({ isValid: true });
+
+      const parsedSubmitError = "Неверные учетные данные";
+      const mockParsed = {
+        fieldErrors: {},
+        submitError: parsedSubmitError,
+      };
+      (parseDjangoApiErrors as Mock).mockReturnValue(mockParsed);
+      (hasFieldErrors as Mock).mockReturnValue(false);
+
+      const apiError = {
+        data: { detail: "Invalid credentials" },
+      };
+      mockLogin.mockReturnValue({
+        unwrap: vi.fn().mockRejectedValue(apiError),
+      });
+
+      const { result } = renderUseLoginForm();
+
+      act(() => {
+        result.current.handleChange("username")("user@test.com");
+        result.current.handleChange("password")("pass123");
+      });
+
+      await act(async () => {
+        const mockEvent: IMockFormEvent = { preventDefault: vi.fn() };
+        result.current.handleSubmit(mockEvent as unknown as React.FormEvent);
+      });
+
+      expect(result.current.errors.submit).toBe(parsedSubmitError);
+      expect(mockOnError).toHaveBeenCalledWith(parsedSubmitError);
+    });
+
+    /**
+     * @description Should set specific internal server error message on 500 status
+     * @scenario Mutation returns error with status 500, no data field
+     * @expected submit error is "Внутренняя ошибка сервера. Попробуйте позже."
+     */
+    it("should set internal server error message on 500 status", async () => {
+      (validateLogin as Mock).mockReturnValue({ isValid: true });
+      (validatePassword as Mock).mockReturnValue({ isValid: true });
+
+      // Правильный мок: login возвращает объект с unwrap, который rejected с { status: 500 }
+      mockLogin.mockReturnValue({
+        unwrap: vi.fn().mockRejectedValue({ status: 500 }),
+      });
+
+      const { result } = renderUseLoginForm();
+
+      act(() => {
+        result.current.handleChange("username")("user");
+        result.current.handleChange("password")("pass");
+      });
+
+      await act(async () => {
+        const mockEvent: IMockFormEvent = { preventDefault: vi.fn() };
+        result.current.handleSubmit(mockEvent as unknown as React.FormEvent);
+      });
+
+      expect(result.current.errors.submit).toBe(
+        "Внутренняя ошибка сервера. Попробуйте позже.",
+      );
+      expect(mockOnError).toHaveBeenCalledWith(
+        "Внутренняя ошибка сервера. Попробуйте позже.",
+      );
     });
   });
 });
