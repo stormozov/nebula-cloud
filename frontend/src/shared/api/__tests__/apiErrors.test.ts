@@ -1,10 +1,17 @@
-import { describe, expect, it } from "vitest";
+import axios from "axios";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
+  extractApiErrorMessage,
   hasAnyErrors,
   hasFieldErrors,
+  isError401,
   parseDjangoApiErrors,
 } from "../apiErrors";
+
+// =============================================================================
+// HELPERS
+// =============================================================================
 
 /** Helper to create expected result with field errors */
 const fieldErrors = (errors: Record<string, string>) => ({
@@ -23,6 +30,10 @@ const noErrors = () => ({
   fieldErrors: {},
   submitError: undefined,
 });
+
+// =============================================================================
+// TESTS
+// =============================================================================
 
 describe("parseDjangoApiErrors", () => {
   describe("Invalid input handling", () => {
@@ -604,5 +615,184 @@ describe("hasAnyErrors", () => {
     it("should return false for empty string submitError", () => {
       expect(hasAnyErrors({ fieldErrors: {}, submitError: "" })).toBe(false);
     });
+  });
+});
+
+describe("isError401", () => {
+  /**
+   * @description Should return true when status is 401
+   * @scenario Status is 401
+   * @expected Returns true
+   */
+  it("should return true when status is 401", () => {
+    const expectedValue = { status: 401 } as unknown as Parameters<
+      typeof isError401
+    >[0];
+    expect(isError401(expectedValue)).toBe(true);
+  });
+
+  /**
+   * @description Should return false when status is not 401
+   * @scenario Status is not 401
+   * @expected Returns false
+   */
+  it("should return false when status is not 401", () => {
+    const expectedValue = { status: 400 } as unknown as Parameters<
+      typeof isError401
+    >[0];
+    expect(isError401(expectedValue)).toBe(false);
+  });
+
+  /**
+   * @description Should return false when err is null
+   * @scenario Err is null
+   * @expected Returns false
+   */
+  it("should return false when err is null", () => {
+    const expectedValue = null as unknown as Parameters<typeof isError401>[0];
+    expect(isError401(expectedValue)).toBeFalsy();
+  });
+
+  /**
+   * @description Should return false when status field missing
+   * @scenario Status field missing
+   * @expected Returns false
+   */
+  it("should return false when status field missing", () => {
+    const expectedValue = {} as unknown as Parameters<typeof isError401>[0];
+    expect(isError401(expectedValue)).toBe(false);
+  });
+});
+
+describe("extractApiErrorMessage", () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  /**
+   * @description Should return null when not an Axios error
+   * @scenario Not an Axios error
+   * @expected Returns null
+   */
+  it("should return null when not an Axios error", () => {
+    vi.spyOn(axios, "isAxiosError").mockReturnValue(false);
+
+    const expectedValue = {} as unknown as Parameters<
+      typeof extractApiErrorMessage
+    >[0];
+
+    expect(extractApiErrorMessage(expectedValue)).toBeNull();
+  });
+
+  /**
+   * @description Should return null when Axios error has no response.data
+   * @scenario Axios error has no response.data
+   * @expected Returns null
+   */
+  it("should return null when Axios error has no response.data", () => {
+    vi.spyOn(axios, "isAxiosError").mockReturnValue(true);
+
+    const expectedValue = { response: {} } as unknown as Parameters<
+      typeof extractApiErrorMessage
+    >[0];
+
+    expect(extractApiErrorMessage(expectedValue)).toBeNull();
+  });
+
+  /**
+   * @description Should extract from data.detail string
+   * @scenario Axios error has data.detail string
+   * @expected Returns string
+   */
+  it("should extract from data.detail string", () => {
+    vi.spyOn(axios, "isAxiosError").mockReturnValue(true);
+
+    const error = {
+      response: { data: { detail: "Invalid" } },
+    } as unknown as Parameters<typeof extractApiErrorMessage>[0];
+
+    expect(extractApiErrorMessage(error)).toBe("Invalid");
+  });
+
+  /**
+   * @description Should extract from data.detail array of strings
+   * @scenario Axios error has data.detail array of strings
+   * @expected Returns string separated by semicolon
+   */
+  it("should extract from data.detail array of strings", () => {
+    vi.spyOn(axios, "isAxiosError").mockReturnValue(true);
+
+    const error = {
+      response: { data: { detail: ["Error 1", "Error 2"] } },
+    } as unknown as Parameters<typeof extractApiErrorMessage>[0];
+
+    expect(extractApiErrorMessage(error)).toBe("Error 1; Error 2");
+  });
+
+  /**
+   * @description Should extract from data.detail array of objects with string
+   * @scenario Axios error has data.detail array of objects with string
+   * @expected Returns string separated by semicolon
+   */
+  it("should extract from data.detail array of objects with string", () => {
+    vi.spyOn(axios, "isAxiosError").mockReturnValue(true);
+
+    const error = {
+      response: {
+        data: {
+          detail: [{ string: "Field is required" }, { string: "Too short" }],
+        },
+      },
+    } as unknown as Parameters<typeof extractApiErrorMessage>[0];
+
+    expect(extractApiErrorMessage(error)).toBe("Field is required; Too short");
+  });
+
+  /**
+   * @description Should extract from first array field when detail absent
+   * @scenario Axios error has first array field
+   * @expected Returns string separated by semicolon
+   */
+  it("should extract from first array field when detail absent", () => {
+    vi.spyOn(axios, "isAxiosError").mockReturnValue(true);
+
+    const error = {
+      response: {
+        data: { non_field_errors: ["Global error"], username: ["X"] },
+      },
+    } as unknown as Parameters<typeof extractApiErrorMessage>[0];
+
+    expect(extractApiErrorMessage(error)).toBe("Global error");
+  });
+
+  /**
+   * @description Should extract from string field when detail and arrays absent
+   * @scenario Axios error has string field
+   * @expected Returns string
+   */
+  it("should extract from string field when detail and arrays absent", () => {
+    vi.spyOn(axios, "isAxiosError").mockReturnValue(true);
+
+    const error = {
+      response: { data: { username: "Bad username" } },
+    } as unknown as Parameters<typeof extractApiErrorMessage>[0];
+
+    expect(extractApiErrorMessage(error)).toBe("Bad username");
+  });
+
+  /**
+   * @description Should fallback to JSON.stringify(data) when no valid fields found
+   * @scenario Axios error has no valid fields
+   * @expected Returns JSON.stringify(data)
+   */
+  it("should fallback to JSON.stringify(data) when no valid fields found", () => {
+    vi.spyOn(axios, "isAxiosError").mockReturnValue(true);
+
+    const data = { detail: undefined, foo: { bar: 1 } };
+    const error = { response: { data } } as unknown as Parameters<
+      typeof extractApiErrorMessage
+    >[0];
+
+    expect(extractApiErrorMessage(error)).toBe(JSON.stringify(data));
   });
 });

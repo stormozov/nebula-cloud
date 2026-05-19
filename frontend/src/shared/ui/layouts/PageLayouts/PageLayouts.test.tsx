@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
 import * as PageLayouts from "./index";
 
 import { AppContainer } from "./PageContainer";
@@ -7,6 +8,27 @@ import { AppHeader } from "./PageHeader";
 import { PageMain } from "./PageMain";
 import { PageSidebar } from "./PageSidebar";
 import { PageWrapper } from "./PageWrapper";
+
+// =============================================================================
+// MOCKS
+// =============================================================================
+
+vi.mock("@/shared/ui", async (importOriginal) => {
+  const original = (await importOriginal()) as Record<string, unknown>;
+  return {
+    ...original,
+    Logo: () => <div data-testid="logo">Logo</div>,
+    Navigation: () => <nav data-testid="navigation">Navigation</nav>,
+  };
+});
+
+vi.mock("@/widgets/user-profile-menu", () => ({
+  UserProfileMenu: () => <div data-testid="user-profile-menu">User</div>,
+}));
+
+// =============================================================================
+// TESTS
+// =============================================================================
 
 const { PageLayout } = PageLayouts;
 
@@ -70,6 +92,46 @@ describe("PageLayout", () => {
     it("applies custom className", () => {
       const customClass = "header-custom";
       render(<AppHeader className={customClass}>Content</AppHeader>);
+      expect(screen.getByRole("banner")).toHaveClass(
+        "page__header",
+        customClass,
+      );
+    });
+
+    /**
+     * @description Renders AppHeader with default layout (no children)
+     * @scenario Mounting AppHeader without children
+     * @expected Header renders default layout containers (page__header-container)
+     */
+    it("renders default layout when children are not provided", () => {
+      render(<AppHeader />);
+
+      const header = screen.getByRole("banner");
+      expect(header).toHaveClass("page__header");
+
+      // Static markup from default branch
+      expect(
+        document.querySelector(".page__header-container"),
+      ).toBeInTheDocument();
+      expect(
+        document.querySelector(".page__header-content"),
+      ).toBeInTheDocument();
+
+      // Ensure default children from internal layout are rendered
+      expect(screen.getByTestId("logo")).toBeInTheDocument();
+      expect(screen.getByTestId("navigation")).toBeInTheDocument();
+      expect(screen.getByTestId("user-profile-menu")).toBeInTheDocument();
+    });
+
+    /**
+     * @description AppHeader applies custom className in default layout
+     * @scenario Mounting AppHeader without children + with className
+     * @expected Header has base and custom classes
+     */
+    it("applies custom className for default layout", () => {
+      const customClass = "header-custom";
+      render(<AppHeader className={customClass} />);
+
       expect(screen.getByRole("banner")).toHaveClass(
         "page__header",
         customClass,
