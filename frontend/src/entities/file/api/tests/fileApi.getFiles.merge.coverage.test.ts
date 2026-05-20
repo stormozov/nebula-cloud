@@ -25,10 +25,7 @@ vi.mock("@/shared/api", () => ({
   API_BASE_URL: "/api",
 }));
 
-const createMockFile = (
-  id: number,
-  originalName: string,
-): IFile => ({
+const createMockFile = (id: number, originalName: string): IFile => ({
   id,
   originalName,
   comment: null,
@@ -99,8 +96,14 @@ describe("fileApi getFiles merge behavior", () => {
      */
     it("should append and replace items by id when merging page 2 into page 1 cache", async () => {
       // Arrange
-      const page1Files = [createMockFile(1, "file-1-v1.txt"), createMockFile(2, "file-2.txt")];
-      const page2Files = [createMockFile(2, "file-2-v2.txt"), createMockFile(3, "file-3.txt")];
+      const page1Files = [
+        createMockFile(1, "file-1-v1.txt"),
+        createMockFile(2, "file-2.txt"),
+      ];
+      const page2Files = [
+        createMockFile(2, "file-2-v2.txt"),
+        createMockFile(3, "file-3.txt"),
+      ];
       let byId = new Map<number, IFile>();
 
       server.use(
@@ -129,7 +132,7 @@ describe("fileApi getFiles merge behavior", () => {
       // Assert
       const mergedFiles = mergedResult.data?.results;
       expect(mergedFiles).toBeDefined();
-      expect(mergedFiles).toHaveLength(3); 
+      expect(mergedFiles).toHaveLength(3);
 
       if (mergedFiles) {
         byId = new Map<number, IFile>(mergedFiles.map((f) => [f.id, f]));
@@ -147,7 +150,10 @@ describe("fileApi getFiles merge behavior", () => {
      */
     it("should not merge with existing cache when dispatching page 1", async () => {
       // Arrange
-      const page1Files = [createMockFile(10, "p1-a.txt"), createMockFile(11, "p1-b.txt")];
+      const page1Files = [
+        createMockFile(10, "p1-a.txt"),
+        createMockFile(11, "p1-b.txt"),
+      ];
 
       server.use(
         http.get("/api/storage/files/", ({ request }) => {
@@ -175,4 +181,3 @@ describe("fileApi getFiles merge behavior", () => {
     });
   });
 });
-

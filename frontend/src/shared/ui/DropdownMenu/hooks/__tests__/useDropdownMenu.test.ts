@@ -162,7 +162,6 @@ describe("useDropdownMenu", () => {
     it("should capture activeElement on open and restore it on closeAndRestoreFocus", () => {
       // Arrange
       const { result } = renderHook(() => useDropdownMenu());
-      const originalActive = document.activeElement;
       const button = document.createElement("button");
       button.focus = vi.fn();
       document.body.appendChild(button);

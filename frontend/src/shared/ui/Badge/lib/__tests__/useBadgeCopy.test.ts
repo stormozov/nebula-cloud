@@ -1,10 +1,11 @@
-import { renderHook, act } from "@testing-library/react";
-import { toast } from "react-toastify";
-import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
+import { act, renderHook } from "@testing-library/react";
 import React from "react";
+import { toast } from "react-toastify";
+import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
+
+import { copyToClipboardWithFeedback } from "@/shared/utils";
 
 import { useBadgeCopy } from "../useBadgeCopy";
-import { copyToClipboardWithFeedback } from "@/shared/utils";
 
 vi.mock("@/shared/utils", () => ({
   copyToClipboardWithFeedback: vi.fn(),

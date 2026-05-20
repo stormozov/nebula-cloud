@@ -10,9 +10,11 @@ vi.mock("@/features/theme/model/hooks", () => ({
 
 import { useTheme } from "@/features/theme/model/hooks";
 
-
 const typedUseTheme = useTheme as unknown as {
-  mockReturnValue: (value: { theme: Theme; setTheme: (t: Theme) => void }) => void;
+  mockReturnValue: (value: {
+    theme: Theme;
+    setTheme: (t: Theme) => void;
+  }) => void;
 };
 
 describe("ThemeSwitcher", () => {
@@ -37,12 +39,20 @@ describe("ThemeSwitcher", () => {
       render(<ThemeSwitcher />);
 
       // Assert
-      const radiogroup = screen.getByRole("radiogroup", { name: /выбор темы/i });
+      const radiogroup = screen.getByRole("radiogroup", {
+        name: /выбор темы/i,
+      });
       expect(radiogroup).toBeInTheDocument();
 
-      const lightButton = within(radiogroup).getByRole("button", { name: /светлая/i });
-      const darkButton = within(radiogroup).getByRole("button", { name: /тёмная/i });
-      const systemButton = within(radiogroup).getByRole("button", { name: /системная/i });
+      const lightButton = within(radiogroup).getByRole("button", {
+        name: /светлая/i,
+      });
+      const darkButton = within(radiogroup).getByRole("button", {
+        name: /тёмная/i,
+      });
+      const systemButton = within(radiogroup).getByRole("button", {
+        name: /системная/i,
+      });
 
       expect(lightButton).toBeInTheDocument();
       expect(darkButton).toBeInTheDocument();
@@ -63,10 +73,18 @@ describe("ThemeSwitcher", () => {
       render(<ThemeSwitcher />);
 
       // Assert
-      const radiogroup = screen.getByRole("radiogroup", { name: /выбор темы/i });
-      const lightButton = within(radiogroup).getByRole("button", { name: /светлая/i });
-      const darkButton = within(radiogroup).getByRole("button", { name: /тёмная/i });
-      const systemButton = within(radiogroup).getByRole("button", { name: /системная/i });
+      const radiogroup = screen.getByRole("radiogroup", {
+        name: /выбор темы/i,
+      });
+      const lightButton = within(radiogroup).getByRole("button", {
+        name: /светлая/i,
+      });
+      const darkButton = within(radiogroup).getByRole("button", {
+        name: /тёмная/i,
+      });
+      const systemButton = within(radiogroup).getByRole("button", {
+        name: /системная/i,
+      });
 
       expect(lightButton).toHaveAttribute("aria-pressed", "false");
       expect(darkButton).toHaveAttribute("aria-pressed", "true");
@@ -117,13 +135,18 @@ describe("ThemeSwitcher", () => {
       rerender(<ThemeSwitcher />);
 
       // Assert
-      const radiogroup = screen.getByRole("radiogroup", { name: /выбор темы/i });
-      const lightButton = within(radiogroup).getByRole("button", { name: /светлая/i });
-      const systemButton = within(radiogroup).getByRole("button", { name: /системная/i });
+      const radiogroup = screen.getByRole("radiogroup", {
+        name: /выбор темы/i,
+      });
+      const lightButton = within(radiogroup).getByRole("button", {
+        name: /светлая/i,
+      });
+      const systemButton = within(radiogroup).getByRole("button", {
+        name: /системная/i,
+      });
 
       expect(lightButton).toHaveAttribute("aria-pressed", "false");
       expect(systemButton).toHaveAttribute("aria-pressed", "true");
     });
   });
 });
-

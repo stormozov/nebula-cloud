@@ -59,12 +59,9 @@ import { isPublicRoute } from "@/shared/utils";
 
 type SelectorMock = (...args: never[]) => unknown;
 
-
 const useAppSelectorMock = useAppSelector as unknown as ReturnType<
   typeof vi.fn
 >;
-
-
 
 const useNavigateMock = useNavigate as unknown as ReturnType<typeof vi.fn>;
 const useLocationMock = useLocation as unknown as ReturnType<typeof vi.fn>;

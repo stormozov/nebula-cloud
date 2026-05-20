@@ -38,8 +38,6 @@ jobs:
               run: yarn typecheck
 
     test:
-        # Disabled temporarily due to test instability
-        if: false
         name: 🧪 Run Tests
         runs-on: ubuntu-latest
         needs: lint-and-typecheck

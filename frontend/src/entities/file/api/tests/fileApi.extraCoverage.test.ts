@@ -3,27 +3,21 @@ import { HttpResponse, http } from "msw";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/shared/api", async () => {
-  const actual = await vi.importActual<typeof import("@/shared/api")>(
-    "@/shared/api",
-  );
+  const actual =
+    await vi.importActual<typeof import("@/shared/api")>("@/shared/api");
 
   return {
     ...actual,
     API_BASE_URL: "/api",
-    fetchWithAuth: vi.fn((url: string, init?: RequestInit) =>
-      fetch(url, init),
-    ),
+    fetchWithAuth: vi.fn((url: string, init?: RequestInit) => fetch(url, init)),
   };
 });
-
 
 vi.mock("@/shared/utils", () => ({
   downloadFile: vi.fn(),
 }));
 
-const { getImageBlobFromApi, downloadFileFromApi } = await import(
-  "../fileApi"
-);
+const { getImageBlobFromApi, downloadFileFromApi } = await import("../fileApi");
 
 describe("fileApi extra coverage", () => {
   afterEach(() => {
@@ -81,4 +75,3 @@ describe("fileApi extra coverage", () => {
     });
   });
 });
-

@@ -25,10 +25,7 @@ vi.mock("@/shared/api", () => ({
   API_BASE_URL: "/api",
 }));
 
-const createMockFile = (
-  id: number,
-  originalName: string,
-): IFile => ({
+const createMockFile = (id: number, originalName: string): IFile => ({
   id,
   originalName,
   comment: null,
@@ -162,4 +159,3 @@ describe("fileApi getFiles forceRefetch behavior", () => {
     expect(requestSpy).toHaveBeenCalledTimes(1);
   });
 });
-

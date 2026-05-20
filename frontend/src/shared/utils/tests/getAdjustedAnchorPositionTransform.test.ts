@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
+
+import type { AnchorPosition } from "@/shared/types/common";
+
 import {
   calculateViewportAdjustments,
   calculateVirtualCoordinates,
   getAdjustedAnchorPositionTransform,
   getBasePercentageOffsets,
 } from "../getAdjustedAnchorPositionTransform";
-import type { AnchorPosition } from "@/shared/types/common";
 
 // Helpers to create fake DOMRect
 const createFakeDOMRect = (

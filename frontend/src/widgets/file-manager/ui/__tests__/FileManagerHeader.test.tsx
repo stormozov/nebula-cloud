@@ -5,10 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { FileSearchInput } from "@/features/file/file-search";
 import { HelpKeyboardShortcutsButton } from "@/features/help";
 import { useMediaQuery } from "@/shared/hooks";
-import {
-  ControlledInput,
-  PageWrapper
-} from "@/shared/ui";
+import { ControlledInput, PageWrapper } from "@/shared/ui";
 import { FileManagerHeader } from "../FileManagerHeader";
 
 // =============================================================================

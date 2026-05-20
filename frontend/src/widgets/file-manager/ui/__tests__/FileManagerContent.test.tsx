@@ -41,7 +41,7 @@ describe("FileManagerContent", () => {
     files: [],
     onFileSelect: vi.fn(),
     isLoading: false,
-    handlers: {}
+    handlers: {},
   };
 
   beforeEach(() => {

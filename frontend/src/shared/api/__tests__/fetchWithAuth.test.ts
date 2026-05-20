@@ -184,11 +184,7 @@ describe("fetchWithAuth", () => {
     const errorResponse = new Response(null, { status: 401 });
     mockFetch.mockResolvedValueOnce(errorResponse);
 
-    const result = await fetchWithAuth(
-      API_URL,
-      undefined,
-      false,
-    );
+    const result = await fetchWithAuth(API_URL, undefined, false);
 
     expect(mockFetch).toHaveBeenCalledTimes(1);
     expect(result).toBe(errorResponse);
@@ -212,9 +208,7 @@ describe("fetchWithAuth", () => {
     const errorResponse = new Response(null, { status: 401 });
     mockFetch.mockResolvedValueOnce(errorResponse);
 
-    await expect(fetchWithAuth(API_URL)).rejects.toBe(
-      errorResponse,
-    );
+    await expect(fetchWithAuth(API_URL)).rejects.toBe(errorResponse);
 
     expect(mockFetch).toHaveBeenCalledTimes(1);
     expect(mockGetRefreshedToken).toHaveBeenCalledTimes(1);
