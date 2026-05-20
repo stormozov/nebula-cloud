@@ -1,4 +1,5 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
+import { renderWithRouter } from "@tests/utils/renderWithRouter";
 import { describe, expect, it } from "vitest";
 
 import { Logo } from "./Logo";
@@ -15,11 +16,13 @@ describe("Logo", () => {
      * @expected Div with logo class
      */
     it("renders div with logo class", () => {
-      render(<Logo />);
+      renderWithRouter(<Logo />);
+
       const logoDiv = screen.getByText(LOGO_TEXT).closest("div");
       expect(logoDiv).toBeInTheDocument();
       expect(logoDiv).toHaveClass("logo");
-      expect(logoDiv).toContainHTML(`<p>${LOGO_TEXT}</p>`);
+
+      expect(logoDiv?.querySelector("p")).toHaveTextContent(LOGO_TEXT);
     });
   });
 
@@ -32,7 +35,7 @@ describe("Logo", () => {
      * @expected Div with "logo" class
      */
     it('applies "logo" class to root div', () => {
-      render(<Logo />);
+      renderWithRouter(<Logo />);
       const logoDiv = screen.getByText(LOGO_TEXT).closest("div");
       expect(logoDiv).toHaveClass("logo");
     });
@@ -47,7 +50,7 @@ describe("Logo", () => {
      * @expected Exact text LOGO_TEXT inside p tag
      */
     it("renders exact text LOGO_TEXT inside p tag", () => {
-      render(<Logo />);
+      renderWithRouter(<Logo />);
       expect(screen.getByText(LOGO_TEXT)).toBeInTheDocument();
     });
   });
@@ -62,7 +65,7 @@ describe("Logo", () => {
      */
     it("applies id attribute to div", () => {
       const id = "test-logo-id";
-      render(<Logo id={id} />);
+      renderWithRouter(<Logo id={id} />);
       const logoDiv = screen.getByText(LOGO_TEXT).closest("div");
       expect(logoDiv).toHaveAttribute("id", id);
     });
@@ -73,7 +76,7 @@ describe("Logo", () => {
      * @expected Div with data-testid="logo-test"
      */
     it("applies data-* attributes", () => {
-      render(<Logo data-testid="logo-test" />);
+      renderWithRouter(<Logo data-testid="logo-test" />);
       expect(screen.getByTestId("logo-test")).toBeInTheDocument();
     });
 
@@ -84,7 +87,7 @@ describe("Logo", () => {
      */
     it("applies style attribute", () => {
       const customStyle = { margin: "10px" };
-      render(<Logo style={customStyle} />);
+      renderWithRouter(<Logo style={customStyle} />);
       const logoDiv = screen.getByText(LOGO_TEXT).closest("div");
       expect(logoDiv).toHaveStyle({ margin: "10px" });
     });
@@ -96,7 +99,7 @@ describe("Logo", () => {
      */
     it("applies aria-label attribute", () => {
       const ariaLabel = "Nebula Cloud Logo";
-      render(<Logo aria-label={ariaLabel} />);
+      renderWithRouter(<Logo aria-label={ariaLabel} />);
       const logoDiv = screen.getByText(LOGO_TEXT).closest("div");
       expect(logoDiv).toHaveAttribute("aria-label", ariaLabel);
     });

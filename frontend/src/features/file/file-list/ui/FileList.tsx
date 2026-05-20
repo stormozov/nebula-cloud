@@ -1,6 +1,7 @@
 import { ListState } from "@/shared/ui/ListState";
 
 import type { IFileListProps } from "../lib/types";
+import { useFileListKeyboardShortcuts } from "../lib/useFileListKeyboardShortcuts";
 import { FileListBody } from "./FileListBody";
 import { FileListHeader } from "./FileListHeader";
 
@@ -18,6 +19,8 @@ export function FileList({
   headers = [],
   onSelectFile,
 }: IFileListProps) {
+  useFileListKeyboardShortcuts({ files, handlers });
+
   return (
     <ListState
       states={{ ...states, itemsCount: files.length }}

@@ -30,7 +30,7 @@ import {
 } from "react-icons/fa6";
 import { FiMoreVertical } from "react-icons/fi";
 import { IoIosArrowBack, IoIosArrowForward, IoIosCloud } from "react-icons/io";
-import { IoMoon, IoReloadSharp, IoSearch } from "react-icons/io5";
+import { IoMenu, IoMoon, IoReloadSharp, IoSearch } from "react-icons/io5";
 import {
   MdEdit,
   MdLogin,
@@ -85,6 +85,7 @@ export const ICONS = {
   eye: FaEye,
   comment: FaComment,
   dashboard: BiSolidDashboard,
+  menu: IoMenu,
 
   // ========== Status & Feedback ==========
   check: FaCheck,

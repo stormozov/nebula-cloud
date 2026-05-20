@@ -24,6 +24,10 @@
 
     &:first-child {
       width: 128px;
+
+      @media (max-width: 480px) {
+        width: auto;
+      }
     }
   }
 

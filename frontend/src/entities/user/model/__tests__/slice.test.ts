@@ -9,8 +9,12 @@ import {
   setTokens,
   setUser,
   userSlice,
-} from "./slice";
-import type { IAuthState, IToken, IUser, IUserAuthResponse } from "./types";
+} from "../slice";
+import type { IAuthState, IToken, IUser, IUserAuthResponse } from "../types";
+
+// =============================================================================
+// HELPERS
+// =============================================================================
 
 /** Helper to create a mock user */
 const createMockUser = (overrides: Partial<IUser> = {}): IUser => ({
@@ -56,6 +60,10 @@ const initialState: IAuthState = {
 
 /** Reducer reference for testing */
 const reducer = userSlice.reducer;
+
+// =============================================================================
+// TESTS
+// =============================================================================
 
 describe("userSlice", () => {
   describe("Initial state", () => {

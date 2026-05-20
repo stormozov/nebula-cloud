@@ -29,6 +29,10 @@
     &:focus-visible {
       outline: 2px solid var(--color-primary);
     }
+
+    @media (max-width: 600px) {
+      padding: 0;
+    }
   }
 
   &__avatar {
@@ -40,7 +44,7 @@
     font-weight: var(--font-weight-medium);
     color: var(--color-text-primary);
 
-    @media (max-width: 768px) {
+    @media (max-width: 600px) {
       display: none;
     }
   }

@@ -106,7 +106,7 @@ class TestFileSizeEdgeCases:
         file_obj = File.objects.first()
         assert file_obj.size == 1
 
-    def test_upload_file_at_100mb_limit_returns_201(self, authenticated_client):
+    def test_upload_file_at_100mb_limit_returns_201(self, authenticated_client, user_account):
         """
         Verify that file exactly at 100MB limit is accepted.
 
@@ -116,7 +116,10 @@ class TestFileSizeEdgeCases:
             - Size is exactly 100MB (104857600 bytes)
         """
 
-        # Arrange
+        # Arrange - Increase storage limit to accommodate 100MB file
+        user_account.storage_limit = 150 * 1024 * 1024  # 150MB
+        user_account.save()
+
         file_content = b"x" * MAX_UPLOAD_SIZE
         limit_file = SimpleUploadedFile(
             name="limit_100mb.bin",
@@ -747,7 +750,7 @@ class TestPerformanceBoundaries:
 
         Expected:
             - HTTP 200 OK
-            - All files returned (no pagination limit in current implementation)
+            - Total count is correct (pagination returns all files across pages)
             - Response time is reasonable (< 5 seconds for 100 files)
         """
 
@@ -771,7 +774,9 @@ class TestPerformanceBoundaries:
 
         # Assert
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == users_count
+        assert response.data["count"] == users_count
+        assert len(response.data["results"]) == 10  # First page (PAGE_SIZE=10)
+        assert response.data["next"] is not None  # More pages available
         assert elapsed_time < 10  # Should complete in under 10 seconds
 
     def test_comment_with_maximum_length_returns_200(self, authenticated_client, create_file):

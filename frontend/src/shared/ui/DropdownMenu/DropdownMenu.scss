@@ -33,7 +33,7 @@
 
     width: 100%;
 
-    background-color: none;
+    background-color: transparent;
     border: none;
     border-radius: var(--radius-sm);
     outline: 2px solid transparent;
@@ -95,6 +95,10 @@
       opacity: 0.5;
       cursor: default;
       pointer-events: none;
+    }
+
+    @media (max-width: 576px) {
+      font-size: var(--text-size-regular);
     }
   }
 

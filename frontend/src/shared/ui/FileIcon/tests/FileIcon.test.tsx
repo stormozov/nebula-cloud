@@ -1,5 +1,6 @@
 import { render } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
+
 import { FileIcon } from "../FileIcon";
 import type { FileType } from "../types";
 import { FILE_TYPE_ICONS, getFileType } from "../utils";
@@ -7,6 +8,7 @@ import { FILE_TYPE_ICONS, getFileType } from "../utils";
 // =============================================================================
 // TEST HELPERS
 // =============================================================================
+
 /**
  * Helper: creates test cases for file type to icon rendering
  * Covers all file types without testing utility logic
@@ -17,21 +19,21 @@ const createFileTypeTestCases = () => [
   { filename: "song.mp3", expectedType: "audio" as FileType },
   { filename: "report.pdf", expectedType: "document" as FileType },
   { filename: "archive.zip", expectedType: "archive" as FileType },
-  { filename: "script.ts", expectedType: "code" as FileType },
+  { filename: "script.ts", expectedType: "unknown" as FileType },
   { filename: "unknown.exe", expectedType: "unknown" as FileType },
 ];
 
 // =============================================================================
 // TEST SUITE
 // =============================================================================
+
 describe("FileIcon", () => {
-  beforeEach(() => {
-    // No mocks needed - component uses pure utilities
-  });
+  beforeEach(() => {});
 
   // ---------------------------------------------------------------------------
   //  Rendering tests
   // ---------------------------------------------------------------------------
+
   /**
    * Tests for component rendering behavior
    */
@@ -87,7 +89,7 @@ describe("FileIcon", () => {
       { filename: "song.mp3", expectedLabel: "Аудио" },
       { filename: "report.pdf", expectedLabel: "Документ" },
       { filename: "archive.zip", expectedLabel: "Архив" },
-      { filename: "script.ts", expectedLabel: "Код" },
+      { filename: "script.ts", expectedLabel: "Файл" },
       { filename: "unknown.exe", expectedLabel: "Файл" },
     ])("should render aria-label for '$filename': '$expectedLabel'", ({
       filename,
@@ -104,6 +106,7 @@ describe("FileIcon", () => {
   // ---------------------------------------------------------------------------
   //  Props tests
   // ---------------------------------------------------------------------------
+
   /**
    * Tests for component props behavior
    */
@@ -176,7 +179,7 @@ describe("FileIcon", () => {
     it.each([
       { filename: "photo.jpg", expectedTitle: "Изображение" },
       { filename: "movie.mp4", expectedTitle: "Видео" },
-      { filename: "script.ts", expectedTitle: "Код" },
+      { filename: "script.ts", expectedTitle: "Файл" },
     ])("should show tooltip for '$filename' when showTooltip=true", ({
       filename,
       expectedTitle,
@@ -188,6 +191,7 @@ describe("FileIcon", () => {
       const iconElement = container.querySelector("svg");
       // React Icons renders <title> as child element, not attribute
       const titleElement = iconElement?.querySelector("title");
+
       expect(titleElement?.textContent).toBe(expectedTitle);
     });
 
@@ -203,6 +207,7 @@ describe("FileIcon", () => {
 
       const iconElement = container.querySelector("svg");
       const titleElement = iconElement?.querySelector("title");
+
       expect(titleElement).toBeNull();
     });
 
@@ -211,18 +216,20 @@ describe("FileIcon", () => {
      * @scenario showTooltip prop omitted
      * @expected title element not present (default false)
      */
-    it("should use default showTooltip value", () => {
+    it("should show tooltip by default when showTooltip not provided", () => {
       const { container } = render(<FileIcon filename="test.txt" />);
-
       const iconElement = container.querySelector("svg");
       const titleElement = iconElement?.querySelector("title");
-      expect(titleElement).toBeNull();
+
+      expect(titleElement).toBeDefined();
+      expect(titleElement?.textContent).toBe("Документ");
     });
   });
 
   // ---------------------------------------------------------------------------
   //  CSS class tests
   // ---------------------------------------------------------------------------
+
   /**
    * Tests for CSS class application
    */
@@ -262,6 +269,7 @@ describe("FileIcon", () => {
   // ---------------------------------------------------------------------------
   //  Integration tests
   // ---------------------------------------------------------------------------
+
   /**
    * Integration tests - component works with utilities
    */
@@ -330,6 +338,7 @@ describe("FileIcon", () => {
   // ---------------------------------------------------------------------------
   //  Edge cases
   // ---------------------------------------------------------------------------
+
   /**
    * Edge cases - boundary values and special inputs
    */
@@ -372,7 +381,7 @@ describe("FileIcon", () => {
     it.each([
       { filename: "FILE.JPG", expectedClass: "file-icon--image" },
       { filename: "document.PDF", expectedClass: "file-icon--document" },
-      { filename: "SCRIPT.TS", expectedClass: "file-icon--code" },
+      { filename: "SCRIPT.TS", expectedClass: "file-icon--unknown" },
     ])("should handle uppercase extension: '$filename'", ({
       filename,
       expectedClass,

@@ -1,3 +1,4 @@
+import { useMediaQuery } from "@/shared/hooks";
 import { Button } from "@/shared/ui";
 import type { SelectUser } from "@/widgets/admin-user-manager";
 
@@ -43,11 +44,15 @@ export function UserNavigation({
     onNext: handleNext,
   });
 
+  const isMobile576px = useMediaQuery({ query: "(max-width: 576px)" });
+
+  const buttonsSize = isMobile576px ? "medium" : "small";
+
   return (
     <div className="user-navigation">
       <Button
         variant="ghost"
-        size="small"
+        size={buttonsSize}
         title="Предыдущий пользователь (←)"
         aria-label="Предыдущий пользователь"
         icon={{ name: hasPrev ? "arrowLeft" : "doNotDisturb" }}
@@ -58,7 +63,7 @@ export function UserNavigation({
       </Button>
       <Button
         variant="ghost"
-        size="small"
+        size={buttonsSize}
         title="Следующий пользователь (→)"
         aria-label="Следующий пользователь"
         icon={{ name: hasNext ? "arrowRight" : "doNotDisturb", isRight: true }}

@@ -48,12 +48,6 @@ export const useFileRowInteractions = ({
       event.preventDefault();
       onSelect?.(file);
       handlers.onView?.(file);
-    } else if (
-      (event.ctrlKey && event.key === "s") ||
-      (event.metaKey && event.key === "s")
-    ) {
-      event.preventDefault();
-      handlers.onDownload?.(file);
     } else if (event.key === "Delete" || event.key === "Backspace") {
       event.preventDefault();
       handlers.onDelete?.(file);
@@ -63,12 +57,6 @@ export const useFileRowInteractions = ({
     } else if (event.key === "F2") {
       event.preventDefault();
       handlers.onRename?.(file);
-    } else if (
-      (event.ctrlKey && event.key === "l") ||
-      (event.metaKey && event.key === "l")
-    ) {
-      event.preventDefault();
-      handlers.onPublicLink?.(file);
     }
   };
 

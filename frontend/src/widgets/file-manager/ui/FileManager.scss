@@ -13,7 +13,9 @@
   border: 1px solid var(--color-border-primary);
   border-radius: var(--radius-md);
 
-  cursor: default;
+  @media (max-width: 992px) {
+    padding: var(--space-3);
+  }
 
   &__header {
     padding-bottom: var(--space-4);
@@ -22,6 +24,10 @@
 
   &__header-top {
     margin-bottom: var(--space-4);
+  }
+
+  &__mobile-search {
+    margin-top: var(--space-4);
   }
 
   &__dropzone {

@@ -132,4 +132,86 @@ export const userApiHandlers = [
       { status: 401 },
     );
   }),
+
+  // Refresh token endpoint
+  http.post("/api/auth/refresh/", async ({ request }) => {
+    const body = (await request.json()) as { refresh?: string };
+
+    // Check for refresh token
+    if (!body?.refresh) {
+      return HttpResponse.json(
+        { detail: "Refresh token is required." },
+        { status: 400 },
+      );
+    }
+
+    // Check for invalid token (null in test)
+    if (body.refresh === "null") {
+      return HttpResponse.json(
+        { detail: "Invalid refresh token." },
+        { status: 401 },
+      );
+    }
+
+    // Successful token refresh
+    return HttpResponse.json({
+      access: "mock_access_token_refreshed",
+      refresh: "mock_refresh_token_refreshed",
+    });
+  }),
+
+  // Get current user storage summary endpoint
+  http.get("/api/users/me/storage-summary/", ({ request }) => {
+    const authHeader = request.headers.get("Authorization");
+
+    // Check for valid token
+    if (authHeader === "Bearer mock_access_token_12345") {
+      return HttpResponse.json({
+        file_count: 42,
+        total_size: 1048576,
+        total_size_formatted: "1 MB",
+        storage_limit: 10485760,
+        storage_limit_formatted: "10 MB",
+        usage_percent: 10,
+      });
+    }
+
+    // Invalid or missing token
+    return HttpResponse.json(
+      { detail: "Учетные данные не предоставлены." },
+      { status: 401 },
+    );
+  }),
+
+  // Get admin user storage stats endpoint
+  http.get("/api/admin/users/:userId/storage-stats/", ({ request, params }) => {
+    const authHeader = request.headers.get("Authorization");
+    const userId = params.userId;
+
+    // Check for valid token with admin privileges
+    if (authHeader === "Bearer mock_access_token_12345") {
+      return HttpResponse.json({
+        user: {
+          id: Number(userId),
+          username: `user${userId}`,
+          email: `user${userId}@example.com`,
+        },
+        storage: {
+          file_count: 100,
+          total_size: 5242880,
+          total_size_formatted: "5 MB",
+          storage_limit: 10485760,
+          storage_limit_formatted: "10 MB",
+          usage_percent: 50,
+          path: `/users/user${userId}/`,
+        },
+      });
+    }
+
+    // Invalid or missing token
+    return HttpResponse.json(
+      { detail: "Учетные данные не предоставлены." },
+      { status: 401 },
+    );
+  }),
 ];

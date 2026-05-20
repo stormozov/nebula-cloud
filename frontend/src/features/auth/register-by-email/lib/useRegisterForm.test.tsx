@@ -12,6 +12,7 @@ import {
 } from "vitest";
 
 import { useRegisterMutation } from "@/entities/user";
+import { hasFieldErrors, parseDjangoApiErrors } from "@/shared/api";
 import type { IValidationResult } from "@/shared/types/validation";
 import { isFormValid } from "@/shared/utils";
 import { validateRegistrationForm } from "@/shared/validators";
@@ -82,6 +83,8 @@ describe("useRegisterForm", () => {
   // Mocked functions available via vi.mocked()
   const mockValidateRegistrationForm = vi.mocked(validateRegistrationForm);
   const mockIsFormValid = vi.mocked(isFormValid);
+  const mockParseDjangoApiErrors = vi.mocked(parseDjangoApiErrors);
+  const mockHasFieldErrors = vi.mocked(hasFieldErrors);
 
   const mockValidValidationResults: Record<string, IValidationResult> = {
     username: { isValid: true },
@@ -307,6 +310,293 @@ describe("useRegisterForm", () => {
       expect(mockRegister).toHaveBeenCalled();
       expect(mockOnSuccess).toHaveBeenCalled();
       expect(mockNavigate).toHaveBeenCalledWith("/disk", { replace: true });
+    });
+
+    describe("when API returns an error", () => {
+      beforeEach(() => {
+        // Fill valid form data to pass validation
+        const { result } = renderUseRegisterForm();
+        act(() => {
+          result.current.handleChange("username")("testuser");
+          result.current.handleChange("email")("test@example.com");
+          result.current.handleChange("password")("Password123");
+          result.current.handleChange("passwordConfirm")("Password123");
+          result.current.handleChange("firstName")("Test");
+          result.current.handleChange("lastName")("User");
+        });
+      });
+
+      /**
+       * @description Should handle field errors from API
+       * @scenario API returns field-specific errors (e.g., username taken)
+       * @expected Errors set, onError called with first field error message
+       */
+      it("should set field errors when API returns fieldErrors", async () => {
+        // Arrange
+        const apiError = {
+          data: {
+            username: ["User with this username already exists."],
+            email: ["Email is invalid."],
+          },
+        };
+        const parsedFieldErrors: Record<string, string> = {
+          username: "User with this username already exists.",
+          email: "Email is invalid.",
+        };
+        mockParseDjangoApiErrors.mockReturnValue({
+          fieldErrors: parsedFieldErrors,
+          submitError: undefined,
+        });
+        mockHasFieldErrors.mockReturnValue(true);
+
+        mockRegister.mockReturnValue({
+          unwrap: () => Promise.reject(apiError),
+        });
+
+        const { result } = renderUseRegisterForm({
+          onSuccess: mockOnSuccess,
+          onError: mockOnError,
+        });
+
+        // Re-fill form in this specific render
+        act(() => {
+          result.current.handleChange("username")("testuser");
+          result.current.handleChange("email")("test@example.com");
+          result.current.handleChange("password")("Password123");
+          result.current.handleChange("passwordConfirm")("Password123");
+          result.current.handleChange("firstName")("Test");
+          result.current.handleChange("lastName")("User");
+        });
+
+        const mockEvent: IMockFormEvent = { preventDefault: vi.fn() };
+
+        // Act
+        await act(async () => {
+          await result.current.handleSubmit(
+            mockEvent as React.FormEvent<HTMLFormElement>,
+          );
+        });
+
+        // Assert
+        expect(mockRegister).toHaveBeenCalled();
+        expect(mockParseDjangoApiErrors).toHaveBeenCalledWith(apiError.data);
+        expect(result.current.errors.username).toBe(
+          "User with this username already exists.",
+        );
+        expect(result.current.errors.email).toBe("Email is invalid.");
+        expect(result.current.errors.submit).toBeUndefined();
+        expect(mockOnError).toHaveBeenCalledWith(
+          "User with this username already exists.",
+        );
+        expect(mockOnSuccess).not.toHaveBeenCalled();
+        expect(mockNavigate).not.toHaveBeenCalled();
+      });
+
+      /**
+       * @description Should handle submitError from API
+       * @scenario API returns a non-field-specific error
+       * @expected submit error set, onError called with submitError
+       */
+      it("should set submit error when API returns submitError", async () => {
+        // Arrange
+        const apiError = {
+          data: { non_field_errors: ["Registration disabled"] },
+        };
+        const parsedSubmitError = "Registration disabled";
+        mockParseDjangoApiErrors.mockReturnValue({
+          fieldErrors: {},
+          submitError: parsedSubmitError,
+        });
+        mockHasFieldErrors.mockReturnValue(false);
+
+        mockRegister.mockReturnValue({
+          unwrap: () => Promise.reject(apiError),
+        });
+
+        const { result } = renderUseRegisterForm({
+          onSuccess: mockOnSuccess,
+          onError: mockOnError,
+        });
+
+        act(() => {
+          result.current.handleChange("username")("testuser");
+          result.current.handleChange("email")("test@example.com");
+          result.current.handleChange("password")("Password123");
+          result.current.handleChange("passwordConfirm")("Password123");
+          result.current.handleChange("firstName")("Test");
+          result.current.handleChange("lastName")("User");
+        });
+
+        const mockEvent: IMockFormEvent = { preventDefault: vi.fn() };
+
+        // Act
+        await act(async () => {
+          await result.current.handleSubmit(
+            mockEvent as React.FormEvent<HTMLFormElement>,
+          );
+        });
+
+        // Assert
+        expect(result.current.errors.submit).toBe(parsedSubmitError);
+        expect(mockOnError).toHaveBeenCalledWith(parsedSubmitError);
+      });
+
+      /**
+       * @description Should set generic error when API error has neither fieldErrors nor submitError
+       * @scenario API error object has no recognizable error data
+       * @expected Generic submit error set, onError called with generic message
+       */
+      it("should set generic submit error when no fieldErrors and no submitError", async () => {
+        // Arrange
+        const apiError = { data: { some_weird_structure: [] } };
+        mockParseDjangoApiErrors.mockReturnValue({
+          fieldErrors: {},
+          submitError: undefined,
+        });
+        mockHasFieldErrors.mockReturnValue(false);
+
+        mockRegister.mockReturnValue({
+          unwrap: () => Promise.reject(apiError),
+        });
+
+        const { result } = renderUseRegisterForm({
+          onSuccess: mockOnSuccess,
+          onError: mockOnError,
+        });
+
+        act(() => {
+          result.current.handleChange("username")("testuser");
+          result.current.handleChange("email")("test@example.com");
+          result.current.handleChange("password")("Password123");
+          result.current.handleChange("passwordConfirm")("Password123");
+          result.current.handleChange("firstName")("Test");
+          result.current.handleChange("lastName")("User");
+        });
+
+        const mockEvent: IMockFormEvent = { preventDefault: vi.fn() };
+
+        // Act
+        await act(async () => {
+          await result.current.handleSubmit(
+            mockEvent as React.FormEvent<HTMLFormElement>,
+          );
+        });
+
+        // Assert
+        expect(result.current.errors.submit).toBe(
+          "Ошибка регистрации. Попробуйте позже.",
+        );
+        expect(mockOnError).toHaveBeenCalledWith(
+          "Ошибка регистрации. Попробуйте позже.",
+        );
+      });
+
+      /**
+       * @description Should handle error without 'data' property
+       * @scenario Rejected value is not an object or has no 'data' field
+       * @expected Generic error set, onError called with generic message
+       */
+      it("should handle error without data property", async () => {
+        // Arrange
+        const apiError = "Network failure"; // string, not an object
+        mockRegister.mockReturnValue({
+          unwrap: () => Promise.reject(apiError),
+        });
+
+        const { result } = renderUseRegisterForm({
+          onSuccess: mockOnSuccess,
+          onError: mockOnError,
+        });
+
+        act(() => {
+          result.current.handleChange("username")("testuser");
+          result.current.handleChange("email")("test@example.com");
+          result.current.handleChange("password")("Password123");
+          result.current.handleChange("passwordConfirm")("Password123");
+          result.current.handleChange("firstName")("Test");
+          result.current.handleChange("lastName")("User");
+        });
+
+        const mockEvent: IMockFormEvent = { preventDefault: vi.fn() };
+
+        // Act
+        await act(async () => {
+          await result.current.handleSubmit(
+            mockEvent as React.FormEvent<HTMLFormElement>,
+          );
+        });
+
+        // Assert
+        expect(mockParseDjangoApiErrors).not.toHaveBeenCalled(); // because condition `'data' in error` fails
+        expect(result.current.errors.submit).toBe(
+          "Ошибка регистрации. Попробуйте позже.",
+        );
+        expect(mockOnError).toHaveBeenCalledWith(
+          "Ошибка регистрации. Попробуйте позже.",
+        );
+      });
+
+      /**
+       * @description Should preserve existing errors and merge new ones
+       * @scenario Existing error on username, API returns email error
+       * @expected Both errors present, submit error not overwritten if not provided
+       */
+      it("should merge new API errors with existing errors", async () => {
+        // Arrange
+        const { result } = renderUseRegisterForm({
+          onSuccess: mockOnSuccess,
+          onError: mockOnError,
+        });
+
+        // Set an existing error manually
+        act(() => {
+          result.current.handleChange("username")("existing");
+          mockValidateRegistrationForm.mockReturnValueOnce({
+            username: { isValid: false, error: "Previous username error" },
+            email: { isValid: true },
+            password: { isValid: true },
+            passwordConfirm: { isValid: true },
+            firstName: { isValid: true },
+            lastName: { isValid: true },
+          });
+          result.current.handleBlur("username")();
+        });
+        expect(result.current.errors.username).toBe("Previous username error");
+
+        // Fill valid data for other fields
+        act(() => {
+          result.current.handleChange("email")("test@example.com");
+          result.current.handleChange("password")("Password123");
+          result.current.handleChange("passwordConfirm")("Password123");
+          result.current.handleChange("firstName")("Test");
+          result.current.handleChange("lastName")("User");
+        });
+
+        const apiError = { data: { email: ["Email already taken."] } };
+        mockParseDjangoApiErrors.mockReturnValue({
+          fieldErrors: { email: "Email already taken." },
+          submitError: undefined,
+        });
+        mockHasFieldErrors.mockReturnValue(true);
+
+        mockRegister.mockReturnValue({
+          unwrap: () => Promise.reject(apiError),
+        });
+
+        const mockEvent: IMockFormEvent = { preventDefault: vi.fn() };
+
+        // Act
+        await act(async () => {
+          await result.current.handleSubmit(
+            mockEvent as React.FormEvent<HTMLFormElement>,
+          );
+        });
+
+        // Assert
+        expect(result.current.errors.username).toBe("Previous username error");
+        expect(result.current.errors.email).toBe("Email already taken.");
+        expect(result.current.errors.submit).toBeUndefined();
+      });
     });
   });
 

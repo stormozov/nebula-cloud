@@ -9,4 +9,10 @@
   &--reverse {
     flex-direction: row-reverse;
   }
+
+  &--mobile-column {
+    @media (max-width: 352px) {
+      flex-direction: column;
+    }
+  }
 }

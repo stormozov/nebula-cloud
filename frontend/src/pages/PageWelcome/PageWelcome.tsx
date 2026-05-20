@@ -1,4 +1,5 @@
 import { RegisterButton } from "@/features/auth";
+import { useMediaQuery } from "@/shared/hooks";
 import {
   AdvantagesList,
   AppFeatures,
@@ -14,6 +15,10 @@ import "./PageWelcome.scss";
  * Component representing the Welcome page.
  */
 export default function PageWelcome() {
+  const isAuthActionsVisible = useMediaQuery({
+    query: "(max-width: 480px)",
+  });
+
   return (
     <PageLayout className="page-welcome">
       <PageLayout.Header>
@@ -24,7 +29,7 @@ export default function PageWelcome() {
             className="page__header-wrapper"
           >
             <Logo />
-            <AuthActions />
+            <AuthActions onlyIcon={isAuthActionsVisible} />
           </PageLayout.Wrapper>
         </PageLayout.Container>
       </PageLayout.Header>
@@ -39,7 +44,7 @@ export default function PageWelcome() {
               Безопасное облачное хранилище для ваших файлов. Загружайте,
               храните и делитесь документами с простым и удобным интерфейсом.
             </p>
-            <AuthActions registerFirst />
+            <AuthActions registerFirst mobileColumn />
           </section>
 
           <section className="page-welcome__advantages-section">

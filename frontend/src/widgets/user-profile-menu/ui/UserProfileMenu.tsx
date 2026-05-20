@@ -1,6 +1,7 @@
 import { useSelector } from "react-redux";
 
 import { selectUser } from "@/entities/user";
+import { useMediaQuery } from "@/shared/hooks";
 import { Avatar, Badge, Button, DropdownMenu } from "@/shared/ui";
 
 import { useProfileMenuActions } from "../lib/useProfileMenuActions";
@@ -16,6 +17,7 @@ import "./UserProfileMenu.scss";
 export function UserProfileMenu() {
   const user = useSelector(selectUser);
 
+  const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
   const actions = useProfileMenuActions();
 
   const fullName = user?.fullName || user?.username;
@@ -31,13 +33,13 @@ export function UserProfileMenu() {
       <Avatar
         src=""
         alt={fullName || "Аватар пользователя"}
-        size="sm"
+        size={isMobile ? "md" : "sm"}
         className="user-profile-menu__avatar"
       />
 
       <span className="user-profile-menu__name">{fullName}</span>
 
-      {user.isStaff && (
+      {!isMobile && user.isStaff && (
         <Badge position="bottom-center" className="user-profile-menu__badge">
           Админ
         </Badge>

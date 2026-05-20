@@ -57,7 +57,7 @@
   &__extra {
     display: flex;
     justify-content: space-between;
-    margin-top: var(--space-1);
+    margin-top: var(--space-2);
     font-size: var(--text-size-caption);
   }
 
@@ -80,5 +80,9 @@
     padding: var(--space-4);
     border: 1px solid var(--color-border-secondary);
     border-radius: var(--radius-md);
+
+    @media (max-width: 992px) {
+      padding: var(--space-3);
+    }
   }
 }

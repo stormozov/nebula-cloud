@@ -3,8 +3,21 @@
 // =============================================================================
 
 .user-details-modal-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
   max-width: 300px;
   width: 100%;
+  
+  @media (max-width: 1024px) {
+    flex-direction: row;
+    max-width: 100%;
+    --text-size-regular: var(--font-size-md);
+  }
+  @media (max-width: 600px) {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
 
   &__section {
     position: relative;
@@ -13,8 +26,8 @@
     border-radius: var(--radius-lg);
     width: 100%;
 
-    &:not(:last-child) {
-      margin-bottom: var(--space-4);
+    @media (max-width: 600px) {
+      padding: var(--space-3);
     }
   }
 
@@ -81,6 +94,10 @@
     opacity: 0;
     transition: opacity 0.2s;
     transform: translateY(-50%);
+
+    @media (max-width: 1024px) {
+      opacity: 1;
+    }
   }
 
   &__copy-block-btn {
@@ -97,6 +114,11 @@
 
     &:hover:not(:disabled) {
       color: var(--color-text-secondary);
+    }
+
+    @media (max-width: 1024px) {
+      opacity: 1;
+      visibility: visible;
     }
   }
 }
