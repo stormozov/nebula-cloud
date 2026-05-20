@@ -12,7 +12,7 @@ import "./Navigation.scss";
 /**
  * Interface describing the structure of a navigation item.
  */
-interface INavItem {
+export interface INavItem {
   to: string;
   icon?: IconName;
   label: string;

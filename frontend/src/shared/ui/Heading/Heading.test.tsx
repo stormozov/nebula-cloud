@@ -78,14 +78,13 @@ describe("Heading", () => {
      * @scenario Default Heading render without modifiers
      * @expected Container element has "heading" base class
      */
-    it("applies default classes: heading heading--primary heading--left heading--md", () => {
+    it("applies default classes: heading heading--primary heading--left", () => {
       render(<Heading>Test</Heading>);
       const heading = screen.getByRole("heading");
       expect(heading).toHaveClass(
         "heading",
         "heading--primary",
         "heading--left",
-        "heading--md",
       );
     });
 
@@ -124,7 +123,7 @@ describe("Heading", () => {
       it(`applies heading--${size} class when size="${size}"`, () => {
         render(<Heading visualSize={size}>Test</Heading>);
         const heading = screen.getByRole("heading");
-        expect(heading).toHaveClass(`heading--${size}`);
+        expect(heading).toHaveClass(`heading--visual-${size}`);
       });
     });
 
@@ -150,7 +149,7 @@ describe("Heading", () => {
         "heading",
         "heading--accent",
         "heading--center",
-        "heading--xl",
+        "heading--visual-xl",
         "custom-class",
       );
     });
@@ -167,7 +166,6 @@ describe("Heading", () => {
         "heading",
         "heading--primary",
         "heading--left",
-        "heading--md",
       );
     });
   });

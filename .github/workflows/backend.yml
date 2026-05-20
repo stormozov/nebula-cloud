@@ -62,8 +62,6 @@ jobs:
               run: mypy backend/ --exclude=migrations || echo "Type checking completed with warnings"
 
     test:
-        # Disabled temporarily due to test instability
-        if: false
         name: Run Tests
         runs-on: ubuntu-latest
         needs: [lint, type-check]

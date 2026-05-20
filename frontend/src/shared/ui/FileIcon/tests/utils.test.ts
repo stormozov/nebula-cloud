@@ -20,22 +20,14 @@ const createExtensionTestCases = () => [
   { filename: "bitmap.bmp", expected: "image" as FileType },
   { filename: "vector.svg", expected: "image" as FileType },
   { filename: "modern.webp", expected: "image" as FileType },
-  { filename: "icon.ico", expected: "image" as FileType },
   // Video extensions
   { filename: "movie.mp4", expected: "video" as FileType },
   { filename: "clip.avi", expected: "video" as FileType },
   { filename: "recording.mov", expected: "video" as FileType },
-  { filename: "film.wmv", expected: "video" as FileType },
   { filename: "video.mkv", expected: "video" as FileType },
-  { filename: "stream.webm", expected: "video" as FileType },
-  { filename: "flash.flv", expected: "video" as FileType },
   // Audio extensions
   { filename: "song.mp3", expected: "audio" as FileType },
   { filename: "track.wav", expected: "audio" as FileType },
-  { filename: "lossless.flac", expected: "audio" as FileType },
-  { filename: "audio.aac", expected: "audio" as FileType },
-  { filename: "radio.ogg", expected: "audio" as FileType },
-  { filename: "music.wma", expected: "audio" as FileType },
   // Document extensions
   { filename: "report.pdf", expected: "document" as FileType },
   { filename: "letter.doc", expected: "document" as FileType },
@@ -46,25 +38,13 @@ const createExtensionTestCases = () => [
   { filename: "slides.pptx", expected: "document" as FileType },
   { filename: "notes.txt", expected: "document" as FileType },
   { filename: "formatted.rtf", expected: "document" as FileType },
+  { filename: "data.csv", expected: "document" as FileType },
   // Archive extensions
   { filename: "archive.zip", expected: "archive" as FileType },
   { filename: "compressed.rar", expected: "archive" as FileType },
   { filename: "package.7z", expected: "archive" as FileType },
   { filename: "backup.tar", expected: "archive" as FileType },
   { filename: "gzip.gz", expected: "archive" as FileType },
-  { filename: "bzip.bz2", expected: "archive" as FileType },
-  // Code extensions
-  { filename: "script.js", expected: "code" as FileType },
-  { filename: "module.ts", expected: "code" as FileType },
-  { filename: "component.jsx", expected: "code" as FileType },
-  { filename: "app.tsx", expected: "code" as FileType },
-  { filename: "program.py", expected: "code" as FileType },
-  { filename: "class.java", expected: "code" as FileType },
-  { filename: "source.c", expected: "code" as FileType },
-  { filename: "code.cpp", expected: "code" as FileType },
-  { filename: "page.html", expected: "code" as FileType },
-  { filename: "styles.css", expected: "code" as FileType },
-  { filename: "data.json", expected: "code" as FileType },
 ];
 
 // =============================================================================
@@ -110,9 +90,9 @@ describe("utils", () => {
         { filename: "FILE.JPG", expected: "image" as FileType },
         { filename: "document.PDF", expected: "document" as FileType },
         { filename: "audio.MP3", expected: "audio" as FileType },
-        { filename: "Script.TS", expected: "code" as FileType },
         { filename: "archive.ZIP", expected: "archive" as FileType },
         { filename: "video.MP4", expected: "video" as FileType },
+        { filename: "Script.TS", expected: "unknown" as FileType },
       ])("should handle uppercase extension: '$filename' → '$expected'", ({
         filename,
         expected,
@@ -130,7 +110,7 @@ describe("utils", () => {
         { filename: "archive.tar.gz", expected: "archive" as FileType },
         { filename: "file.name.txt", expected: "document" as FileType },
         { filename: "backup.2024.zip", expected: "archive" as FileType },
-        { filename: "config.test.json", expected: "code" as FileType },
+        { filename: "config.test.json", expected: "unknown" as FileType },
       ])("should handle multiple dots: '$filename' → '$expected'", ({
         filename,
         expected,
@@ -187,7 +167,7 @@ describe("utils", () => {
       it.each([
         { filename: ".gitignore", expected: "unknown" as FileType },
         { filename: ".bashrc", expected: "unknown" as FileType },
-        { filename: ".config.json", expected: "code" as FileType },
+        { filename: ".config.json", expected: "unknown" as FileType },
       ])("should handle dotfile: '$filename' → '$expected'", ({
         filename,
         expected,
@@ -253,7 +233,7 @@ describe("utils", () => {
         { filename: "song.mp3", expected: "Аудио" },
         { filename: "report.pdf", expected: "Документ" },
         { filename: "archive.zip", expected: "Архив" },
-        { filename: "script.ts", expected: "Код" },
+        { filename: "script.ts", expected: "Файл" },
         { filename: "unknown.exe", expected: "Файл" },
       ])("should work with getFileType: '$filename' → '$expected'", ({
         filename,

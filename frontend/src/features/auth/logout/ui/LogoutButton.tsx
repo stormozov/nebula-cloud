@@ -21,6 +21,7 @@ export function LogoutButton({
   size = "medium",
   fullWidth = false,
   className,
+  children,
   ...restProps
 }: IButtonProps) {
   const { logout, isLoading } = useLogout();
@@ -37,7 +38,7 @@ export function LogoutButton({
       onClick={logout}
       {...restProps}
     >
-      Выход
+      {children || "Выйти"}
     </Button>
   );
 }

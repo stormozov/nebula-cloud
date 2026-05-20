@@ -55,14 +55,15 @@ class TestAdminUserList:
 
         # Act
         response = admin_client.get(admin_list_url)
+        data = response.data["results"]
 
         # Assert
         assert response.status_code == status.HTTP_200_OK
-        assert isinstance(response.data, list)
-        assert len(response.data) >= expected_min_count
-        assert all("username" in user for user in response.data)
-        assert all("email" in user for user in response.data)
-        assert all("is_staff" in user for user in response.data)
+        assert isinstance(data, list)
+        assert len(data) >= expected_min_count
+        assert all("username" in user for user in data)
+        assert all("email" in user for user in data)
+        assert all("is_staff" in user for user in data)
 
     def test_regular_user_cannot_list_users(self, authenticated_client, admin_list_url):
         """
@@ -128,7 +129,7 @@ class TestAdminUserList:
 
         # Assert
         assert response.status_code == status.HTTP_200_OK
-        users_by_email = {user["email"]: user for user in response.data}
+        users_by_email = {user["email"]: user for user in response.data["results"]}
 
         # Find regular user
         if user_account.email in users_by_email:

@@ -570,6 +570,27 @@ describe("file-format", () => {
         const result = truncateWithMiddleEllipsis(longWord, 15);
         expect(result).toBe("superc...ocious");
       });
+
+      /**
+       * @description Should truncate first word with ellipsis when it's longer than maxPrefixLength after removing other words
+       * @scenario Input with a very long first word, maxLength small enough that even the single word exceeds maxPrefixLength; default prefixWordCount=4, suffixWordCount=1
+       * @expected The first word is sliced and ended with "...", then " ... " and suffix
+       */
+      it("should truncate first word if it still exceeds maxPrefixLength after word removal", () => {
+        // Arrange
+        const veryLongFirstWord = "a".repeat(50);
+        const input = `${veryLongFirstWord} second third fourth last`;
+        const maxLength = 25;
+
+        // Act
+        const result = truncateWithMiddleEllipsis(input, maxLength);
+
+        // Assert
+        const expectedPrefix = `${"a".repeat(13)}...`;
+        const expected = `${expectedPrefix} ... last`;
+        expect(result).toBe(expected);
+        expect(result.length).toBeLessThanOrEqual(maxLength);
+      });
     });
   });
 

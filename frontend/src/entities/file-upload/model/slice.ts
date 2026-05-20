@@ -101,6 +101,7 @@ export const fileUploadSlice = createSlice({
       uploadItem.progress = 0;
       uploadItem.error = undefined;
       uploadItem.needsReupload = false;
+      uploadItem.startedAt = undefined;
       state.isQueueCompleted = false;
 
       // Decrement failed counter as it will be re-attempted

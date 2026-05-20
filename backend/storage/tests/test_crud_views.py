@@ -46,7 +46,7 @@ class TestFileViewSetList:
 
         # Assert
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 2
+        assert len(response.data["results"]) == 2
 
     def test_list_returns_only_user_files(
         self, authenticated_client: APIClient, create_file, another_user_account
@@ -67,7 +67,7 @@ class TestFileViewSetList:
 
         # Assert
         assert response.status_code == status.HTTP_200_OK
-        assert all(item["original_name"] != "other_file.txt" for item in response.data)
+        assert all(item["original_name"] != "other_file.txt" for item in response.data["results"])
 
     def test_list_admin_filter_by_user_id(
         self, admin_client: APIClient, create_file, user_account, another_user_account
@@ -88,7 +88,7 @@ class TestFileViewSetList:
 
         # Assert
         assert response.status_code == status.HTTP_200_OK
-        assert all(item["original_name"] == "user1_file.txt" for item in response.data)
+        assert all(item["original_name"] == "user1_file.txt" for item in response.data["results"])
 
     def test_list_empty_returns_empty_array(self, authenticated_client: APIClient) -> None:
         """
@@ -106,7 +106,7 @@ class TestFileViewSetList:
 
         # Assert
         assert response.status_code == status.HTTP_200_OK
-        assert response.data == []
+        assert response.data["results"] == []
 
 
 # ==================================================================================================

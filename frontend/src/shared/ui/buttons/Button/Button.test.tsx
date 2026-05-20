@@ -62,10 +62,10 @@ describe("Button", () => {
       });
     });
 
-    it("applies button--full-width class when fullWidth=true", () => {
+    it("applies w-full class when fullWidth=true", () => {
       render(<Button fullWidth>Full</Button>);
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("button--full-width");
+      expect(button).toHaveClass("w-full");
     });
 
     it("appends custom className to existing classes", () => {
@@ -91,7 +91,7 @@ describe("Button", () => {
       expect(button.className).toContain("className");
       expect(button.className).toContain("button--danger");
       expect(button.className).toContain("button--large");
-      expect(button.className).toContain("button--full-width");
+      expect(button.className).toContain("w-full");
       expect(button.className).toContain("button");
     });
 

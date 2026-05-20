@@ -6,8 +6,8 @@ import type {
   IRegisterFormErrors,
   IRegisterFormTouched,
   IRegisterFormValues,
-} from "./types";
-import * as utils from "./utils";
+} from "../types";
+import * as utils from "../utils";
 
 /**
  * @description Tests for register form utility functions

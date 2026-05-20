@@ -4,7 +4,7 @@ import { Button } from "@/shared/ui";
 /**
  * Props for the `FileManagerContent` component.
  */
-interface FileManagerContentProps {
+interface IFileManagerContentProps {
   /** Indicates whether there are more pages of files to load. */
   hasNextPage: boolean;
   /** Indicates whether data is currently being fetched from the server. */
@@ -24,7 +24,7 @@ export const FileManagerContent = ({
   isFetching,
   fileListProps,
   loadMore,
-}: FileManagerContentProps) => {
+}: IFileManagerContentProps) => {
   return (
     <div className="file-manager__list">
       <FileList {...fileListProps} />

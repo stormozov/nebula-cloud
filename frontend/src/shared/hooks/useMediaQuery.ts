@@ -1,19 +1,22 @@
 import { useEffect, useState } from "react";
 
 /**
- * Interface defining the input parameters for the {@link useMediaQuery} hook.
+ * Determines the initial matching state of a given media query.
+ *
+ * @param query - A valid CSS media query string (e.g., `(max-width: 768px)`
+ * or `(prefers-color-scheme: dark)`).
+ *
+ * @returns A boolean indicating whether the media query currently matches.
+ *
+ * @example
+ * ```ts
+ * const isMobile = getInitialMatches("(max-width: 768px)");
+ * ```
  */
-interface IMediaQueryParams {
-  /**
-   * The media query string to evaluate.
-   *
-   * @remarks
-   * Must be a valid CSS media query, such as `(max-width: 768px)`
-   * or `(prefers-color-scheme: dark)`. This query will be used to determine
-   * the current matching state and listen for changes.
-   */
-  query: string;
-}
+export const getInitialMatches = (query: string): boolean => {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia(query).matches;
+};
 
 /**
  * Custom React hook that monitors changes in a CSS media query.
@@ -37,16 +40,12 @@ interface IMediaQueryParams {
  * }
  * ```
  */
-export const useMediaQuery = ({ query }: IMediaQueryParams): boolean => {
-  const [matches, setMatches] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return window.matchMedia(query).matches;
-  });
+export const useMediaQuery = ({ query }: { query: string }): boolean => {
+  const [matches, setMatches] = useState(() => getInitialMatches(query));
 
   useEffect(() => {
     const media = window.matchMedia(query);
     const listener = (e: MediaQueryListEvent) => setMatches(e.matches);
-
     media.addEventListener("change", listener);
     return () => media.removeEventListener("change", listener);
   }, [query]);

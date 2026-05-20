@@ -1,6 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
+import { setAuthTokens } from "@tests/mocks/localStorage";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { userSlice } from "../model/slice";
+
+import { userSlice } from "../../model/slice";
+
+// =============================================================================
+// MOCK SETUP
+// =============================================================================
 
 // Helper to track calls to getAccessTokenFromPersist
 let accessTokenMock: string | null = "mock_access_token";
@@ -16,7 +22,11 @@ vi.mock("@/shared/utils", async (importOriginal) => {
   };
 });
 
-const { userApi } = await import("./userApi");
+const { userApi } = await import("../userApi");
+
+// =============================================================================
+// TEST STORE
+// =============================================================================
 
 /** Creates a test store with minimal configuration. */
 const createTestStore = () => {
@@ -30,6 +40,10 @@ const createTestStore = () => {
   });
 };
 
+// =============================================================================
+// TESTS
+// =============================================================================
+
 describe("userApi with MSW", () => {
   let store: ReturnType<typeof createTestStore>;
 
@@ -42,6 +56,10 @@ describe("userApi with MSW", () => {
   afterEach(() => {
     vi.clearAllMocks();
   });
+
+  // ---------------------------------------------------------------------------
+  // API Slice Configuration
+  // ---------------------------------------------------------------------------
 
   describe("API Slice Configuration", () => {
     /**
@@ -74,6 +92,10 @@ describe("userApi with MSW", () => {
       expect(userApi.util).toBeDefined();
     });
   });
+
+  // ---------------------------------------------------------------------------
+  // Endpoints Definition
+  // ---------------------------------------------------------------------------
 
   describe("Endpoints Definition", () => {
     /**
@@ -116,6 +138,10 @@ describe("userApi with MSW", () => {
       expect(userApi.endpoints.logout).toBeDefined();
     });
   });
+
+  // ---------------------------------------------------------------------------
+  // Actual API calls with MSW
+  // ---------------------------------------------------------------------------
 
   describe("Actual API calls with MSW", () => {
     /**
@@ -192,6 +218,10 @@ describe("userApi with MSW", () => {
     });
   });
 
+  // ---------------------------------------------------------------------------
+  // Branch Coverage
+  // ---------------------------------------------------------------------------
+
   describe("prepareHeaders branch coverage", () => {
     /**
      * @description Should execute API call when token is present (truthy branch)
@@ -230,6 +260,113 @@ describe("userApi with MSW", () => {
       expect(result).toBeDefined();
     });
   });
+
+  // ---------------------------------------------------------------------------
+  // Refresh mutation
+  // ---------------------------------------------------------------------------
+
+  describe("refresh mutation", () => {
+    /**
+     * @description Should execute refresh mutation and return valid token pair
+     * @scenario MSW returns mock token response; refreshTokenMock is defined
+     * @expected Received data contains access and refresh strings
+     */
+    it("should execute refresh mutation and return token pair", async () => {
+      // Arrange
+      refreshTokenMock = "valid_refresh_token";
+      store = createTestStore();
+
+      // Act
+      const result = await store.dispatch(userApi.endpoints.refresh.initiate());
+
+      // Assert
+      expect(result).toBeDefined();
+      expect(result.data).toBeDefined();
+      if (result.data) {
+        expect(result.data).toHaveProperty("access");
+        expect(result.data).toHaveProperty("refresh");
+        expect(typeof result.data.access).toBe("string");
+        expect(typeof result.data.refresh).toBe("string");
+      }
+    });
+
+    /**
+     * @description Should handle error when refresh token is invalid
+     * @scenario MSW returns an error response; refreshTokenMock is null
+     * @expected Error object is present in result
+     */
+    it("should handle error when refresh token is invalid", async () => {
+      // Arrange
+      refreshTokenMock = null;
+      store = createTestStore();
+
+      // Act
+      const result = await store.dispatch(userApi.endpoints.refresh.initiate());
+
+      // Assert
+      expect(result).toBeDefined();
+      expect(result.error).toBeDefined();
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Get Storage Summary query
+  // ---------------------------------------------------------------------------
+
+  describe("getStorageSummary query", () => {
+    /**
+     * @description Should fetch storage summary for current user when userId is undefined
+     * @scenario Calling initiate with undefined; MSW returns stats for current user
+     * @expected Response data contains storage properties (e.g., fileCount)
+     */
+    it("should fetch current user storage summary when userId is undefined", async () => {
+      // Arrange
+      setAuthTokens("mock_access_token_12345");
+      store = createTestStore();
+
+      // Act
+      const result = await store.dispatch(
+        userApi.endpoints.getStorageSummary.initiate(undefined),
+      );
+
+      // Assert
+      expect(result).toBeDefined();
+      expect(result.data).toBeDefined();
+      if (result.data) {
+        expect(result.data).toHaveProperty("fileCount");
+      }
+    });
+
+    /**
+     * @description Should fetch storage summary for specific admin user when userId is provided
+     * @scenario Calling initiate with a numeric userId; MSW returns admin view
+     * @expected Response data contains user and storage properties
+     */
+    it("should fetch admin user storage summary when userId is provided", async () => {
+      // Arrange
+      setAuthTokens("mock_access_token_12345");
+      const userId = 42;
+      store = createTestStore();
+
+      // Act
+      const result = await store.dispatch(
+        userApi.endpoints.getStorageSummary.initiate(userId),
+      );
+
+      // Assert
+      expect(result).toBeDefined();
+      expect(result.data).toBeDefined();
+      if (result.data) {
+        // admin response should have both user and storage
+        expect(result.data).toHaveProperty("user");
+        expect(result.data).toHaveProperty("storage");
+      }
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Exported Hooks
+  // ---------------------------------------------------------------------------
 
   describe("Exported Hooks", () => {
     /**
@@ -271,31 +408,67 @@ describe("userApi with MSW", () => {
       expect(userApi.useLogoutMutation).toBeDefined();
       expect(typeof userApi.useLogoutMutation).toBe("function");
     });
-  });
 
-  describe("API Slice Integrity", () => {
     /**
-     * @description Should have all required endpoints
-     * @scenario Verifying all required endpoints are present
-     * @expected All required endpoints should be present
+     * @description Should export useRefreshMutation hook
+     * @scenario Verifying useRefreshMutation hook is exported
+     * @expected Hook should be a function
      */
-    it("should have all required endpoints", () => {
-      expect(userApi.endpoints).toHaveProperty("getMe");
-      expect(userApi.endpoints).toHaveProperty("login");
-      expect(userApi.endpoints).toHaveProperty("register");
-      expect(userApi.endpoints).toHaveProperty("logout");
+    it("should export useRefreshMutation hook", () => {
+      expect(userApi.useRefreshMutation).toBeDefined();
+      expect(typeof userApi.useRefreshMutation).toBe("function");
     });
 
     /**
-     * @description Should export all required hooks
-     * @scenario Verifying all required hooks are exported
-     * @expected All required hooks should be exported
+     * @description Should export useGetStorageSummaryQuery hook
+     * @scenario Verifying useGetStorageSummaryQuery hook is exported
+     * @expected Hook should be a function
      */
-    it("should export all required hooks", () => {
-      expect(userApi).toHaveProperty("useGetMeQuery");
-      expect(userApi).toHaveProperty("useLoginMutation");
-      expect(userApi).toHaveProperty("useRegisterMutation");
-      expect(userApi).toHaveProperty("useLogoutMutation");
+    it("should export useGetStorageSummaryQuery hook", () => {
+      expect(userApi.useGetStorageSummaryQuery).toBeDefined();
+      expect(typeof userApi.useGetStorageSummaryQuery).toBe("function");
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // API Slice Integrity
+  // ---------------------------------------------------------------------------
+
+  describe("API Slice Integrity", () => {
+    describe("Required Endpoints", () => {
+      /**
+       * @description Should have all required endpoints
+       * @scenario Verifying all required endpoints are present
+       * @expected All required endpoints should be present
+       */
+      it.each([
+        "getMe",
+        "login",
+        "register",
+        "logout",
+        "refresh",
+        "getStorageSummary",
+      ])("should have endpoint %s", (endpoint) => {
+        expect(userApi.endpoints).toHaveProperty(endpoint);
+      });
+    });
+
+    describe("Exported Hooks", () => {
+      /**
+       * @description Should export all required hooks
+       * @scenario Verifying all required hooks are exported
+       * @expected All required hooks should be exported
+       */
+      it.each([
+        "useGetMeQuery",
+        "useLoginMutation",
+        "useRegisterMutation",
+        "useLogoutMutation",
+        "useRefreshMutation",
+        "useGetStorageSummaryQuery",
+      ])("should export hook %s", (hook) => {
+        expect(userApi).toHaveProperty(hook);
+      });
     });
 
     /**
@@ -307,6 +480,10 @@ describe("userApi with MSW", () => {
       expect(userApi.reducerPath).toBe("userApi");
     });
   });
+
+  // ---------------------------------------------------------------------------
+  // Endpoint Name Consistency
+  // ---------------------------------------------------------------------------
 
   describe("Endpoint Name Consistency", () => {
     /**
@@ -350,7 +527,33 @@ describe("userApi with MSW", () => {
       const endpoint = userApi.endpoints.logout as unknown as { name: string };
       expect(endpoint.name).toBe("logout");
     });
+
+    /**
+     * @description Should have correct name for refresh endpoint
+     * @scenario Verifying refresh endpoint name
+     * @expected Endpoint name should be "refresh"
+     */
+    it("should have correct name for refresh endpoint", () => {
+      const endpoint = userApi.endpoints.refresh as unknown as { name: string };
+      expect(endpoint.name).toBe("refresh");
+    });
+
+    /**
+     * @description Should have correct name for getStorageSummary endpoint
+     * @scenario Verifying getStorageSummary endpoint name
+     * @expected Endpoint name should be "getStorageSummary"
+     */
+    it("should have correct name for getStorageSummary endpoint", () => {
+      const endpoint = userApi.endpoints.getStorageSummary as unknown as {
+        name: string;
+      };
+      expect(endpoint.name).toBe("getStorageSummary");
+    });
   });
+
+  // ---------------------------------------------------------------------------
+  // API Slice Identity
+  // ---------------------------------------------------------------------------
 
   describe("API Slice Identity", () => {
     /**

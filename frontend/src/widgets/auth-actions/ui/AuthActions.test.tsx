@@ -193,6 +193,40 @@ describe("AuthActions", () => {
   });
 
   // -------------------------------------------------------------------------
+  // Button Layout Modifiers Tests
+  // -------------------------------------------------------------------------
+
+  describe("Button Layout Modifiers", () => {
+    /**
+     * @description Should add mobile column modifier class when mobileColumn is true
+     * @scenario Passing mobileColumn={true} should add "auth-actions--mobile-column"
+     * @expected Container classList contains "auth-actions--mobile-column"
+     */
+    it("should add mobile column class when mobileColumn is true", () => {
+      // Arrange
+      render(<AuthActions mobileColumn />);
+
+      // Assert
+      const container = getContainer();
+      expect(container.className).toContain("auth-actions--mobile-column");
+    });
+
+    /**
+     * @description Should not add mobile column modifier class when mobileColumn is false
+     * @scenario Passing mobileColumn={false} should not add "auth-actions--mobile-column"
+     * @expected Container classList does not contain "auth-actions--mobile-column"
+     */
+    it("should not add mobile column class when mobileColumn is false", () => {
+      // Arrange
+      render(<AuthActions mobileColumn={false} />);
+
+      // Assert
+      const container = getContainer();
+      expect(container.className).not.toContain("auth-actions--mobile-column");
+    });
+  });
+
+  // -------------------------------------------------------------------------
   // Button Order Tests
   // -------------------------------------------------------------------------
 
@@ -248,6 +282,48 @@ describe("AuthActions", () => {
 
       expect(screen.getByTestId("login-button")).toBeInTheDocument();
       expect(screen.getByTestId("register-button")).toBeInTheDocument();
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // Only Icon Mode Tests
+  // -------------------------------------------------------------------------
+
+  describe("Only Icon Mode", () => {
+    /**
+     * @description Should hide LoginButton and RegisterButton text when onlyIcon is true
+     * @scenario Passing onlyIcon={true} should render buttons without children text
+     * @expected Both buttons have empty text content
+     */
+    it("should hide buttons text when onlyIcon is true", () => {
+      // Arrange
+      render(<AuthActions onlyIcon />);
+
+      // Assert
+      const loginButton = screen.getByTestId("login-button");
+      const registerButton = screen.getByTestId("register-button");
+
+      expect(loginButton).toHaveTextContent("");
+      expect(registerButton).toHaveTextContent("");
+    });
+
+    /**
+     * @description Should still propagate variants and size when onlyIcon is true
+     * @scenario Passing onlyIcon with custom size should keep data-variant and data-size
+     * @expected Login has secondary variant and Register has primary variant with correct size
+     */
+    it("should keep button variants and size when onlyIcon is true", () => {
+      // Arrange
+      render(<AuthActions onlyIcon size="large" registerFirst />);
+
+      // Assert
+      const loginButton = screen.getByTestId("login-button");
+      const registerButton = screen.getByTestId("register-button");
+
+      expect(loginButton).toHaveAttribute("data-variant", "secondary");
+      expect(registerButton).toHaveAttribute("data-variant", "primary");
+      expect(loginButton).toHaveAttribute("data-size", "large");
+      expect(registerButton).toHaveAttribute("data-size", "large");
     });
   });
 

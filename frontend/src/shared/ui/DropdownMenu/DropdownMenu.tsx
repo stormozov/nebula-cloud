@@ -226,6 +226,4 @@ export function DropdownMenu<T>(props: IDropdownMenuProps<T>) {
       </div>
     );
   }
-
-  return null;
 }

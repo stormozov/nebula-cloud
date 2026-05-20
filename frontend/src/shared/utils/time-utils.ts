@@ -22,5 +22,6 @@ export const formatDate = (dateString: string | null | undefined): string => {
     day: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
+    timeZone: "Europe/Moscow",
   });
 };

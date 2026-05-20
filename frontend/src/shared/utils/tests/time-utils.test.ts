@@ -35,7 +35,7 @@ describe("formatDate utility", () => {
      * @expected Returns "05.10.2023, 14:30"
      */
     it("formats Unix timestamp string to ru-RU format", () => {
-      const result = formatDate("2023-10-05T14:30:00");
+      const result = formatDate("2023-10-05T14:30:00+03:00");
       expect(result).toBe("05.10.2023, 14:30");
     });
 

@@ -1,6 +1,12 @@
 import { UserDetailsModal, UserList, UserSearchInput } from "@/features/admin";
 import { useMediaQuery } from "@/shared/hooks";
-import { Badge, Button, ControlledInput, Heading, ModalConfirm } from "@/shared/ui";
+import {
+  Badge,
+  Button,
+  ControlledInput,
+  Heading,
+  ModalConfirm,
+} from "@/shared/ui";
 
 import { useUserManager } from "../lib/useUserManager";
 

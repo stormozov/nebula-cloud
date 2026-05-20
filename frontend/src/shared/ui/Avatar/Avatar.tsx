@@ -2,6 +2,7 @@ import classNames from "classnames";
 import { useState } from "react";
 
 import { getInitials } from "@/shared/utils";
+
 import "./Avatar.scss";
 
 /**
